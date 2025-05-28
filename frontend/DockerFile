@@ -1,0 +1,19 @@
+# Use official Node image
+FROM node:23-alpine
+
+# Create app directory
+WORKDIR /app
+
+# Copy package files and install
+COPY package*.json ./
+RUN npm install
+
+# Copy rest of the code
+COPY . .
+
+# Build app
+RUN npm run build
+
+# Expose port and start
+EXPOSE 3000
+CMD ["npm", "start"]
