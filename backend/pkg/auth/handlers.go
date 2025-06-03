@@ -1,0 +1,82 @@
+package auth
+
+import (
+	"database/sql"
+	"encoding/json"
+	"log"
+	"net/http"
+
+	// "time"
+
+	"github.com/gorilla/sessions"
+	"golang.org/x/crypto/bcrypt"
+)
+
+type RegisterRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Username string `json:"nickname"` // maps nickname input to username DB field
+	Avatar   string `json:"avatar"`   // maps to avatar_url
+	Bio      string `json:"about_me"` // maps to bio
+}
+
+func RegisterHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req RegisterRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid input", http.StatusBadRequest)
+			log.Println("JSON decode error:", err)
+			return
+		}
+
+		hashed, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+		if err != nil {
+			http.Error(w, "Error hashing password", http.StatusInternalServerError)
+			log.Println("Bcrypt error:", err)
+			return
+		}
+
+		_, err = db.Exec(`
+			INSERT INTO users (username, email, password_hash, bio, avatar_url)
+			VALUES (?, ?, ?, ?, ?)`,
+			req.Username, req.Email, string(hashed), req.Bio, req.Avatar)
+
+		if err != nil {
+			http.Error(w, "Registration failed", http.StatusInternalServerError)
+			log.Println("DB insert error:", err)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
+		w.Write([]byte("Registered successfully"))
+	}
+}
+
+type LoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func LoginHandler(db *sql.DB, store *sessions.CookieStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req LoginRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid input", http.StatusBadRequest)
+			return
+		}
+
+		var id int
+		var hashed string
+		err := db.QueryRow("SELECT id, password_hash FROM users WHERE email = ?", req.Email).Scan(&id, &hashed)
+		if err != nil || bcrypt.CompareHashAndPassword([]byte(hashed), []byte(req.Password)) != nil {
+			http.Error(w, "Invalid email or password", http.StatusUnauthorized)
+			return
+		}
+
+		session, _ := store.Get(r, "session")
+		session.Values["user_id"] = id
+		session.Save(r, w)
+
+		w.Write([]byte("Logged in"))
+	}
+}

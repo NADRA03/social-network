@@ -1,0 +1,25 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.7.0
+2 info using node@v20.15.0
+3 silly config:load:file:C:\Program Files\nodejs\node_modules\npm\npmrc
+4 silly config:load:file:C:\Users\Zahra\Desktop\social-network\.npmrc
+5 silly config:load:file:C:\Users\Zahra\.npmrc
+6 silly config:load:file:C:\Users\Zahra\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm exec create-next-app@latest frontend --typescript
+8 verbose argv "exec" "--" "create-next-app@latest" "frontend" "--typescript"
+9 verbose logfile logs-max:10 dir:C:\Users\Zahra\Desktop\social-network\UsersZahraAppDataLocalnpm-cache\_logs\2025-05-28T17_41_05_259Z-
+10 verbose logfile C:\Users\Zahra\Desktop\social-network\UsersZahraAppDataLocalnpm-cache\_logs\2025-05-28T17_41_05_259Z-debug-0.log
+11 silly logfile done cleaning log files
+12 http fetch GET 200 https://registry.npmjs.org/create-next-app 664ms (cache miss)
+13 silly idealTree buildDeps
+14 silly fetch manifest create-next-app@15.3.2
+15 http fetch GET 200 https://registry.npmjs.org/create-next-app 505ms (cache miss)
+16 silly placeDep ROOT create-next-app@15.3.2 OK for:  want: 15.3.2
+17 silly reify moves {}
+18 silly audit bulk request { 'create-next-app': [ '15.3.2' ] }
+19 silly tarball no local data for create-next-app@https://registry.npmjs.org/create-next-app/-/create-next-app-15.3.2.tgz. Extracting by manifest.
+20 http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 431ms
+21 silly audit report {}
+22 http fetch GET 200 https://registry.npmjs.org/create-next-app/-/create-next-app-15.3.2.tgz 1594ms (cache miss)
+23 verbose exit 0
+24 info ok

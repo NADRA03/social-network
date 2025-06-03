@@ -1,0 +1,25 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"        # Host:Container - Next.js app on port 3000
+    restart: unless-stopped
+    depends_on:
+      - backend            # Wait for backend to be ready
+    networks:
+      - socialnet
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8080:8080"        # Host:Container - Go server on port 8080
+    restart: unless-stopped
+    networks:
+      - socialnet
+
+networks:
+  socialnet:
+    driver: bridge

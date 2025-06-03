@@ -1,0 +1,47 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.7.0
+2 info using node@v20.15.0
+3 silly config:load:file:C:\Program Files\nodejs\node_modules\npm\npmrc
+4 silly config:load:file:C:\Users\Zahra\Desktop\social-network\.npmrc
+5 silly config:load:file:C:\Users\Zahra\.npmrc
+6 silly config:load:file:C:\Users\Zahra\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm exec social-network@latest frontend --typescript
+8 verbose argv "exec" "--" "social-network@latest" "frontend" "--typescript"
+9 verbose logfile logs-max:10 dir:C:\Users\Zahra\Desktop\social-network\UsersZahraAppDataLocalnpm-cache\_logs\2025-05-28T17_40_09_249Z-
+10 verbose logfile C:\Users\Zahra\Desktop\social-network\UsersZahraAppDataLocalnpm-cache\_logs\2025-05-28T17_40_09_249Z-debug-0.log
+11 silly logfile done cleaning log files
+12 http fetch GET 200 https://registry.npmjs.org/npm 488ms
+13 http fetch GET 404 https://registry.npmjs.org/social-network 1150ms (cache skip)
+14 http fetch GET 404 https://registry.npmjs.org/social-network 825ms (cache skip)
+15 notice
+15 notice New [31mmajor[39m version of npm available! [31m10.7.0[39m -> [34m11.4.1[39m
+15 notice Changelog: [34mhttps://github.com/npm/cli/releases/tag/v11.4.1[39m
+15 notice To update run: [4mnpm install -g npm@11.4.1[24m
+15 notice  { force: true, [Symbol(proc-log.meta)]: true }
+16 verbose stack HttpErrorGeneral: 404 Not Found - GET https://registry.npmjs.org/social-network - Not found
+16 verbose stack     at C:\Program Files\nodejs\node_modules\npm\node_modules\npm-registry-fetch\lib\check-response.js:95:15
+16 verbose stack     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+16 verbose stack     at async RegistryFetcher.packument (C:\Program Files\nodejs\node_modules\npm\node_modules\pacote\lib\registry.js:91:19)
+16 verbose stack     at async RegistryFetcher.manifest (C:\Program Files\nodejs\node_modules\npm\node_modules\pacote\lib\registry.js:129:23)
+16 verbose stack     at async getManifest (C:\Program Files\nodejs\node_modules\npm\node_modules\libnpmexec\lib\index.js:27:22)
+16 verbose stack     at async missingFromTree (C:\Program Files\nodejs\node_modules\npm\node_modules\libnpmexec\lib\index.js:61:22)
+16 verbose stack     at async C:\Program Files\nodejs\node_modules\npm\node_modules\libnpmexec\lib\index.js:163:32
+16 verbose stack     at async Promise.all (index 0)
+16 verbose stack     at async exec (C:\Program Files\nodejs\node_modules\npm\node_modules\libnpmexec\lib\index.js:161:3)
+16 verbose stack     at async module.exports (C:\Program Files\nodejs\node_modules\npm\lib\cli\entry.js:74:5)
+17 verbose statusCode 404
+18 verbose pkgid social-network@latest
+19 verbose cwd C:\Users\Zahra\Desktop\social-network
+20 verbose Windows_NT 10.0.22631
+21 verbose node v20.15.0
+22 verbose npm  v10.7.0
+23 error code E404
+24 error 404 Not Found - GET https://registry.npmjs.org/social-network - Not found
+25 error 404
+26 error 404  'social-network@latest' is not in this registry.
+27 error 404
+27 error 404 Note that you can also install from a
+28 error 404 tarball, folder, http url, or git url.
+29 verbose exit 1
+30 verbose code 1
+31 error A complete log of this run can be found in: C:\Users\Zahra\Desktop\social-network\UsersZahraAppDataLocalnpm-cache\_logs\2025-05-28T17_40_09_249Z-debug-0.log
