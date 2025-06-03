@@ -7,6 +7,7 @@
 6 silly config:load:file:C:\Users\Zahra\AppData\Roaming\npm\etc\npmrc
 7 verbose title npm run dev
 8 verbose argv "run" "dev"
-9 verbose logfile logs-max:10 dir:C:\Users\Zahra\Desktop\social-network\frontend\UsersZahraAppDataLocalnpm-cache\_logs\2025-06-02T08_40_02_791Z-
-10 verbose logfile C:\Users\Zahra\Desktop\social-network\frontend\UsersZahraAppDataLocalnpm-cache\_logs\2025-06-02T08_40_02_791Z-debug-0.log
-11 silly logfile done cleaning log files
+9 verbose logfile logs-max:10 dir:C:\Users\Zahra\Desktop\social-network\frontend\UsersZahraAppDataLocalnpm-cache\_logs\2025-06-03T16_13_34_231Z-
+10 verbose logfile C:\Users\Zahra\Desktop\social-network\frontend\UsersZahraAppDataLocalnpm-cache\_logs\2025-06-03T16_13_34_231Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
+12 silly logfile done cleaning log files
