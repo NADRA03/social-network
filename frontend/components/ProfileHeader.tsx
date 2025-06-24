@@ -1,5 +1,8 @@
+"use client";
+
 import { useState } from "react";
-import { Camera, Mail, MapPin, Calendar } from "lucide-react";
+import axios from "axios";
+import { Camera, Mail, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ProfileHeaderProps {
@@ -7,7 +10,11 @@ interface ProfileHeaderProps {
   title: string;
   email: string;
   joinDate: string;
-  avatarUrl?: string;
+  avatarUrl: string;
+  isOwner: boolean;
+  isPrivate?: boolean;
+  userId?: number;
+  isFollowing?: boolean;
 }
 
 export const ProfileHeader = ({
@@ -16,8 +23,37 @@ export const ProfileHeader = ({
   email,
   joinDate,
   avatarUrl,
+  isOwner,
+  isPrivate = false,
+  userId,
+  isFollowing = false,
 }: ProfileHeaderProps) => {
-    const [isPrivate, setIsPrivate] = useState(false);
+  const [privateStatus, setPrivateStatus] = useState(isPrivate);
+  const [following, setFollowing] = useState(isFollowing);
+
+  const togglePrivacy = () => {
+    // Ideally call backend here
+    setPrivateStatus((prev) => !prev);
+  };
+
+  const toggleFollow = async () => {
+    try {
+      if (following) {
+        await axios.delete(`http://localhost:8080/unfollow/${userId}`, {
+          withCredentials: true,
+        });
+      } else {
+        await axios.post(
+          `http://localhost:8080/follow/${userId}`,
+          {},
+          { withCredentials: true }
+        );
+      }
+      setFollowing((prev) => !prev);
+    } catch (err) {
+      console.error("Failed to follow/unfollow", err);
+    }
+  };
   return (
     <div className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 text-white overflow-hidden">
       <div className="absolute inset-0 bg-black/20"></div>
@@ -71,12 +107,26 @@ export const ProfileHeader = ({
           </div>
 
           <div className="flex gap-3">
-            <Button className="bg-white text-blue-600 hover:bg-blue-50 font-medium px-6">
-              Edit Profile
-            </Button>
-            <Button className="bg-white text-blue-600 hover:bg-blue-50 font-medium px-6" onClick={() => setIsPrivate((prev) => !prev)}>
-              {isPrivate ? "Make Public" : "Make Private"}
-            </Button>
+            {isOwner ? (
+              <>
+                <Button className="bg-white text-blue-600 hover:bg-blue-50 font-medium px-6">
+                  Edit Profile
+                </Button>
+                <Button
+                  className="bg-white text-blue-600 hover:bg-blue-50 font-medium px-6"
+                  onClick={togglePrivacy}
+                >
+                  {privateStatus ? "Make Public" : "Make Private"}
+                </Button>
+              </>
+            ) : userId ? (
+              <Button
+                className="bg-white text-blue-600 hover:bg-blue-50 font-medium px-6"
+                onClick={toggleFollow}
+              >
+                {following ? "Unfollow" : "Follow"}
+              </Button>
+            ) : null}
           </div>
         </div>
       </div>

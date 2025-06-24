@@ -5,5 +5,6 @@ CREATE TABLE users (
     password_hash TEXT NOT NULL,
     bio TEXT,
     avatar_url TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_private BOOLEAN DEFAULT 0
 );

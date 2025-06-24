@@ -8,12 +8,14 @@ import (
 
 	"social-network/pkg/auth"
 	"social-network/pkg/db/sqlite"
+	"social-network/pkg/profile"
+
+	// "social-network/pkg/profile"
 
 	"github.com/gorilla/mux"
 )
 
 func main() {
-	// Get absolute path to the migrations directory
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Fatal("Failed to get working directory:", err)
@@ -24,21 +26,26 @@ func main() {
 
 	dbPath := filepath.Join(cwd, "..", "social.db")
 
-	db := sqlite.InitDB(dbPath, migrationPath)
-	defer db.Close()
+	sqlite.InitDB(dbPath, migrationPath)
+	defer sqlite.DB.Close()
 
 	r := mux.NewRouter()
 
-	// Basic health check route
+	// Basic health check
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("API is running"))
 	})
 
 	// Auth routes
-	r.Handle("/register", auth.RegisterHandler(db)).Methods("POST")
-	r.Handle("/login", auth.LoginHandler(db, auth.Store)).Methods("POST")
-	// r.Handle("/profile", auth.AuthMiddleware(auth.Store, profileHandler(db))).Methods("GET")
+	r.Handle("/register", auth.RegisterHandler(sqlite.DB)).Methods("POST")
+	r.Handle("/login", auth.LoginHandler(sqlite.DB)).Methods("POST")
 
+	// Profile routes (with auth middleware)
+	r.Handle("/profile/me", auth.AuthMiddleware(http.HandlerFunc(profile.GetOwnProfileHandler))).Methods("GET")
+	r.HandleFunc("/users/{id}", profile.GetUserProfileHandler).Methods("GET")
+	// r.Handle("/profile/privacy", auth.AuthMiddleware(auth.Store, profile.TogglePrivacyHandler(db))).Methods("PATCH")
+	r.Handle("/follow/{id}", auth.AuthMiddleware(profile.FollowHandler(sqlite.DB))).Methods("POST")
+	r.Handle("/unfollow/{id}", auth.AuthMiddleware(profile.UnfollowHandler(sqlite.DB))).Methods("DELETE")
 	// Apply CORS middleware
 	handler := enableCORS(r)
 

@@ -11,6 +11,7 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form submitted");
     try {
       const res = await axios.post(
         "http://localhost:8080/login",
@@ -20,8 +21,9 @@ export default function LoginPage() {
         }
       );
 
-      const userId = res.data.user_id; // ⬅ make sure backend returns this
+      const userId = res.data.user_id;
       alert("Login successful!");
+      await new Promise((r) => setTimeout(r, 100));
       router.push(`/profile/me`); 
     } catch (err: any) {
       alert("Login failed.");

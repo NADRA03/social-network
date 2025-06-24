@@ -8,7 +8,6 @@ import { ProfileHeader } from "@/components/ProfileHeader";
 import { ProfileStats } from "@/components/ProfileStats";
 import { ProfileTabs } from "@/components/ProfileTabs";
 import AMPMToggle from "@/components/AMPMToggle";
-import { Button } from "@/components/ui/button";
 
 const Profile = () => {
   const { id } = useParams();
@@ -20,7 +19,7 @@ const Profile = () => {
       try {
         let res;
         if (!id || id === "me") {
-          res = await axios.get("http://localhost:8080/profile", {
+          res = await axios.get("http://localhost:8080/profile/me", {
             withCredentials: true,
           });
         } else {
@@ -31,6 +30,7 @@ const Profile = () => {
 
         setProfile(res.data);
       } catch (err) {
+        console.error("Profile fetch failed:", err);
         setError("You are not authorized to view this profile.");
       }
     };
@@ -43,24 +43,20 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Top-right AM/PM toggle */}
       <AMPMToggle />
 
-      {/* Main Profile Header */}
       <ProfileHeader
         name={profile.username}
         title={profile.title || "Member"}
         email={profile.email}
         joinDate={profile.joinDate || ""}
         avatarUrl={profile.avatar || ""}
+        isOwner={profile.is_owner}
+        isPrivate={profile.is_private}
+        userId={profile.user_id}
+        isFollowing={profile.is_following || false} // You can adjust this field when your follow logic is ready
       />
 
-      {/* Optional Buttons (only for owner) */}
-      {profile.is_owner && (
-        <div className="flex gap-4 justify-end px-4 mt-2"></div>
-      )}
-
-      {/* Stats and Tabs */}
       <ProfileStats />
       <ProfileTabs />
     </div>
