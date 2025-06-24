@@ -6,9 +6,6 @@ import (
 	"log"
 	"net/http"
 
-	// "time"
-
-	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -57,7 +54,7 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
-func LoginHandler(db *sql.DB, store *sessions.CookieStore) http.HandlerFunc {
+func LoginHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req LoginRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -73,10 +70,12 @@ func LoginHandler(db *sql.DB, store *sessions.CookieStore) http.HandlerFunc {
 			return
 		}
 
-		session, _ := store.Get(r, "session")
-		session.Values["user_id"] = id
-		session.Save(r, w)
+		createSession(w, id) // Set the cookie
 
-		w.Write([]byte("Logged in"))
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"message": "Logged in",
+			"user_id": id,
+		})
 	}
 }
