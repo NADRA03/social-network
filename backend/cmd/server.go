@@ -21,7 +21,7 @@ func main() {
 		log.Fatal("Failed to get working directory:", err)
 	}
 
-	migrationDir := filepath.Join(cwd, "..", "pkg", "db", "migrations", "sqlMigrations")
+	migrationDir := filepath.Join(cwd, "..", "pkg", "db", "migrations")
 	migrationPath := "file://" + filepath.ToSlash(migrationDir)
 
 	dbPath := filepath.Join(cwd, "..", "social.db")
@@ -43,7 +43,7 @@ func main() {
 	// Profile routes (with auth middleware)
 	r.Handle("/profile/me", auth.AuthMiddleware(http.HandlerFunc(profile.GetOwnProfileHandler))).Methods("GET")
 	r.HandleFunc("/users/{id}", profile.GetUserProfileHandler).Methods("GET")
-	// r.Handle("/profile/privacy", auth.AuthMiddleware(auth.Store, profile.TogglePrivacyHandler(db))).Methods("PATCH")
+	r.Handle("/profile/privacy", auth.AuthMiddleware(http.HandlerFunc(profile.TogglePrivacyHandler(sqlite.DB)))).Methods("PATCH")
 	r.Handle("/follow/{id}", auth.AuthMiddleware(profile.FollowHandler(sqlite.DB))).Methods("POST")
 	r.Handle("/unfollow/{id}", auth.AuthMiddleware(profile.UnfollowHandler(sqlite.DB))).Methods("DELETE")
 	// Apply CORS middleware
@@ -58,7 +58,7 @@ func enableCORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000") // your frontend origin
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 		if r.Method == "OPTIONS" {
