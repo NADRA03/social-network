@@ -31,9 +31,17 @@ export const ProfileHeader = ({
   const [privateStatus, setPrivateStatus] = useState(isPrivate);
   const [following, setFollowing] = useState(isFollowing);
 
-  const togglePrivacy = () => {
-    // Ideally call backend here
-    setPrivateStatus((prev) => !prev);
+  const togglePrivacy = async () => {
+    try {
+      await axios.patch(
+        `http://localhost:8080/profile/privacy`,
+        {},
+        { withCredentials: true }
+      );
+      setPrivateStatus((prev) => !prev);
+    } catch (err) {
+      console.error("Failed to toggle privacy", err);
+    }
   };
 
   const toggleFollow = async () => {

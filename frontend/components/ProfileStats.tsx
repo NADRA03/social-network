@@ -1,33 +1,45 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, StickyNote, Eye } from "lucide-react";
 
-export const ProfileStats = () => {
+interface ProfileStatsProps {
+  followerCount: number;
+  followingCount: number;
+  postCount: number;
+  isPrivate: boolean;
+}
+
+export const ProfileStats = ({
+  isPrivate,
+  followerCount,
+  followingCount,
+  postCount,
+}: ProfileStatsProps) => {
   const stats = [
     {
       icon: Users,
       label: "Followers",
-      value: "0",
+      value: followerCount,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
     },
     {
       icon: Users,
       label: "Followings",
-      value: "0",
+      value: followingCount,
       color: "text-green-600",
       bgColor: "bg-green-50",
     },
     {
       icon: StickyNote,
       label: "No. of Posts",
-      value: "0",
+      value: postCount,
       color: "text-yellow-600",
       bgColor: "bg-yellow-50",
     },
     {
       icon: Eye,
       label: "User Privacy",
-      value: "Public",
+      value: isPrivate ? "Private" : "Public",
       color: "text-purple-600",
       bgColor: "bg-purple-50",
     },

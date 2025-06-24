@@ -24,7 +24,7 @@ export default function LoginPage() {
       const userId = res.data.user_id;
       alert("Login successful!");
       await new Promise((r) => setTimeout(r, 100));
-      router.push(`/profile/me`); 
+      router.push(`/profile/me`);
     } catch (err: any) {
       alert("Login failed.");
     }

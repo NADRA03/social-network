@@ -8,7 +8,6 @@ import { House, MessageSquareMore } from 'lucide-react';
 import { useState } from "react";
 
 
-
 export default function HomePage() {
   // const [dropdownOpen, setDropdownOpen] = useState(false);
   // const [menuOpen, setMenuOpen] = useState(false);

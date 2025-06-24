@@ -19,7 +19,7 @@ const Profile = () => {
       try {
         let res;
         if (!id || id === "me") {
-          res = await axios.get("http://localhost:8080/profile/me", {
+          res = await axios.get(`http://localhost:8080/profile/me`, {
             withCredentials: true,
           });
         } else {
@@ -54,11 +54,21 @@ const Profile = () => {
         isOwner={profile.is_owner}
         isPrivate={profile.is_private}
         userId={profile.user_id}
-        isFollowing={profile.is_following || false} // You can adjust this field when your follow logic is ready
+        isFollowing={profile.is_following || false}
       />
 
-      <ProfileStats />
-      <ProfileTabs />
+      <ProfileStats
+        isPrivate={profile.is_private}
+        followerCount={profile.follower_count}
+        followingCount={profile.following_count}
+        postCount={profile.post_count}
+      />
+      <ProfileTabs
+        // isPrivate={profile.is_private}
+        // isOwner={profile.is_owner}
+        // isFollowing={profile.is_following}
+        canViewContent={profile.can_view_content}
+      />
     </div>
   );
 };

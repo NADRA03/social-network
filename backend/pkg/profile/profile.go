@@ -30,25 +30,33 @@ func GetOwnProfileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-    currentUserID, err := auth.GetUserIDFromSession(r)
+	currentUserID, err := auth.GetUserIDFromSession(r)
 	isFollowing := false
 	if err != nil {
-		err = sqlite.DB.QueryRow(`SELECT 1 FROM follows WHERE follower_id = ? AND followed_id = ?`, currentUserID, userID).Scan(&isFollowing)
+		err = sqlite.DB.QueryRow(`SELECT 1 FROM followers WHERE follower_id = ? AND followed_id = ?`, currentUserID, userID).Scan(&isFollowing)
 		if err != nil {
 			isFollowing = true
 		}
 	}
 
+	var followerCount, followingCount, postCount int
+	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM followers WHERE follower_id = ?`, currentUserID).Scan(&followerCount)
+	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM followers WHERE followed_id = ?`, currentUserID).Scan(&followingCount)
+	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM posts WHERE user_id = ?`, currentUserID).Scan(&postCount)
+
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"username":   username,
-		"email":      email,
-		"bio":        bio,
-		"avatar":     avatar,
-		"is_private": isPrivate,
-		"is_owner":   true,
-		"user_id":    userID,
-		"joinDate":   joinDate,
-		"isFollowing": isFollowing,
+		"username":       username,
+		"email":          email,
+		"bio":            bio,
+		"avatar":         avatar,
+		"is_private":     isPrivate,
+		"is_owner":       true,
+		"user_id":        userID,
+		"joinDate":       joinDate,
+		"isFollowing":    false,
+		"followerCount":  followerCount,
+		"followingCount": followingCount,
+		"postCount":      postCount,
 	})
 }
 
@@ -103,4 +111,3 @@ func UnfollowHandler(db *sql.DB) http.HandlerFunc {
 		w.Write([]byte("Unfollowed"))
 	}
 }
-
