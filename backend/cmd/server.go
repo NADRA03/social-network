@@ -9,6 +9,7 @@ import (
 	"social-network/pkg/auth"
 	"social-network/pkg/db/sqlite"
 	"social-network/pkg/profile"
+	"social-network/pkg/chat"
 
 	// "social-network/pkg/profile"
 
@@ -39,13 +40,17 @@ func main() {
 	// Auth routes
 	r.Handle("/register", auth.RegisterHandler(sqlite.DB)).Methods("POST")
 	r.Handle("/login", auth.LoginHandler(sqlite.DB)).Methods("POST")
-
+    r.Handle("/ws", auth.AuthMiddleware(http.HandlerFunc(auth.UserWebSocket))).Methods("GET")
+    r.Handle("/getSession", auth.AuthMiddleware(http.HandlerFunc(auth.GetSessionHandler))).Methods("GET")
 	// Profile routes (with auth middleware)
 	r.Handle("/profile/me", auth.AuthMiddleware(http.HandlerFunc(profile.GetOwnProfileHandler))).Methods("GET")
 	r.HandleFunc("/users/{id}", profile.GetUserProfileHandler).Methods("GET")
 	r.Handle("/profile/privacy", auth.AuthMiddleware(http.HandlerFunc(profile.TogglePrivacyHandler(sqlite.DB)))).Methods("PATCH")
 	r.Handle("/follow/{id}", auth.AuthMiddleware(profile.FollowHandler(sqlite.DB))).Methods("POST")
 	r.Handle("/unfollow/{id}", auth.AuthMiddleware(profile.UnfollowHandler(sqlite.DB))).Methods("DELETE")
+	//chat 
+	r.Handle("/chat/messages", auth.AuthMiddleware(http.HandlerFunc(chat.GetChatMessagesHandler))).Methods("GET")
+	
 	// Apply CORS middleware
 	handler := enableCORS(r)
 
