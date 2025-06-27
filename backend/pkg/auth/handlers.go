@@ -33,21 +33,30 @@ func RegisterHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		_, err = db.Exec(`
+		result, err := db.Exec(`
 			INSERT INTO users (username, email, password_hash, bio, avatar_url)
 			VALUES (?, ?, ?, ?, ?)`,
 			req.Username, req.Email, string(hashed), req.Bio, req.Avatar)
-
 		if err != nil {
 			http.Error(w, "Registration failed", http.StatusInternalServerError)
 			log.Println("DB insert error:", err)
 			return
 		}
 
+		userID, err := result.LastInsertId()
+		if err != nil {
+			http.Error(w, "Failed to retrieve user ID", http.StatusInternalServerError)
+			log.Println("LastInsertId error:", err)
+			return
+		}
+
+		createSession(w, int(userID))
+
 		w.WriteHeader(http.StatusCreated)
 		w.Write([]byte("Registered successfully"))
 	}
 }
+
 
 type LoginRequest struct {
 	Email    string `json:"email"`
@@ -70,7 +79,7 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		createSession(w, id) // Set the cookie
+		createSession(w, id) 
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{

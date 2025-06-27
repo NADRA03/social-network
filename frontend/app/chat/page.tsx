@@ -1,332 +1,209 @@
 'use client';
 
-import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import '../output.css';
+import { connectWebSocket } from "../api";
+import { useEffect, useState, useRef } from "react";
+import { socket } from "../api";
+import { session } from '../utils/session';
+import { appendChatMessage } from '../utils/chat';
+import { loadChatHistory } from '../utils/chat';
 
+type User = {
+  id: number;
+  username: string;
+  email: string;
+  avatar_url: string;
+  created_at: string;
+  last_message_time: string;
+  last_message_text: string;
+  last_message_from: number | null;
+  last_message_owner: "incoming" | "outgoing";
+};
 
 export default function ChatPage() {
-    const [showPopover, setShowPopover] = useState(false);
-      const [open, setOpen] = useState(false);
+  const [showPopover, setShowPopover] = useState(false);
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [onlineIDs, setOnlineIDs] = useState<number[]>([]);  
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [partner, setPartner] = useState<string | null>(null);
+  let offset = 0;
+    const limit = 10;
 
-    
+  useEffect(() => {
+    connectWebSocket((event) => {
+      const data = JSON.parse(event.data);
+      if (data.type !== "userlist") return;
 
-  return (
-    <main className="min-h-screen">
+      const container = containerRef.current;
+      if (!container) return;
+
+      container.innerHTML = ""; 
+
+      data.users.forEach((user: any) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "flex items-center gap-4 mb-4";
+
+        const avatarStatus = data.online.includes(user.ID) ? "avatar-online" : "avatar-offline";
+        const avatarUrl = user.ImageURL || "https://img.daisyui.com/images/profile/demo/gordon@192.webp";
+
+        wrapper.innerHTML = `
+          <div class="avatar ${avatarStatus}">
+            <div class="w-12 rounded-full">
+              <img src="${avatarUrl}" />
+            </div>
+          </div>
+          <div class="text-sm">${user.Username}</div>
+        `;
+
+        container.appendChild(wrapper);
+
+        wrapper.addEventListener("click", () => {
+          setSelectedUserId(user.ID);
+          setPartner(user.Username);
+        });
+
+        container.appendChild(wrapper);
+      });
+    });
+  }, []);
+  
+
+  useEffect(() => {
+  if (!selectedUserId) return;
+
+  offset = 0;
+  partner && loadChatHistory(session.UserID, selectedUserId, partner, limit, offset);
+
+  const chatForm = document.getElementById("chat-form");
+  const input = document.getElementById("default-search") as HTMLInputElement;
+
+  const handler = (e: Event) => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+
+    if (text.length > 200) {
+      // showToast("Message is too long. Maximum 200 characters.");
+      return;
+    }
+
+    sendMessageToSocket(text);
+    input.value = "";
+  };
+
+  chatForm?.addEventListener("submit", handler);
+  return () => {
+    chatForm?.removeEventListener("submit", handler);
+  };
+}, [selectedUserId]);
+
+
+function sendMessageToSocket(text: string): void {
+	if (!text.trim()) return;
+
+	if (socket && socket.readyState === WebSocket.OPEN) {
+		const payload = {
+			type: "chat",
+			to: selectedUserId,
+			text: text.trim(),
+		};
+		socket.send(JSON.stringify(payload));
+	} else {
+		console.warn("WebSocket is not connected.");
+		return;
+	}
+
+	partner && appendChatMessage(
+		{
+			sender_id: session.UserID,
+			text: text.trim(),
+			created_at: new Date().toISOString(),
+		},
+		partner
+	);
+
+	offset++;
+}
+
+useEffect(() => {
+  if (!selectedUserId) return;
+
+  const chatBox = document.getElementById("chat-messages");
+  if (!chatBox) return;
+
+  const onScroll = async () => {
+    if (chatBox.scrollTop === 0) {
+      offset += limit;
+      const previousHeight = chatBox.scrollHeight;
+      console.log("here"); 
+      if (partner) {
+        await loadChatHistory(session.UserID, selectedUserId, partner, limit, offset);
+        const newHeight = chatBox.scrollHeight;
+        chatBox.scrollTop = newHeight - previousHeight;
+      }
+    }
+  };
+
+  chatBox.addEventListener("scroll", onScroll);
+
+  return () => {
+    chatBox.removeEventListener("scroll", onScroll);
+  };
+}, [selectedUserId]);
+
+return (
+<main className="h-screen overflow-hidden">
 
 
 
 
-<div className="navbar bg-base-100 border-b border-base-300">
-  <div className="flex-1">
-    <a className="btn btn-ghost text-xl ml-2">Social Network</a>
-  </div>
-  <div className="flex gap-2">
-<label className="input">
-  <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-    <g
-      strokeLinejoin="round"
-      strokeLinecap="round"
-      strokeWidth="2.5"
-      fill="none"
-      stroke="currentColor"
-    >
-      <circle cx="11" cy="11" r="8"></circle>
-      <path d="m21 21-4.3-4.3"></path>
-    </g>
-  </svg>
-  <input type="search" required placeholder="Search" />
-</label>
-    <div className="dropdown dropdown-end">
-      <div id="nav-image" tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-        <div className="w-10 rounded-full">
-          <img
-            alt="Tailwind CSS Navbar component"
-            src="https://img.daisyui.com/images/profile/demo/gordon@192.webp" />
-        </div>
-      </div>
-      <ul
-        tabIndex={0}
-        className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-        <li>
-          <a className="justify-between">
-            Home
-          </a>
-        </li>
-        <li><a>Dashboard</a></li>
-        <li><a>Profile</a></li>
-        <li><a>Settings</a></li>
-        <li><a>Logout</a></li>
-      </ul>
-    </div>
 
-
-      <div className="dropdown dropdown-end">
-    <button tabIndex={0} className="btn btn-ghost btn-circle">
-      <div className="indicator">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-          />
-        </svg>
-        <span className="badge badge-xs badge-primary indicator-item"></span>
-      </div>
-    </button>
-    <ul
-      tabIndex={0}
-      className="menu menu-sm dropdown-content bg-base-100 rounded-box mt-3 w-48 p-2 shadow"
-    >
-      <li><a>Notifications</a></li>
-      <li><a>Mark all as read</a></li>
-    </ul>
-  </div>
-  </div>
+<div className="flex h-full">
+{/* Sidebar */}
+<div className=" w-1/5 h-full flex flex-col pl-10 pt-5 overflow-hidden">
+  <div ref={containerRef}></div>
 </div>
 
-{/* nav end */}
 
-
-
-
-<div className="flex">
-<div className="bg-base-300 w-1/5 min-h-screen flex flex-col pl-10 pt-5">
-
-
-
-
-
-<div className=''>
-<div className="avatar avatar-online">
-  <div className="w-24 rounded-full">
-    <img src="https://img.daisyui.com/images/profile/demo/gordon@192.webp" />
-  </div>
-</div>
-</div>
-
-
-
-</div>
 <div className="divider divider-horizontal"></div>
 
 
-<div className="min-h-screen w-1/3 relative">
-<div className="chat chat-start mt-2">
-  <div className="chat-image avatar">
-    <div className="w-10 rounded-full">
-      <img
-        onClick={() => setShowPopover(!showPopover)}
-        alt="Tailwind CSS chat bubble component"
-        src="https://img.daisyui.com/images/profile/demo/kenobee@192.webp"
-      />
+{/* Chat panel */}
+<div id="chat" className="h-full w-1/3 relative flex flex-col overflow-hidden">
+  {selectedUserId === null ? (
+    <div className="text-gray-500 text-center mt-20 text-xl">
+      👋 Select a user to start chatting
     </div>
-  </div>
-  <div className="chat-header">
-    Obi-Wan Kenobi
-    <time className="text-xs opacity-50">12:45</time>
-  </div>
-  <div className="chat-bubble">You were the Chosen One!</div>
-  <div className="chat-footer opacity-50">Delivered</div>
-
-
-
-
-
-
-      <div className="relative inline-block text-left">
-
-      {showPopover && (
-        <div className="absolute z-10 mt-2 w-64 text-sm text-gray-500 bg-white border border-gray-200 rounded-lg shadow-md dark:text-gray-400 dark:bg-gray-800 dark:border-gray-600">
-          <div className="p-3">
-            <div className="flex items-center justify-between mb-2">
-              <a href="#">
-                <img
-                  className="w-10 h-10 rounded-full"
-                  src="https://img.daisyui.com/images/profile/demo/kenobee@192.webp"
-                  alt="Jese Leos"
-                />
-              </a>
-              <div>
-                <button
-                  type="button"
-                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-                >
-                  Follow
-                </button>
-              </div>
-            </div>
-            <p className="text-base font-semibold leading-none text-gray-900 dark:text-white">
-              <a href="#">Jese Leos</a>
-            </p>
-            <p className="mb-3 text-sm font-normal">
-              <a href="#" className="hover:underline">
-                @jeseleos
-              </a>
-            </p>
-            <p className="mb-4 text-sm">
-              Open-source contributor. Building{" "}
-              <a
-                href="#"
-                className="text-blue-600 dark:text-blue-500 hover:underline"
-              >
-                flowbite.com
-              </a>
-              .
-            </p>
-            <ul className="flex text-sm gap-4">
-              <li>
-                <a href="#" className="hover:underline">
-                  <span className="font-semibold text-gray-900 dark:text-white">
-                    799
-                  </span>{" "}
-                  Following
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:underline">
-                  <span className="font-semibold text-gray-900 dark:text-white">
-                    3,758
-                  </span>{" "}
-                  Followers
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      )}
-    </div>
-</div>
-<div className="chat chat-end">
-  <div className="chat-image avatar">
-    <div className="w-10 rounded-full">
-      <img
-        alt="Tailwind CSS chat bubble component"
-        src="https://img.daisyui.com/images/profile/demo/anakeen@192.webp"
-      />
-    </div>
-  </div>
-  <div className="chat-header">
-    Anakin
-    <time className="text-xs opacity-50">12:46</time>
-  </div>
-  <div className="chat-bubble">I hate you!</div>
-  <div className="chat-footer opacity-50">Seen at 12:46</div>
-</div>
-
-
-
-
-
-
-    <div className='absolute bottom-2 left-1/2 -translate-x-1/2 w-5/6'>
-    <form>
-      <label htmlFor="chat" className="sr-only">
-        Your message
-      </label>
-      <div className="flex items-center px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700">
-        {/* Upload Image Button */}
-        <button
-          type="button"
-          className="inline-flex justify-center p-2 text-gray-500 rounded-lg cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
-        >
-          <svg
-            className="w-5 h-5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 20 18"
-          >
-            <path
-              fill="currentColor"
-              d="M13 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0ZM7.565 7.423 4.5 14h11.518l-2.516-3.71L11 13 7.565 7.423Z"
-            />
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M18 1H2a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"
-            />
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M13 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0ZM7.565 7.423 4.5 14h11.518l-2.516-3.71L11 13 7.565 7.423Z"
-            />
-          </svg>
-          <span className="sr-only">Upload image</span>
-        </button>
-
-        {/* Add Emoji Button */}
-        <button
-          type="button"
-          className="p-2 text-gray-500 rounded-lg cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
-        >
-          <svg
-            className="w-5 h-5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 20 20"
-          >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M13.408 7.5h.01m-6.876 0h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM4.6 11a5.5 5.5 0 0 0 10.81 0H4.6Z"
-            />
-          </svg>
-          <span className="sr-only">Add emoji</span>
-        </button>
-
-        {/* Message Textarea */}
-        <textarea
-          id="chat"
-          rows={1}
-          className="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          placeholder="Your message..."
-        ></textarea>
-
-        {/* Send Button */}
-        <button
-          type="submit"
-          className="inline-flex justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600"
-        >
-          <svg
-            className="w-5 h-5 rotate-90 rtl:-rotate-90"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 18 20"
-          >
-            <path d="m17.914 18.594-8-18a1 1 0 0 0-1.828 0l-8 18a1 1 0 0 0 1.157 1.376L8 18.281V9a1 1 0 0 1 2 0v9.281l6.758 1.689a1 1 0 0 0 1.156-1.376Z" />
-          </svg>
-          <span className="sr-only">Send message</span>
-        </button>
+  ) : (
+    <>
+      {/* Message List */}
+      <div id="chat-messages" className="flex-1 overflow-y-auto p-4 space-y-3">
       </div>
-    </form>
-    </div>
 
-
-    
+      {/* Message Input */}
+      <form id="chat-form" className="p-4 border-t border-base-300 flex gap-2">
+        <input
+          id="default-search"
+          type="text"
+          className="input input-bordered flex-1"
+          placeholder="Type your message..."
+          maxLength={200}
+        />
+        <button type="submit" className="btn btn-primary">Send</button>
+      </form>
+    </>
+  )}
 </div>
 
   <div className="divider divider-horizontal"></div>
-  <div className="bg-base-300 w-3/7 min-h-screen">
+  <div className="overflow-hidden bg-base-300 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 w-3/7 min-h-screen">
 
 
-    <div className="relative z-10 inline-block text-sm text-gray-500 dark:text-gray-400 w-full">
+    <div className="relative z-10 inline-block text-sm text-gray-900 dark:text-gray-400 w-full">
       <div className="p-3">
         <div className="flex">
           <div className="me-3 shrink-0">
