@@ -3,6 +3,11 @@
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Mail, Lock, User } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -21,69 +26,78 @@ export default function LoginPage() {
         }
       );
 
-      const userId = res.data.user_id;
+      const username = res.data.username;
       alert("Login successful!");
       await new Promise((r) => setTimeout(r, 100));
-      router.push(`/profile/me`);
+      router.push(`/profile/${username}`);
     } catch (err: any) {
       alert("Login failed.");
     }
   };
 
   return (
-    <form onSubmit={handleLogin} className="max-w-sm mx-auto">
-      <div className="mb-5">
-        <label
-          htmlFor="email"
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >
-          Your email
-        </label>
-        <input
-          type="email"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-          placeholder="name@flowbite.com"
-          required
-        />
-      </div>
-      <div className="mb-5">
-        <label
-          htmlFor="password"
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >
-          Your password
-        </label>
-        <input
-          type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-          required
-        />
-      </div>
-      <div className="flex items-start mb-5">
-        <input
-          id="remember"
-          type="checkbox"
-          className="w-4 h-4 border border-gray-300 rounded-sm bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600"
-        />
-        <label
-          htmlFor="remember"
-          className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-        >
-          Remember me
-        </label>
-      </div>
-      <button
-        type="submit"
-        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-      >
-        Submit
-      </button>
-    </form>
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 flex items-center justify-center p-6">
+      <div className="absolute inset-0 bg-black/20"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 to-purple-600/30"></div>
+
+      <Card className="relative w-full max-w-md bg-white/90 backdrop-blur-sm border-0 shadow-2xl">
+        <CardHeader className="text-center pb-8">
+          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center mb-4">
+            <User className="w-8 h-8 text-white" />
+          </div>
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Welcome Back
+          </CardTitle>
+          <p className="text-gray-600 mt-2">Sign in to your account</p>
+        </CardHeader>
+
+        <CardContent>
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-gray-700 font-medium">
+                Email Address
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                <Input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10 h-12 bg-gray-50/50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-gray-700 font-medium">
+                Password
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                <Input
+                  type="password"
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10 h-12 bg-gray-50/50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="Enter your password"
+                  required
+                />
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              Sign In
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -1,375 +1,550 @@
 "use client";
 
-import React from "react";
-import './globals.css';
-import './home.css';
-import './output.css';
-import { House, MessageSquareMore } from 'lucide-react'; 
-import { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { supabase } from "@/lib/supabase";
+import {
+  House,
+  MessageSquareMore,
+  Bell,
+  Search,
+  Plus,
+  Paperclip,
+  MapPin,
+  Camera,
+  MessageCircle,
+  X,
+  Send,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import axios from "axios";
 
+interface Post {
+  id: number;
+  username: string;
+  avatar?: string;
+  content: string;
+  image?: string;
+  created_at: string;
+}
 
-export default function HomePage() {
-  // const [dropdownOpen, setDropdownOpen] = useState(false);
-  // const [menuOpen, setMenuOpen] = useState(false);
+interface Comment {
+  id: number;
+  username: string;
+  content: string;
+  created_at: string;
+}
 
-  // const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
-  // const toggleMenu = () => setMenuOpen(!menuOpen);
+export async function uploadImageToSupabase(
+  file: File
+): Promise<string | null> {
+  const filePath = `posts/${Date.now()}-${file.name}`;
+  const { data, error } = await supabase.storage
+    .from("social")
+    .upload(filePath, file);
 
+  if (error) {
+    console.error("Upload failed:", error);
+    return null;
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from("social")
+    .getPublicUrl(filePath);
+  return publicUrlData?.publicUrl || null;
+}
+
+export default function Home() {
   const [showForm, setShowForm] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [content, setContent] = useState("");
+  const [commentContent, setCommentContent] = useState("");
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch posts
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/feed", { withCredentials: true })
+      .then((res) => {
+        console.log("Fetched posts:", res.data);
+        console.log("Posts received from backend:", res.data);
+        setPosts(res.data);
+      })
+      .catch((err) => console.error("Failed to load posts", err));
+  }, []);
+
+  // Submit new post
+  const handlePost = async () => {
+    if (!content.trim()) return;
+
+    let imageUrl: string | null = "";
+    if (imageFile) {
+      try {
+        imageUrl = await uploadImageToSupabase(imageFile);
+      } catch (err) {
+        console.error("Image upload failed", err);
+      }
+    }
+
+    axios
+      .post(
+        "http://localhost:8080/post",
+        { content, image: imageUrl || "" },
+        { withCredentials: true }
+      )
+      .then(() => {
+        setContent("");
+        setImageFile(null);
+        setShowForm(false);
+        return axios.get("http://localhost:8080/feed", {
+          withCredentials: true,
+        });
+      })
+      .then((res) => setPosts(res.data))
+      .catch((err) => console.error("Failed to create post", err));
+  };
+
+  //Upload images on posts
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validTypes = ["image/jpeg", "image/png", "image/gif"];
+    if (!validTypes.includes(file.type)) {
+      alert("Only jpeg, jpg, and gif types are allowed");
+      return;
+    }
+
+    setImageFile(file);
+  };
+
+  // Handle comment popup
+  const handleCommentClick = (post: Post) => {
+    setSelectedPost(post);
+    setShowComments(true);
+    fetchComments(post.id);
+  };
+
+  // Submit comment
+  const submitComment = async () => {
+    if (!commentContent.trim() || !selectedPost) return;
+
+    try {
+      await axios.post(
+        "http://localhost:8080/comment",
+        {
+          post_id: selectedPost.id,
+          content: commentContent,
+        },
+        { withCredentials: true }
+      );
+
+      setCommentContent("");
+      fetchComments(selectedPost.id);
+    } catch (err) {
+      console.error("Failed to submit comment:", err);
+    }
+  };
+
+  const fetchComments = async (postId: number) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8080/comments?post_id=${postId}`,
+        { withCredentials: true }
+      );
+      setComments(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error("Failed to load comments:", err);
+      setComments([]);
+    }
+  };
 
   return (
-    <main id="main" className="flex min-h-screen bg-black-100 text-2xl font-bold">
+    <main className="flex min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-100">
+      {/* Navigation Bar with Gradient */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-white/20 shadow-lg">
+        <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Social Network
+            </h1>
+          </div>
 
+          <div className="flex items-center gap-4">
+            {/* Search Bar with Modern Styling */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <input
+                type="search"
+                placeholder="Search"
+                className="pl-10 pr-4 py-2 bg-white/70 backdrop-blur-sm border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent shadow-sm"
+              />
+            </div>
 
+            {/* Notifications with Modern Button */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative bg-white/30 hover:bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl"
+                >
+                  <Bell className="h-5 w-5" />
+                  <span className="absolute -top-1 -right-1 h-3 w-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full"></span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="bg-white/90 backdrop-blur-md border-white/20"
+              >
+                <DropdownMenuItem>Notifications</DropdownMenuItem>
+                <DropdownMenuItem>Mark all as read</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-
-<div className="navbar bg-base-100 border-b border-base-300">
-  <div className="flex-1">
-    <a className="btn btn-ghost text-xl ml-2">Social Network</a>
-  </div>
-  <div className="flex gap-2">
-<label className="input">
-  <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-    <g
-      strokeLinejoin="round"
-      strokeLinecap="round"
-      strokeWidth="2.5"
-      fill="none"
-      stroke="currentColor"
-    >
-      <circle cx="11" cy="11" r="8"></circle>
-      <path d="m21 21-4.3-4.3"></path>
-    </g>
-  </svg>
-  <input type="search" required placeholder="Search" />
-</label>
-    <div className="dropdown dropdown-end">
-      <div id="nav-image" tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-        <div className="w-10 rounded-full">
-          <img
-            alt="Tailwind CSS Navbar component"
-            src="https://img.daisyui.com/images/profile/demo/gordon@192.webp" />
+            {/* Profile Menu with Enhanced Styling */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="p-0 bg-white/30 hover:bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl"
+                >
+                  <img
+                    src="https://img.daisyui.com/images/profile/demo/gordon@192.webp"
+                    alt="Profile"
+                    className="h-10 w-10 rounded-lg border-2 border-white/30"
+                  />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="bg-white/90 backdrop-blur-md border-white/20"
+              >
+                <DropdownMenuItem>Home</DropdownMenuItem>
+                <DropdownMenuItem>Dashboard</DropdownMenuItem>
+                <DropdownMenuItem>Profile</DropdownMenuItem>
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem>Logout</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
-      <ul
-        tabIndex={0}
-        className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-        <li>
-          <a className="justify-between">
-            Home
-          </a>
-        </li>
-        <li><a>Dashboard</a></li>
-        <li><a>Profile</a></li>
-        <li><a>Settings</a></li>
-        <li><a>Logout</a></li>
-      </ul>
-    </div>
 
+      {/* Main Content Area */}
+      <div className="flex w-full pt-20">
+        {/* Sidebar with Gradient */}
+        <div className="w-64 h-screen bg-gradient-to-b from-white/40 to-white/20 backdrop-blur-md border-r border-white/20 fixed left-0 top-20 shadow-xl">
+          <div className="p-6">
+            <nav className="space-y-3">
+              <Button className="w-full justify-start bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg">
+                <House className="w-4 h-4 mr-3" />
+                Home
+              </Button>
 
-      <div className="dropdown dropdown-end">
-    <button tabIndex={0} className="btn btn-ghost btn-circle">
-      <div className="indicator">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-          />
-        </svg>
-        <span className="badge badge-xs badge-primary indicator-item"></span>
-      </div>
-    </button>
-    <ul
-      tabIndex={0}
-      className="menu menu-sm dropdown-content bg-base-100 rounded-box mt-3 w-48 p-2 shadow"
-    >
-      <li><a>Notifications</a></li>
-      <li><a>Mark all as read</a></li>
-    </ul>
-  </div>
-  </div>
-</div>
-  
-  <div className="flex w-screen h-screen">
-  <div className="bg-base-300 h-screen w-1/6">
-    
-
- 
-      <div className="flex justify-around mt-5 ml-2" id="nav">
-      <ul className="flex-column w-1.5/2 space-y-4 text-sm font-medium text-gray-500 dark:text-gray-400 md:me-4 mb-4 md:mb-0">
-        <li>
-          <a
-            href="#"
-            className="inline-flex items-center px-4 py-3 text-white bg-blue-700 rounded-lg active w-full dark:bg-blue-600"
-            aria-current="page"
-          >
-          <House className="w-4 h-4 me-2 text-white dark:text-gray-400" />
-            Home
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            className="inline-flex items-center px-4 py-3 rounded-lg hover:text-gray-900 bg-gray-50 hover:bg-gray-100 w-full dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-white"
-          >
-            <MessageSquareMore
-              className="w-4 h-4 me-2 text-gray-500 dark:text-gray-400"
-            />
-            Dashboard
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            className="inline-flex items-center px-4 py-3 rounded-lg hover:text-gray-900 bg-gray-50 hover:bg-gray-100 w-full dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-white"
-          >
-            <svg
-              className="w-4 h-4 me-2 text-gray-500 dark:text-gray-400"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
-            </svg>
-            Profile
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            className="inline-flex items-center px-4 py-3 rounded-lg hover:text-gray-900 bg-gray-50 hover:bg-gray-100 w-full dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-white"
-          >
-            <svg
-              className="w-4 h-4 me-2 text-gray-500 dark:text-gray-400"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M18 7.5h-.423l-.452-1.09.3-.3a1.5 1.5 0 0 0 0-2.121L16.01 2.575a1.5 1.5 0 0 0-2.121 0l-.3.3-1.089-.452V2A1.5 1.5 0 0 0 11 .5H9A1.5 1.5 0 0 0 7.5 2v.423l-1.09.452-.3-.3a1.5 1.5 0 0 0-2.121 0L2.576 3.99a1.5 1.5 0 0 0 0 2.121l.3.3L2.423 7.5H2A1.5 1.5 0 0 0 .5 9v2A1.5 1.5 0 0 0 2 12.5h.423l.452 1.09-.3.3a1.5 1.5 0 0 0 0 2.121l1.415 1.413a1.5 1.5 0 0 0 2.121 0l.3-.3 1.09.452V18A1.5 1.5 0 0 0 9 19.5h2a1.5 1.5 0 0 0 1.5-1.5v-.423l1.09-.452.3.3a1.5 1.5 0 0 0 2.121 0l1.415-1.414a1.5 1.5 0 0 0 0-2.121l-.3-.3.452-1.09H18a1.5 1.5 0 0 0 1.5-1.5V9A1.5 1.5 0 0 0 18 7.5Zm-8 6a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" />
-            </svg>
-            Settings
-          </a>
-        </li>
-      </ul>
-      </div>
-
-
-
-  </div>
-  <div className="divider divider-horizontal"></div>
-  <div className=" bg-base-300  grid h-screen grow">
-
-
-      <div id="posts" >
-      <div id="post" className="flex items-start gap-2.5">
-      <img
-        className="w-8 h-8 rounded-full"
-        src="https://img.daisyui.com/images/profile/demo/gordon@192.webp"
-        alt="Bonnie Green image"
-        width={32}
-        height={32}
-      />
-      <div className="flex flex-col gap-1">
-        <div className="flex flex-col w-full max-w-[326px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
-          <div className="flex items-center space-x-2 rtl:space-x-reverse mb-2">
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">Bonnie Green</span>
-            <span className="text-sm font-normal text-gray-500 dark:text-gray-400">11:46</span>
-          </div>
-          <p className="text-sm font-normal text-gray-900 dark:text-white">This is the new office &lt;3</p>
-          <div className="group relative my-2.5">
-            <div className="absolute w-full h-full bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
-              <button
-                className="inline-flex items-center justify-center rounded-full h-10 w-10 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50"
+              <Button
+                variant="ghost"
+                className="w-full justify-start bg-white/30 hover:bg-white/50 backdrop-blur-sm border border-white/20 text-gray-700"
               >
-                <svg className="w-5 h-5 text-white" aria-hidden="true" fill="none" viewBox="0 0 16 18">
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3"
-                  />
+                <MessageSquareMore className="w-4 h-4 mr-3" />
+                Dashboard
+              </Button>
+
+              <Button
+                variant="ghost"
+                className="w-full justify-start bg-white/30 hover:bg-white/50 backdrop-blur-sm border border-white/20 text-gray-700"
+              >
+                <svg
+                  className="w-4 h-4 mr-3"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
                 </svg>
-              </button>
-              <div
-                role="tooltip"
-                className="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip dark:bg-gray-700"
+                Profile
+              </Button>
+
+              <Button
+                variant="ghost"
+                className="w-full justify-start bg-white/30 hover:bg-white/50 backdrop-blur-sm border border-white/20 text-gray-700"
               >
-                Download image
-                <div className="tooltip-arrow" data-popper-arrow />
+                <svg
+                  className="w-4 h-4 mr-3"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M18 7.5h-.423l-.452-1.09.3-.3a1.5 1.5 0 0 0 0-2.121L16.01 2.575a1.5 1.5 0 0 0-2.121 0l-.3.3-1.089-.452V2A1.5 1.5 0 0 0 11 .5H9A1.5 1.5 0 0 0 7.5 2v.423l-1.09.452-.3-.3a1.5 1.5 0 0 0-2.121 0L2.576 3.99a1.5 1.5 0 0 0 0 2.121l.3.3L2.423 7.5H2A1.5 1.5 0 0 0 .5 9v2A1.5 1.5 0 0 0 2 12.5h.423l.452 1.09-.3.3a1.5 1.5 0 0 0 0 2.121l1.415 1.413a1.5 1.5 0 0 0 2.121 0l.3-.3 1.09.452V18A1.5 1.5 0 0 0 9 19.5h2a1.5 1.5 0 0 0 1.5-1.5v-.423l1.09-.452.3.3a1.5 1.5 0 0 0 2.121 0l1.415-1.414a1.5 1.5 0 0 0 0-2.121l-.3-.3.452-1.09H18a1.5 1.5 0 0 0 1.5-1.5V9A1.5 1.5 0 0 0 18 7.5Zm-8 6a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" />
+                </svg>
+                Settings
+              </Button>
+            </nav>
+          </div>
+        </div>
+
+        <Separator orientation="vertical" className="ml-64 bg-white/20" />
+
+        {/* Centered Posts Feed */}
+        <div className="flex w-full justify-center pl-64">
+          <div className="w-full max-w-3xl px-8 py-12">
+            <div className="space-y-8">
+              {posts.map((post, index) => (
+                <Card
+                  key={index}
+                  className="bg-white/70 backdrop-blur-md border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:-translate-y-2 rounded-2xl overflow-hidden"
+                >
+                  <CardContent className="p-8">
+                    <div className="flex items-start gap-6">
+                      <img
+                        src={
+                          post.avatar ||
+                          "https://img.daisyui.com/images/profile/demo/gordon@192.webp"
+                        }
+                        alt="Profile"
+                        className="w-14 h-14 rounded-full border-3 border-white/50 shadow-xl ring-2 ring-gradient-to-r ring-from-blue-400 ring-to-purple-400"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-4 mb-4">
+                          <span className="font-bold text-gray-800 text-xl">
+                            {post.username}
+                          </span>
+                          <span className="text-sm text-gray-500 bg-white/40 px-3 py-1 rounded-full backdrop-blur-sm">
+                            {new Date(post.created_at).toLocaleString()}
+                          </span>
+                        </div>
+                        <p className="text-gray-700 mb-6 text-lg leading-relaxed">
+                          {post.content}
+                        </p>
+                        {post.image && (
+                          <div className="relative group mb-6">
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/30 to-purple-600/30 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="bg-white/40 hover:bg-white/60 text-white border border-white/30 shadow-lg rounded-full w-12 h-12"
+                              >
+                                <svg
+                                  className="w-6 h-6"
+                                  fill="none"
+                                  viewBox="0 0 16 18"
+                                >
+                                  <path
+                                    stroke="currentColor"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3"
+                                  />
+                                </svg>
+                              </Button>
+                            </div>
+                            <img
+                              src={post.image}
+                              alt="Post content"
+                              className="w-full rounded-2xl shadow-xl border border-white/20"
+                            />
+                          </div>
+                        )}
+
+                        {/* Comment Button */}
+                        <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/20">
+                          <Button
+                            onClick={() => handleCommentClick(post)}
+                            variant="ghost"
+                            className="flex items-center gap-2 bg-white/30 hover:bg-white/50 backdrop-blur-sm border border-white/20 text-gray-700 rounded-xl px-6 py-3 transition-all duration-200 hover:scale-105"
+                          >
+                            <MessageCircle className="w-5 h-5" />
+                            <span className="font-medium">Comment</span>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Comments Popup Modal */}
+      {showComments && selectedPost && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-60 p-4">
+          <Card className="w-full max-w-2xl max-h-[80vh] bg-white/95 backdrop-blur-md border-white/20 shadow-3xl rounded-2xl overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-white/20 bg-gradient-to-r from-blue-50/50 to-purple-50/50">
+              <h3 className="text-xl font-bold text-gray-800">Comments</h3>
+              <Button
+                onClick={() => setShowComments(false)}
+                variant="ghost"
+                size="icon"
+                className="bg-white/30 hover:bg-white/50 rounded-full"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+
+            {/* Original Post */}
+            <div className="p-6 border-b border-white/20 bg-white/30">
+              <div className="flex items-start gap-4">
+                <img
+                  src={
+                    selectedPost.avatar ||
+                    "https://img.daisyui.com/images/profile/demo/gordon@192.webp"
+                  }
+                  alt="Profile"
+                  className="w-12 h-12 rounded-full border-2 border-white/40 shadow-lg"
+                />
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="font-semibold text-gray-800">
+                      {selectedPost.username}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      {new Date(selectedPost.created_at).toLocaleString()}
+                    </span>
+                  </div>
+                  <p className="text-gray-700">{selectedPost.content}</p>
+                </div>
               </div>
             </div>
-            <img
-              src="https://img.daisyui.com/images/profile/demo/gordon@192.webp"
-              alt="Chat image"
-              width={300}
-              height={200}
-              className="rounded-lg"
-            />
-          </div>
-        </div>
-      </div>
-      {/* <div className="relative">
-        <button
-          id="dropdownMenuIconButton"
-          data-dropdown-toggle="dropdownDots"
-          data-dropdown-placement="bottom-start"
-          className="inline-flex self-center items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800 dark:focus:ring-gray-600"
-          type="button"
-        >
-          <svg
-            className="w-4 h-4 text-gray-500 dark:text-gray-400"
-            aria-hidden="true"
-            fill="currentColor"
-            viewBox="0 0 4 15"
-          >
-            <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
-          </svg>
-        </button>
-        <div
-          id="dropdownDots"
-          className="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-40 dark:bg-gray-700 dark:divide-gray-600"
-        >
-          <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton">
-            {["Reply", "Forward", "Copy", "Report", "Delete"].map((action) => (
-              <li key={action}>
-                <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                  {action}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div> */}
-    </div>
-    <br></br>
-    </div>
-    
 
-
-      {showForm && (
-      <>
-      <form className="fixed end-30 bottom-6 w-1/3">
-        <div className="mb-4 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
-          <div className="px-4 py-2 bg-white rounded-t-lg dark:bg-gray-800">
-            <label htmlFor="comment" className="sr-only">
-              Your comment
-            </label>
-            <textarea
-              id="comment"
-              rows={4}
-              required
-              className="w-full px-0 text-sm text-gray-900 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400"
-              placeholder="Write a comment..."
-            ></textarea>
-          </div>
-          <div className="flex items-center justify-between px-3 py-2 border-t border-gray-200 dark:border-gray-600">
-            <button
-              type="submit"
-              className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-200 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900"
-            >
-              Post comment
-            </button>
-            <div className="flex ps-0 space-x-1 rtl:space-x-reverse sm:ps-2">
-              {/* Attach file */}
-              <button
-                type="button"
-                className="inline-flex justify-center items-center p-2 text-gray-500 rounded-sm cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
-              >
-                <svg
-                  className="w-4 h-4"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 12 20"
+            {/* Comments List */}
+            <div className="flex-1 overflow-y-auto max-h-96 p-6 space-y-4">
+              {comments.map((comment) => (
+                <div
+                  key={comment.id}
+                  className="flex items-start gap-3 p-4 bg-white/40 rounded-xl backdrop-blur-sm"
                 >
-                  <path
-                    stroke="currentColor"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M1 6v8a5 5 0 1 0 10 0V4.5a3.5 3.5 0 1 0-7 0V13a2 2 0 0 0 4 0V6"
+                  <img
+                    src="https://img.daisyui.com/images/profile/demo/gordon@192.webp"
+                    alt="Profile"
+                    className="w-10 h-10 rounded-full border-2 border-white/40 shadow-md"
                   />
-                </svg>
-                <span className="sr-only">Attach file</span>
-              </button>
-
-              {/* Set location */}
-              <button
-                type="button"
-                className="inline-flex justify-center items-center p-2 text-gray-500 rounded-sm cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
-              >
-                <svg
-                  className="w-4 h-4"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 16 20"
-                >
-                  <path d="M8 0a7.992 7.992 0 0 0-6.583 12.535 1 1 0 0 0 .12.183l.12.146c.112.145.227.285.326.4l5.245 6.374a1 1 0 0 0 1.545-.003l5.092-6.205c.206-.222.4-.455.578-.7l.127-.155a.934.934 0 0 0 .122-.192A8.001 8.001 0 0 0 8 0Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
-                </svg>
-                <span className="sr-only">Set location</span>
-              </button>
-
-              {/* Upload image */}
-              <button
-                type="button"
-                className="inline-flex justify-center items-center p-2 text-gray-500 rounded-sm cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
-              >
-                <svg
-                  className="w-4 h-4"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 20 18"
-                >
-                  <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
-                </svg>
-                <span className="sr-only">Upload image</span>
-              </button>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium text-gray-800">
+                        {comment.username}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {new Date(comment.created_at).toLocaleString()}
+                      </span>
+                    </div>
+                    <p className="text-gray-700 text-sm">{comment.content}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
+
+            {/* Comment Input */}
+            <div className="p-6 border-t border-white/20 bg-white/30">
+              <div className="flex gap-3">
+                <Textarea
+                  placeholder="Write a comment..."
+                  rows={2}
+                  className="flex-1 bg-white/50 border-white/30 focus:border-blue-500/50 rounded-xl resize-none"
+                  value={commentContent}
+                  onChange={(e) => setCommentContent(e.target.value)}
+                />
+                <Button
+                  onClick={submitComment}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg rounded-xl px-6"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </Card>
         </div>
-      </form>
-    </>
       )}
 
-  </div>
+      {/* Post Form Modal with Modern Design */}
+      {showForm && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <Card className="w-full max-w-md mx-4 bg-white/95 backdrop-blur-md border-white/20 shadow-3xl rounded-2xl">
+            <CardContent className="p-8">
+              <Button
+                onClick={() => setShowForm(false)}
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 bg-white/30 hover:bg-white/50 rounded-full z-10"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+              <h3 className="text-xl font-bold text-gray-800 mb-6">
+                Create New Post
+              </h3>
+              <div className="mb-6">
+                <Textarea
+                  placeholder="What's on your mind?"
+                  rows={4}
+                  className="w-full bg-white/50 border-white/30 focus:border-blue-500/50 rounded-xl"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Button
+                  onClick={handlePost}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg px-8 py-3 rounded-xl"
+                >
+                  Post
+                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="bg-white/30 hover:bg-white/50 border border-white/20 rounded-xl"
+                  >
+                    <Paperclip className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="bg-white/30 hover:bg-white/50 border border-white/20 rounded-xl"
+                  >
+                    <MapPin className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="bg-white/30 hover:bg-white/50 border border-white/20 rounded-xl"
+                  >
+                    <Camera className="w-4 h-4" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      ref={fileInputRef}
+                      className="hidden"
+                    />
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
-  
-  </div>
-
-
-    
-
-
-
-<div data-dial-init className="fixed end-6 bottom-6 group">
-  {/* Main FAB Button */}
-  <button
-    type="button"
-    data-dial-toggle="speed-dial-menu-default"
-    aria-controls="speed-dial-menu-default"
-    onClick={() => setShowForm((prev) => !prev)}
-    className="flex items-center justify-center text-white bg-blue-700 rounded-full w-14 h-14 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:focus:ring-blue-800"
-  >
-    <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 1v16M1 9h16" />
-    </svg>
-    <span className="sr-only">Open actions menu</span>
-  </button> 
-</div>
-
-
+      {/* Floating Action Button with Gradient */}
+      <Button
+        onClick={() => setShowForm(!showForm)}
+        className="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110"
+        size="icon"
+      >
+        <Plus className="w-7 h-7" />
+      </Button>
     </main>
   );
 }

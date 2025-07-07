@@ -47,12 +47,13 @@ export const ProfileHeader = ({
   const toggleFollow = async () => {
     try {
       if (following) {
-        await axios.delete(`http://localhost:8080/unfollow/${userId}`, {
+        await axios.delete(`http://localhost:8080/unfollow/${name}`, {
           withCredentials: true,
         });
+        setFollowing(false);
       } else {
         await axios.post(
-          `http://localhost:8080/follow/${userId}`,
+          `http://localhost:8080/follow/${name}`,
           {},
           { withCredentials: true }
         );
@@ -127,7 +128,7 @@ export const ProfileHeader = ({
                   {privateStatus ? "Make Public" : "Make Private"}
                 </Button>
               </>
-            ) : userId ? (
+            ) : name ? (
               <Button
                 className="bg-white text-blue-600 hover:bg-blue-50 font-medium px-6"
                 onClick={toggleFollow}

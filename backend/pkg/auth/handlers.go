@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"social-network/pkg/db/sqlite"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -12,9 +13,9 @@ import (
 type RegisterRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
-	Username string `json:"nickname"` // maps nickname input to username DB field
-	Avatar   string `json:"avatar"`   // maps to avatar_url
-	Bio      string `json:"about_me"` // maps to bio
+	Username string `json:"nickname"`
+	Avatar   string `json:"avatar"`
+	Bio      string `json:"about_me"`
 }
 
 func RegisterHandler(db *sql.DB) http.HandlerFunc {
@@ -70,12 +71,17 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		createSession(w, id) // Set the cookie
+		createSession(w, id)
+
+		var username string
+
+		sqlite.DB.QueryRow("SELECT username FROM users WHERE id = ?", id).Scan(&username)
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"message": "Logged in",
-			"user_id": id,
+			"message":  "Logged in",
+			"user_id":  id,
+			"username": username,
 		})
 	}
 }

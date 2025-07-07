@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"social-network/pkg/auth"
 	"social-network/pkg/db/sqlite"
-	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -40,12 +39,12 @@ func GetOwnProfileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var followerCount, followingCount, postCount int
-	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM followers WHERE follower_id = ?`, currentUserID).Scan(&followerCount)
-	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM followers WHERE followed_id = ?`, currentUserID).Scan(&followingCount)
+	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM followers WHERE followed_id = ?`, currentUserID).Scan(&followerCount)
+	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM followers WHERE follower_id = ?`, currentUserID).Scan(&followingCount)
 	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM posts WHERE user_id = ?`, currentUserID).Scan(&postCount)
 
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"username":       username,
+		"username":       username,	
 		"email":          email,
 		"bio":            bio,
 		"avatar":         avatar,
@@ -69,10 +68,17 @@ func FollowHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		vars := mux.Vars(r)
-		followedID, err := strconv.Atoi(vars["id"])
-		if err != nil || followedID == followerID {
-			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		username := vars["username"]
+		var followedID int
+		err = sqlite.DB.QueryRow("SELECT id FROM users WHERE username = ?", username).Scan(&followedID)
+		// followedID, err := strconv.Atoi(vars["id"])
+		if err != nil {
+			http.Error(w, "user not found", http.StatusNotFound)
 			return
+		}
+
+		if followedID == followerID {
+			http.Error(w, "Cannot follow your own account", http.StatusBadRequest)
 		}
 
 		_, err = db.Exec(`INSERT OR IGNORE INTO followers (follower_id, followed_id) VALUES (?, ?)`, followerID, followedID)
@@ -95,10 +101,16 @@ func UnfollowHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		vars := mux.Vars(r)
-		followedID, err := strconv.Atoi(vars["id"])
-		if err != nil || followedID == followerID {
-			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		username := vars["username"]
+		var followedID int
+		err = sqlite.DB.QueryRow("SELECT id FROM users WHERE username = ?", username).Scan(&followedID)
+		if err != nil {
+			http.Error(w, "User not found", http.StatusNotFound)
 			return
+		}
+
+		if followedID == followerID {
+			http.Error(w, "cannot unfollow your account", http.StatusBadRequest)
 		}
 
 		_, err = db.Exec(`DELETE FROM followers WHERE follower_id = ? AND followed_id = ?`, followerID, followedID)

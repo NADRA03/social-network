@@ -3,7 +3,6 @@ package profile
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"social-network/pkg/auth"
 	"social-network/pkg/db/sqlite"
@@ -11,7 +10,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// User represents a user profile.
 type User struct {
 	ID        int
 	Username  string
@@ -25,28 +23,27 @@ type User struct {
 // GET /users/{id} - returns a public user profile
 func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	targetID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+	username := vars["username"]
+	if username == "" {
+		http.Error(w, "Invalid username", http.StatusBadRequest)
 		return
 	}
-
 	// Try to get requester (viewer) from session
 	requesterID, _ := auth.GetUserIDFromSession(r)
 
-	user, err := getUserByID(targetID)
+	user, err := getUserByUsername(username)
 	if err != nil {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
 
-	canView := true
-	isOwner := requesterID == targetID
+	isOwner := requesterID == user.ID
+	canView := !user.IsPrivate || isOwner
 
 	var followerCount, followingCount, postCount int
-	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM followers WHERE follower_id = ?`, targetID).Scan(&followerCount)
-	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM followers WHERE followed_id = ?`, targetID).Scan(&followingCount)
-	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM posts WHERE user_id = ?`, targetID).Scan(&postCount)
+	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM followers WHERE followed_id = ?`, user.ID).Scan(&followerCount)
+	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM followers WHERE follower_id = ?`, user.ID).Scan(&followingCount)
+	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM posts WHERE user_id = ?`, user.ID).Scan(&postCount)
 
 	response := map[string]interface{}{
 		"username":         user.Username,
@@ -64,18 +61,23 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 		"post_count":       postCount,
 	}
 
-	if user.IsPrivate && requesterID != targetID {
+	isFollowing := false;
+
+	if !isOwner {
 		var count int
 		err := sqlite.DB.QueryRow(`
 			SELECT COUNT(*) FROM followers
 			WHERE followed_id = ? AND follower_id = ?
-		`, targetID, requesterID).Scan(&count)
-		if err != nil || count == 0 {
-			canView = false
+		`, user.ID, requesterID).Scan(&count)
+
+		if err != nil && count > 0 {
+			isFollowing = true
 		}
+
+		canView = !user.IsPrivate || isFollowing
 	}
 
-	response["is_following"] = requesterID != 0 && canView
+	response["is_following"] = isFollowing
 	response["can_view_content"] = canView || isOwner
 
 	w.Header().Set("Content-Type", "application/json")
@@ -83,12 +85,12 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // getUserByID fetches user info from the database
-func getUserByID(id int) (*User, error) {
+func getUserByUsername(username string) (*User, error) {
 	row := sqlite.DB.QueryRow(`
 		SELECT id, username, email, bio, avatar_url, is_private, created_at
 		FROM users
-		WHERE id = ?
-	`, id)
+		WHERE username = ?
+	`, username)
 
 	var u User
 	err := row.Scan(&u.ID, &u.Username, &u.Email, &u.Bio, &u.Avatar, &u.IsPrivate, &u.JoinDate)
@@ -96,5 +98,4 @@ func getUserByID(id int) (*User, error) {
 		return nil, err
 	}
 	return &u, nil
-
 }
