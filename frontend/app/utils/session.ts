@@ -20,7 +20,6 @@ export default function SessionInitializer() {
 				console.log("Session loaded:", res);
 			})
 			.catch(() => {
-				// router.replace("/welcome"); 
 			});
 	}, [router]);
 

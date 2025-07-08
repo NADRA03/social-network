@@ -5,12 +5,12 @@ import (
 	"log"
 	"net/http"
 	"social-network/pkg/db/sqlite"
-
+    "database/sql"
 	"github.com/gorilla/websocket"
 )
 
 
-var activeUsers = make(map[int]*websocket.Conn)
+var ActiveUsers = make(map[int]*websocket.Conn)
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -41,14 +41,14 @@ func UserWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("[WebSocket] User %d connected", userID)
-	activeUsers[userID] = conn
+	ActiveUsers[userID] = conn
 
 	broadcastUserList(r, userID)
 
 	defer func() {
 		log.Printf("[WebSocket] User %d disconnected", userID)
 		conn.Close()
-		delete(activeUsers, userID)
+		delete(ActiveUsers, userID)
 		broadcastUserList(r, userID)
 	}()
 
@@ -83,7 +83,7 @@ func UserWebSocket(w http.ResponseWriter, r *http.Request) {
 				senderUsername = "Unknown"
 			}
 
-			if receiverConn, ok := activeUsers[msg.To]; ok {
+			if receiverConn, ok := ActiveUsers[msg.To]; ok {
 				out := map[string]interface{}{
 					"type":     "chat",
 					"from":     userID,
@@ -104,40 +104,94 @@ func UserWebSocket(w http.ResponseWriter, r *http.Request) {
 				senderUsername = "Unknown"
 			}
 
-			if rc, ok := activeUsers[msg.To]; ok {
+			if rc, ok := ActiveUsers[msg.To]; ok {
 				rc.WriteJSON(map[string]interface{}{
 					"type":     msg.Type,
 					"from":     userID,
 					"username": senderUsername,
 				})
 			}
+
+			case "group-chat":
+				log.Printf("[WebSocket] User %d sending group message to group %d: %s", userID, msg.To, msg.Text)
+
+				_, err := sqlite.DB.Exec(
+					`INSERT INTO messages (sender_id, group_id, content) VALUES (?, ?, ?)`,
+					userID, msg.To, msg.Text)
+				if err != nil {
+					log.Println("[DB] Failed to save group message:", err)
+					continue
+				}
+
+				var senderUsername, groupName string
+
+				err = sqlite.DB.QueryRow(`SELECT username FROM users WHERE id = ?`, userID).Scan(&senderUsername)
+				if err != nil {
+					log.Println("[DB] Failed to get sender username:", err)
+					senderUsername = "Unknown"
+				}
+
+				err = sqlite.DB.QueryRow(`SELECT name FROM groups WHERE id = ?`, msg.To).Scan(&groupName)
+				if err != nil {
+					log.Println("[DB] Failed to get group name:", err)
+					groupName = "Unknown Group"
+				}
+
+				rows, err := sqlite.DB.Query(`SELECT user_id FROM group_members WHERE group_id = ?`, msg.To)
+				if err != nil {
+					log.Println("[DB] Failed to fetch group members:", err)
+					continue
+				}
+				defer rows.Close()
+
+				for rows.Next() {
+					var memberID int
+					if err := rows.Scan(&memberID); err != nil {
+						log.Println("[DB] Failed to scan group member:", err)
+						continue
+					}
+
+					if memberID == userID {
+						continue
+					}
+
+					if memberConn, ok := ActiveUsers[memberID]; ok {
+						out := map[string]interface{}{
+							"type":       "group-chat",
+							"from":       userID,
+							"group":      msg.To,
+							"groupName":  groupName,
+							"username":   senderUsername,
+							"text":       msg.Text,
+						}
+						memberConn.WriteJSON(out)
+					}
+				}
+
+			broadcastUserList(r, userID)
 		}
 	}
+}
+
+type UserListResponse struct {
+	Type      string `json:"type"`
+	OnlineIDs []int  `json:"online"`
+	Users     []User `json:"users"`
+}
+
+type GroupListResponse struct {
+	Type   string                 `json:"type"`
+	Groups []GroupWithLastMessage `json:"groups"`
 }
 
 
 func broadcastUserList(r *http.Request, _ int) {
 	var onlineIDs []int
-	for id := range activeUsers {
+	for id := range ActiveUsers {
 		onlineIDs = append(onlineIDs, id)
 	}
 
-	type Response struct {
-		Type      string `json:"type"`
-		OnlineIDs []int  `json:"online"`
-		Users     []User `json:"users"`
-	}
-
-	for userID, conn := range activeUsers {
-
-		var sessionID string
-		err := sqlite.DB.QueryRow(`SELECT id FROM sessions WHERE user_id = ? ORDER BY created_at DESC LIMIT 1`, userID).Scan(&sessionID)
-		if err != nil {
-			log.Printf("Failed to get session for user %d: %v", userID, err)
-			continue
-		}
-
-
+	for userID, conn := range ActiveUsers {
 
 		users, err := GetConnectedUsersForUser(userID, onlineIDs)
 		if err != nil {
@@ -145,20 +199,86 @@ func broadcastUserList(r *http.Request, _ int) {
 			continue
 		}
 
-		msg, err := json.Marshal(Response{
+		userMsg, err := json.Marshal(UserListResponse{
 			Type:      "userlist",
 			OnlineIDs: onlineIDs,
 			Users:     users,
 		})
+		if err == nil {
+			conn.WriteMessage(websocket.TextMessage, userMsg)
+		}
+
+		groups, err := GetJoinedGroupsForUser(userID)
 		if err != nil {
-			log.Printf("Error marshaling user list for user %d: %v", userID, err)
+			log.Printf("Error getting group list for user %d: %v", userID, err)
 			continue
 		}
 
-		err = conn.WriteMessage(websocket.TextMessage, msg)
-		if err != nil {
-			log.Printf("Error sending user list to user %d: %v", userID, err)
+		groupMsg, err := json.Marshal(GroupListResponse{
+			Type:   "grouplist",
+			Groups: groups,
+		})
+		if err == nil {
+			conn.WriteMessage(websocket.TextMessage, groupMsg)
 		}
-	}
+
+		notifs, err := GetUnreadNotifications(userID)
+			if err != nil {
+			log.Printf("Error fetching notifications for user %d: %v", userID, err)
+			} else {
+			notifMsg, err := json.Marshal(map[string]interface{}{
+			"type":          "notifications-list",
+			"notifications": notifs,
+			})
+			if err == nil {
+			conn.WriteMessage(websocket.TextMessage, notifMsg)
+			}
+			}
+		}
 }
 
+func GetUnreadNotifications(userID int) ([]map[string]interface{}, error) {
+	rows, err := sqlite.DB.Query(`
+		SELECT id, inviter_id, group_id, event_id, type, message, status, created_at, read 
+		FROM notifications 
+		WHERE user_id = ?`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var notifs []map[string]interface{}
+	for rows.Next() {
+		var id, inviterID int
+		var groupID, eventID sql.NullInt64
+		var notifType, message, status, createdAt string
+		var read bool 
+
+		if err := rows.Scan(&id, &inviterID, &groupID, &eventID, &notifType, &message, &status, &createdAt, &read); err != nil {
+			log.Println("Notification scan error:", err)
+			continue
+		}
+
+		notif := map[string]interface{}{
+			"id":         id,
+			"inviter_id": inviterID,
+			"group_id":   nil,
+			"event_id":   nil,
+			"type":       notifType,
+			"message":    message,
+			"status":     status,
+			"created_at": createdAt,
+			"read":       read, 
+		}
+		if groupID.Valid {
+			notif["group_id"] = groupID.Int64
+		}
+		if eventID.Valid {
+			notif["event_id"] = eventID.Int64
+		}
+
+		notifs = append(notifs, notif)
+	}
+
+	return notifs, nil
+}

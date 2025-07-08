@@ -10,7 +10,7 @@ import (
 	"social-network/pkg/db/sqlite"
 	"social-network/pkg/profile"
 	"social-network/pkg/chat"
-
+    "social-network/pkg/notification"
 	// "social-network/pkg/profile"
 
 	"github.com/gorilla/mux"
@@ -49,7 +49,24 @@ func main() {
 	r.Handle("/follow/{id}", auth.AuthMiddleware(profile.FollowHandler(sqlite.DB))).Methods("POST")
 	r.Handle("/unfollow/{id}", auth.AuthMiddleware(profile.UnfollowHandler(sqlite.DB))).Methods("DELETE")
 	//chat 
+	r.Handle("/groups", auth.AuthMiddleware(http.HandlerFunc(chat.CreateGroupHandler))).Methods("POST")
+    r.Handle("/groups/join", auth.AuthMiddleware(http.HandlerFunc(chat.AddGroupMemberHandler))).Methods("POST")
 	r.Handle("/chat/messages", auth.AuthMiddleware(http.HandlerFunc(chat.GetChatMessagesHandler))).Methods("GET")
+	r.Handle("/users/search", auth.AuthMiddleware(http.HandlerFunc(chat.SearchUsersHandler))).Methods("POST")
+    r.Handle("/groups/messages", auth.AuthMiddleware(http.HandlerFunc(chat.GetGroupMessagesHandler))).Methods("GET")
+	r.Handle("/groups/members", auth.AuthMiddleware(http.HandlerFunc(chat.GetGroupMembersHandler))).Methods("GET")
+	r.Handle("/groups/events", auth.AuthMiddleware(http.HandlerFunc(chat.CreateEventHandler))).Methods("POST")
+    r.Handle("/groups/events", auth.AuthMiddleware(http.HandlerFunc(chat.GetGroupEventsHandler))).Methods("GET")
+	r.Handle("/groups/posts", auth.AuthMiddleware(http.HandlerFunc(chat.CreateGroupPost))).Methods("POST")
+	r.Handle("/groups/posts", auth.AuthMiddleware(http.HandlerFunc(chat.GetGroupPosts))).Methods("GET")
+	r.Handle("/groups/comments", auth.AuthMiddleware(http.HandlerFunc(chat.CreateGroupComment))).Methods("POST")
+	r.Handle("/groups/comments", auth.AuthMiddleware(http.HandlerFunc(chat.GetGroupComments))).Methods("GET")
+	r.Handle("/groups/search", auth.AuthMiddleware(http.HandlerFunc(chat.SearchGroupsHandler))).Methods("POST")
+	r.Handle("/groups/vote", auth.AuthMiddleware(http.HandlerFunc(chat.VotePollHandler))).Methods("POST")
+
+	r.Handle("/notifications", auth.AuthMiddleware(http.HandlerFunc(notification.CreateNotificationHandler))).Methods("POST")
+	r.Handle("/notifications/status", auth.AuthMiddleware(http.HandlerFunc(notification.UpdateNotificationStatusHandler))).Methods("POST")
+	r.Handle("/notifications/mark-all-read", auth.AuthMiddleware(http.HandlerFunc(notification.MarkAllNotificationsReadHandler))).Methods("POST")
 	
 	// Apply CORS middleware
 	handler := enableCORS(r)
