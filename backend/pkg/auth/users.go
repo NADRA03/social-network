@@ -19,7 +19,10 @@ type User struct {
 	LastMessageTime  sql.NullString
 	LastMessageText  sql.NullString
 	LastMessageFrom  sql.NullInt64  
-	LastMessageOwner string      
+	LastMessageOwner string  
+	Bio       string 
+	AvatarURL string 
+	IsPrivate bool       
 }
 
 func GetConnectedUsersForUser(sessionUserID int, onlineIDs []int) ([]User, error) {

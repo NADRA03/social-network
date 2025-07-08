@@ -109,3 +109,94 @@ func GetChatMessagesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(messages)
 }
+
+func GetGroupMessages(groupID, limit, offset int) ([]Message, error) {
+	query := `
+		SELECT 
+			m.id,
+			m.sender_id,
+			u.username AS sender_name,
+			m.content,
+			m.created_at
+		FROM 
+			messages m
+		JOIN 
+			users u ON m.sender_id = u.id
+		WHERE 
+			m.group_id = ?
+		ORDER BY 
+			m.created_at DESC
+		LIMIT ? OFFSET ?
+	`
+
+	rows, err := sqlite.DB.Query(query, groupID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var messages []Message
+	for rows.Next() {
+		var msg Message
+		err := rows.Scan(
+			&msg.ID,
+			&msg.SenderID,
+			&msg.SenderName,
+			&msg.Content,
+			&msg.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		messages = append(messages, msg)
+	}
+
+	for i, j := 0, len(messages)-1; i < j; i, j = i+1, j-1 {
+		messages[i], messages[j] = messages[j], messages[i]
+	}
+
+	return messages, nil
+}
+
+func GetGroupMessagesHandler(w http.ResponseWriter, r *http.Request) {
+	userID := auth.Session.UserID
+
+	groupIDStr := r.URL.Query().Get("group_id")
+	limitStr := r.URL.Query().Get("limit")
+	offsetStr := r.URL.Query().Get("offset")
+
+	groupID, err := strconv.Atoi(groupIDStr)
+	if err != nil {
+		http.Error(w, "Invalid group ID", http.StatusBadRequest)
+		return
+	}
+
+	limit, _ := strconv.Atoi(limitStr)
+	offset, _ := strconv.Atoi(offsetStr)
+	if limit <= 0 {
+		limit = 10
+	}
+
+	var exists bool
+	err = sqlite.DB.QueryRow(`
+		SELECT EXISTS (
+			SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ?
+		)
+	`, groupID, userID).Scan(&exists)
+
+	if err != nil || !exists {
+		http.Error(w, "Forbidden: Not a group member", http.StatusForbidden)
+		return
+	}
+
+	messages, err := GetGroupMessages(groupID, limit, offset)
+	if err != nil {
+		http.Error(w, "Failed to get messages", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(messages)
+}
+
+

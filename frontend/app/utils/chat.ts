@@ -1,6 +1,9 @@
 
 import { session } from "./session";
 import { getChatMessages } from "../api";
+import { getSelectedUserId } from "./store";
+import { showToastU } from "./toast";
+
 
 type ChatMessage = {
 	sender_id: number;
@@ -9,12 +12,19 @@ type ChatMessage = {
 };
 
 export function appendChatMessage(msg: ChatMessage, partnerName: string): void {
+	const userId = getSelectedUserId();
+
+	if (msg.sender_id !== userId && msg.sender_id !== session.UserID) {
+      console.log("a toast here");
+      showToastU(`New message from "${partnerName}"`);
+      return;
+  }
+    
 
 
 	const isMe = msg.sender_id === session.UserID;
 	const bubbleSide = isMe ? "chat-end" : "chat-start";
 	const displayName = isMe ? session.Username : partnerName;
-    console.log("Partner Name:", partnerName);
 	const initial = displayName[0]?.toUpperCase() || "?";
 
 	const chatBox = document.getElementById("chat-messages");
@@ -33,7 +43,7 @@ export function appendChatMessage(msg: ChatMessage, partnerName: string): void {
         ${displayName}
         <time class="text-xs opacity-50">${msg.created_at?.slice(0, 16).replace("T", " ")}</time>
       </div>
-      <div class="chat-bubble ${isMe ? "bg-blue-700 text-white" : "bg-base-200 text-black"}" style="
+      <div class="chat-bubble ${isMe ? "bg-base-200 text-black" : "bg-base-200 text-black"}" style="
         word-break: break-word;        
         overflow-wrap: break-word;      
         overflow-x: hidden;">
@@ -88,7 +98,7 @@ function createChatMessageHTML(msg: ChatMessage, partnerName: string): string {
         ${displayName}
         <time class="text-xs opacity-50">${msg.created_at?.slice(0, 16).replace("T", " ")}</time>
       </div>
-      <div class="chat-bubble ${isMe ? "bg-blue-700 text-white" : "bg-base-200 text-black"}" style="
+      <div class="chat-bubble ${isMe ? "bg-base-200 text-black" : "bg-base-200 text-black"}" style="
         word-break: break-word;        
         overflow-wrap: break-word;      
         overflow-x: hidden;">
@@ -100,3 +110,5 @@ function createChatMessageHTML(msg: ChatMessage, partnerName: string): string {
     </div>
   `;
 }
+
+
