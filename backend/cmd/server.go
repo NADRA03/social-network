@@ -11,8 +11,6 @@ import (
 	"social-network/pkg/posts"
 	"social-network/pkg/profile"
 
-	// "social-network/pkg/profile"
-
 	"github.com/gorilla/mux"
 )
 
@@ -43,10 +41,15 @@ func main() {
 
 	// Profile routes
 	r.Handle("/profile/{username}", auth.AuthMiddleware(http.HandlerFunc(profile.GetOwnProfileHandler))).Methods("GET")
-	r.HandleFunc("/users/{username}", profile.GetUserProfileHandler).Methods("GET")
+	r.Handle("/users/{username}", auth.AuthMiddleware(http.HandlerFunc(profile.GetUserProfileHandler))).Methods("GET")
 	r.Handle("/profile/privacy", auth.AuthMiddleware(http.HandlerFunc(profile.TogglePrivacyHandler(sqlite.DB)))).Methods("PATCH")
+	r.Handle("/profile/avatar", auth.AuthMiddleware(http.HandlerFunc(profile.UpdateAvatarHandler))).Methods("PATCH")
 	r.Handle("/follow/{username}", auth.AuthMiddleware(profile.FollowHandler(sqlite.DB))).Methods("POST")
 	r.Handle("/unfollow/{username}", auth.AuthMiddleware(profile.UnfollowHandler(sqlite.DB))).Methods("DELETE")
+	r.Handle("/followers", auth.AuthMiddleware(http.HandlerFunc(profile.GetFollowersHandler))).Methods("GET")
+	r.Handle("/profile/close-friends", auth.AuthMiddleware(http.HandlerFunc(profile.GetCloseFriendsHandler))).Methods("GET")
+	r.Handle("/profile/close-friends", auth.AuthMiddleware(http.HandlerFunc(profile.CloseFriendsHandler))).Methods("PATCH")
+	r.Handle("/users/not-followed", auth.AuthMiddleware(http.HandlerFunc(profile.GetNotFollowedUsersHandler))).Methods("GET")
 	// Post routes
 	r.Handle("/post", auth.AuthMiddleware(http.HandlerFunc(posts.CreatePostHandler))).Methods("POST")
 	r.Handle("/feed", auth.AuthMiddleware(http.HandlerFunc(posts.FeedHandler))).Methods("GET")
