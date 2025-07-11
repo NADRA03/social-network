@@ -1,0 +1,1266 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.7.0
+2 info using node@v20.15.0
+3 silly config:load:file:C:\Program Files\nodejs\node_modules\npm\npmrc
+4 silly config:load:file:C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\.npmrc
+5 silly config:load:file:C:\Users\Zahra\.npmrc
+6 silly config:load:file:C:\Users\Zahra\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm i
+8 verbose argv "i"
+9 verbose logfile logs-max:10 dir:C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\UsersZahraAppDataLocalnpm-cache\_logs\2025-07-11T21_20_21_743Z-
+10 verbose logfile C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\UsersZahraAppDataLocalnpm-cache\_logs\2025-07-11T21_20_21_743Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
+12 silly idealTree buildDeps
+13 silly logfile done cleaning log files
+14 silly reify moves {}
+15 silly audit bulk request {
+15 silly audit   '@alloc/quick-lru': [ '5.2.0' ],
+15 silly audit   '@ampproject/remapping': [ '2.3.0' ],
+15 silly audit   '@emnapi/runtime': [ '1.4.4' ],
+15 silly audit   '@esbuild/win32-x64': [ '0.25.6' ],
+15 silly audit   '@eslint-community/eslint-utils': [ '4.7.0' ],
+15 silly audit   'eslint-visitor-keys': [ '3.4.3', '4.2.1' ],
+15 silly audit   '@eslint-community/regexpp': [ '4.12.1' ],
+15 silly audit   '@eslint/config-array': [ '0.21.0' ],
+15 silly audit   '@eslint/config-helpers': [ '0.3.0' ],
+15 silly audit   '@eslint/core': [ '0.14.0', '0.15.0' ],
+15 silly audit   '@eslint/eslintrc': [ '3.3.1' ],
+15 silly audit   'js-yaml': [ '4.1.0' ],
+15 silly audit   '@eslint/js': [ '9.30.1' ],
+15 silly audit   '@eslint/object-schema': [ '2.1.6' ],
+15 silly audit   '@eslint/plugin-kit': [ '0.3.2' ],
+15 silly audit   '@floating-ui/core': [ '1.7.1' ],
+15 silly audit   '@floating-ui/dom': [ '1.7.1' ],
+15 silly audit   '@floating-ui/react-dom': [ '2.1.3' ],
+15 silly audit   '@floating-ui/utils': [ '0.2.9' ],
+15 silly audit   '@humanfs/core': [ '0.19.1' ],
+15 silly audit   '@humanfs/node': [ '0.16.6' ],
+15 silly audit   '@humanwhocodes/retry': [ '0.3.1', '0.4.3' ],
+15 silly audit   '@humanwhocodes/module-importer': [ '1.0.1' ],
+15 silly audit   '@img/sharp-win32-x64': [ '0.34.2' ],
+15 silly audit   '@isaacs/fs-minipass': [ '4.0.1' ],
+15 silly audit   '@jridgewell/gen-mapping': [ '0.3.8' ],
+15 silly audit   '@jridgewell/resolve-uri': [ '3.1.2' ],
+15 silly audit   '@jridgewell/set-array': [ '1.2.1' ],
+15 silly audit   '@jridgewell/sourcemap-codec': [ '1.5.0' ],
+15 silly audit   '@jridgewell/trace-mapping': [ '0.3.25' ],
+15 silly audit   '@next/env': [ '15.3.2' ],
+15 silly audit   '@next/eslint-plugin-next': [ '15.3.2' ],
+15 silly audit   '@next/swc-darwin-arm64': [ '15.3.2' ],
+15 silly audit   '@next/swc-darwin-x64': [ '15.3.2' ],
+15 silly audit   '@next/swc-linux-arm64-gnu': [ '15.3.2' ],
+15 silly audit   '@next/swc-linux-arm64-musl': [ '15.3.2' ],
+15 silly audit   '@next/swc-linux-x64-gnu': [ '15.3.2' ],
+15 silly audit   '@next/swc-linux-x64-musl': [ '15.3.2' ],
+15 silly audit   '@next/swc-win32-arm64-msvc': [ '15.3.2' ],
+15 silly audit   '@next/swc-win32-x64-msvc': [ '15.3.2' ],
+15 silly audit   '@nodelib/fs.scandir': [ '2.1.5' ],
+15 silly audit   '@nodelib/fs.stat': [ '2.0.5' ],
+15 silly audit   '@nodelib/fs.walk': [ '1.2.8' ],
+15 silly audit   '@nolyfill/is-core-module': [ '1.0.39' ],
+15 silly audit   '@popperjs/core': [ '2.11.8' ],
+15 silly audit   '@radix-ui/primitive': [ '1.1.2' ],
+15 silly audit   '@radix-ui/react-arrow': [ '1.1.7' ],
+15 silly audit   '@radix-ui/react-collection': [ '1.1.7' ],
+15 silly audit   '@radix-ui/react-compose-refs': [ '1.1.2' ],
+15 silly audit   '@radix-ui/react-context': [ '1.1.2' ],
+15 silly audit   '@radix-ui/react-direction': [ '1.1.1' ],
+15 silly audit   '@radix-ui/react-dismissable-layer': [ '1.1.10' ],
+15 silly audit   '@radix-ui/react-dropdown-menu': [ '2.1.15' ],
+15 silly audit   '@radix-ui/react-focus-guards': [ '1.1.2' ],
+15 silly audit   '@radix-ui/react-focus-scope': [ '1.1.7' ],
+15 silly audit   '@radix-ui/react-id': [ '1.1.1' ],
+15 silly audit   '@radix-ui/react-label': [ '2.1.7' ],
+15 silly audit   '@radix-ui/react-menu': [ '2.1.15' ],
+15 silly audit   '@radix-ui/react-popper': [ '1.2.7' ],
+15 silly audit   '@radix-ui/react-portal': [ '1.1.9' ],
+15 silly audit   '@radix-ui/react-presence': [ '1.1.4' ],
+15 silly audit   '@radix-ui/react-primitive': [ '2.1.3' ],
+15 silly audit   '@radix-ui/react-progress': [ '1.1.7' ],
+15 silly audit   '@radix-ui/react-roving-focus': [ '1.1.10' ],
+15 silly audit   '@radix-ui/react-separator': [ '1.1.7' ],
+15 silly audit   '@radix-ui/react-slot': [ '1.2.3' ],
+15 silly audit   '@radix-ui/react-tabs': [ '1.1.12' ],
+15 silly audit   '@radix-ui/react-use-callback-ref': [ '1.1.1' ],
+15 silly audit   '@radix-ui/react-use-controllable-state': [ '1.2.2' ],
+15 silly audit   '@radix-ui/react-use-effect-event': [ '0.0.2' ],
+15 silly audit   '@radix-ui/react-use-escape-keydown': [ '1.1.1' ],
+15 silly audit   '@radix-ui/react-use-layout-effect': [ '1.1.1' ],
+15 silly audit   '@radix-ui/react-use-rect': [ '1.1.1' ],
+15 silly audit   '@radix-ui/react-use-size': [ '1.1.1' ],
+15 silly audit   '@radix-ui/rect': [ '1.1.1' ],
+15 silly audit   '@rollup/plugin-node-resolve': [ '15.3.1' ],
+15 silly audit   '@rollup/pluginutils': [ '5.2.0' ],
+15 silly audit   '@rollup/rollup-android-arm-eabi': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-android-arm64': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-darwin-arm64': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-darwin-x64': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-freebsd-arm64': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-freebsd-x64': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-linux-arm-gnueabihf': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-linux-arm-musleabihf': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-linux-arm64-gnu': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-linux-arm64-musl': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-linux-loongarch64-gnu': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-linux-powerpc64le-gnu': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-linux-riscv64-gnu': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-linux-riscv64-musl': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-linux-s390x-gnu': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-linux-x64-gnu': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-linux-x64-musl': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-win32-arm64-msvc': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-win32-ia32-msvc': [ '4.44.0' ],
+15 silly audit   '@rollup/rollup-win32-x64-msvc': [ '4.44.0' ],
+15 silly audit   '@rtsao/scc': [ '1.1.0' ],
+15 silly audit   '@rushstack/eslint-patch': [ '1.11.0' ],
+15 silly audit   '@supabase/auth-js': [ '2.70.0' ],
+15 silly audit   '@supabase/functions-js': [ '2.4.5' ],
+15 silly audit   '@supabase/node-fetch': [ '2.6.15' ],
+15 silly audit   '@supabase/postgrest-js': [ '1.19.4' ],
+15 silly audit   '@supabase/realtime-js': [ '2.11.15' ],
+15 silly audit   '@supabase/storage-js': [ '2.7.1' ],
+15 silly audit   '@supabase/supabase-js': [ '2.50.5' ],
+15 silly audit   '@swc/counter': [ '0.1.3' ],
+15 silly audit   '@swc/helpers': [ '0.5.15' ],
+15 silly audit   '@tailwindcss/node': [ '4.1.10' ],
+15 silly audit   '@tailwindcss/oxide': [ '4.1.10' ],
+15 silly audit   '@tailwindcss/oxide-win32-x64-msvc': [ '4.1.10' ],
+15 silly audit   '@tailwindcss/postcss': [ '4.1.10' ],
+15 silly audit   '@tailwindcss/vite': [ '4.1.10' ],
+15 silly audit   '@types/estree': [ '1.0.8' ],
+15 silly audit   '@types/json-schema': [ '7.0.15' ],
+15 silly audit   '@types/json5': [ '0.0.29' ],
+15 silly audit   '@types/node': [ '20.19.1' ],
+15 silly audit   '@types/phoenix': [ '1.6.6' ],
+15 silly audit   '@types/react': [ '19.1.8' ],
+15 silly audit   '@types/react-dom': [ '19.1.6' ],
+15 silly audit   '@types/resolve': [ '1.20.2' ],
+15 silly audit   '@types/ws': [ '8.18.1' ],
+15 silly audit   '@typescript-eslint/eslint-plugin': [ '8.34.1' ],
+15 silly audit   ignore: [ '7.0.5', '5.3.2' ],
+15 silly audit   '@typescript-eslint/parser': [ '8.34.1' ],
+15 silly audit   '@typescript-eslint/project-service': [ '8.34.1' ],
+15 silly audit   '@typescript-eslint/scope-manager': [ '8.34.1' ],
+15 silly audit   '@typescript-eslint/tsconfig-utils': [ '8.34.1' ],
+15 silly audit   '@typescript-eslint/type-utils': [ '8.34.1' ],
+15 silly audit   '@typescript-eslint/types': [ '8.34.1' ],
+15 silly audit   '@typescript-eslint/typescript-estree': [ '8.34.1' ],
+15 silly audit   'brace-expansion': [ '2.0.2', '1.1.12' ],
+15 silly audit   'fast-glob': [ '3.3.3', '3.3.1' ],
+15 silly audit   'glob-parent': [ '5.1.2', '6.0.2' ],
+15 silly audit   minimatch: [ '9.0.5', '3.1.2' ],
+15 silly audit   '@typescript-eslint/utils': [ '8.34.1' ],
+15 silly audit   '@typescript-eslint/visitor-keys': [ '8.34.1' ],
+15 silly audit   '@unrs/resolver-binding-win32-x64-msvc': [ '1.9.1' ],
+15 silly audit   acorn: [ '8.15.0' ],
+15 silly audit   'acorn-jsx': [ '5.3.2' ],
+15 silly audit   ajv: [ '6.12.6' ],
+15 silly audit   'ansi-styles': [ '4.3.0' ],
+15 silly audit   argparse: [ '2.0.1' ],
+15 silly audit   'aria-hidden': [ '1.2.6' ],
+15 silly audit   'aria-query': [ '5.3.2' ],
+15 silly audit   'array-buffer-byte-length': [ '1.0.2' ],
+15 silly audit   'array-includes': [ '3.1.9' ],
+15 silly audit   'array.prototype.findlast': [ '1.2.5' ],
+15 silly audit   'array.prototype.findlastindex': [ '1.2.6' ],
+15 silly audit   'array.prototype.flat': [ '1.3.3' ],
+15 silly audit   'array.prototype.flatmap': [ '1.3.3' ],
+15 silly audit   'array.prototype.tosorted': [ '1.1.4' ],
+15 silly audit   'arraybuffer.prototype.slice': [ '1.0.4' ],
+15 silly audit   'ast-types-flow': [ '0.0.8' ],
+15 silly audit   'async-function': [ '1.0.0' ],
+15 silly audit   asynckit: [ '0.4.0' ],
+15 silly audit   'available-typed-arrays': [ '1.0.7' ],
+15 silly audit   'axe-core': [ '4.10.3' ],
+15 silly audit   axios: [ '1.10.0' ],
+15 silly audit   'axobject-query': [ '4.1.0' ],
+15 silly audit   'balanced-match': [ '1.0.2' ],
+15 silly audit   braces: [ '3.0.3' ],
+15 silly audit   busboy: [ '1.6.0' ],
+15 silly audit   'call-bind': [ '1.0.8' ],
+15 silly audit   'call-bind-apply-helpers': [ '1.0.2' ],
+15 silly audit   'call-bound': [ '1.0.4' ],
+15 silly audit   callsites: [ '3.1.0' ],
+15 silly audit   'caniuse-lite': [ '1.0.30001724' ],
+15 silly audit   chalk: [ '4.1.2' ],
+15 silly audit   chownr: [ '3.0.0' ],
+15 silly audit   'class-variance-authority': [ '0.7.1' ],
+15 silly audit   'client-only': [ '0.0.1' ],
+15 silly audit   clsx: [ '2.1.1' ],
+15 silly audit   color: [ '4.2.3' ],
+15 silly audit   'color-convert': [ '2.0.1' ],
+15 silly audit   'color-name': [ '1.1.4' ],
+15 silly audit   'color-string': [ '1.9.1' ],
+15 silly audit   'combined-stream': [ '1.0.8' ],
+15 silly audit   'concat-map': [ '0.0.1' ],
+15 silly audit   'cross-spawn': [ '7.0.6' ],
+15 silly audit   csstype: [ '3.1.3' ],
+15 silly audit   daisyui: [ '5.0.43' ],
+15 silly audit   'damerau-levenshtein': [ '1.0.8' ],
+15 silly audit   'data-view-buffer': [ '1.0.2' ],
+15 silly audit   'data-view-byte-length': [ '1.0.2' ],
+15 silly audit   'data-view-byte-offset': [ '1.0.1' ],
+15 silly audit   debug: [ '4.4.1', '3.2.7' ],
+15 silly audit   'deep-is': [ '0.1.4' ],
+15 silly audit   deepmerge: [ '4.3.1' ],
+15 silly audit   'define-data-property': [ '1.1.4' ],
+15 silly audit   'define-properties': [ '1.2.1' ],
+15 silly audit   'delayed-stream': [ '1.0.0' ],
+15 silly audit   'detect-libc': [ '2.0.4' ],
+15 silly audit   'detect-node-es': [ '1.1.0' ],
+15 silly audit   doctrine: [ '2.1.0' ],
+15 silly audit   'dunder-proto': [ '1.0.1' ],
+15 silly audit   'emoji-picker-react': [ '4.12.3' ],
+15 silly audit   'emoji-regex': [ '9.2.2' ],
+15 silly audit   'enhanced-resolve': [ '5.18.1' ],
+15 silly audit   'es-abstract': [ '1.24.0' ],
+15 silly audit   'es-define-property': [ '1.0.1' ],
+15 silly audit   'es-errors': [ '1.3.0' ],
+15 silly audit   'es-iterator-helpers': [ '1.2.1' ],
+15 silly audit   'es-object-atoms': [ '1.1.1' ],
+15 silly audit   'es-set-tostringtag': [ '2.1.0' ],
+15 silly audit   'es-shim-unscopables': [ '1.1.0' ],
+15 silly audit   'es-to-primitive': [ '1.3.0' ],
+15 silly audit   'escape-string-regexp': [ '4.0.0' ],
+15 silly audit   eslint: [ '9.30.1' ],
+15 silly audit   'eslint-config-next': [ '15.3.2' ],
+15 silly audit   'eslint-import-resolver-node': [ '0.3.9' ],
+15 silly audit   'eslint-import-resolver-typescript': [ '3.10.1' ],
+15 silly audit   'eslint-module-utils': [ '2.12.1' ],
+15 silly audit   'eslint-plugin-import': [ '2.32.0' ],
+15 silly audit   semver: [ '6.3.1', '7.7.2' ],
+15 silly audit   'eslint-plugin-jsx-a11y': [ '6.10.2' ],
+15 silly audit   'eslint-plugin-react': [ '7.37.5' ],
+15 silly audit   'eslint-plugin-react-hooks': [ '5.2.0' ],
+15 silly audit   resolve: [ '2.0.0-next.5', '1.22.10' ],
+15 silly audit   'eslint-scope': [ '8.4.0' ],
+15 silly audit   espree: [ '10.4.0' ],
+15 silly audit   esquery: [ '1.6.0' ],
+15 silly audit   esrecurse: [ '4.3.0' ],
+15 silly audit   estraverse: [ '5.3.0' ],
+15 silly audit   'estree-walker': [ '2.0.2' ],
+15 silly audit   esutils: [ '2.0.3' ],
+15 silly audit   'fast-deep-equal': [ '3.1.3' ],
+15 silly audit   'fast-json-stable-stringify': [ '2.1.0' ],
+15 silly audit   'fast-levenshtein': [ '2.0.6' ],
+15 silly audit   fastq: [ '1.19.1' ],
+15 silly audit   fdir: [ '6.4.6' ],
+15 silly audit   'file-entry-cache': [ '8.0.0' ],
+15 silly audit   'fill-range': [ '7.1.1' ],
+15 silly audit   'find-up': [ '5.0.0' ],
+15 silly audit   flairup: [ '1.0.0' ],
+15 silly audit   'flat-cache': [ '4.0.1' ],
+15 silly audit   flatted: [ '3.3.3' ],
+15 silly audit   flowbite: [ '3.1.2', '2.5.2' ],
+15 silly audit   'flowbite-datepicker': [ '1.3.2' ],
+15 silly audit   'mini-svg-data-uri': [ '1.4.4' ],
+15 silly audit   'follow-redirects': [ '1.15.9' ],
+15 silly audit   'for-each': [ '0.3.5' ],
+15 silly audit   'form-data': [ '4.0.3' ],
+15 silly audit   'function-bind': [ '1.1.2' ],
+15 silly audit   'function.prototype.name': [ '1.1.8' ],
+15 silly audit   'functions-have-names': [ '1.2.3' ],
+15 silly audit   'get-intrinsic': [ '1.3.0' ],
+15 silly audit   'get-nonce': [ '1.0.1' ],
+15 silly audit   'get-proto': [ '1.0.1' ],
+15 silly audit   'get-symbol-description': [ '1.1.0' ],
+15 silly audit   'get-tsconfig': [ '4.10.1' ],
+15 silly audit   globals: [ '14.0.0' ],
+15 silly audit   globalthis: [ '1.0.4' ],
+15 silly audit   gopd: [ '1.2.0' ],
+15 silly audit   'graceful-fs': [ '4.2.11' ],
+15 silly audit   graphemer: [ '1.4.0' ],
+15 silly audit   'has-bigints': [ '1.1.0' ],
+15 silly audit   'has-flag': [ '4.0.0' ],
+15 silly audit   'has-property-descriptors': [ '1.0.2' ],
+15 silly audit   'has-proto': [ '1.2.0' ],
+15 silly audit   'has-symbols': [ '1.1.0' ],
+15 silly audit   'has-tostringtag': [ '1.0.2' ],
+15 silly audit   hasown: [ '2.0.2' ],
+15 silly audit   'import-fresh': [ '3.3.1' ],
+15 silly audit   imurmurhash: [ '0.1.4' ],
+15 silly audit   'internal-slot': [ '1.1.0' ],
+15 silly audit   'is-array-buffer': [ '3.0.5' ],
+15 silly audit   'is-arrayish': [ '0.3.2' ],
+15 silly audit   'is-async-function': [ '2.1.1' ],
+15 silly audit   'is-bigint': [ '1.1.0' ],
+15 silly audit   'is-boolean-object': [ '1.2.2' ],
+15 silly audit   'is-bun-module': [ '2.0.0' ],
+15 silly audit   'is-callable': [ '1.2.7' ],
+15 silly audit   'is-core-module': [ '2.16.1' ],
+15 silly audit   'is-data-view': [ '1.0.2' ],
+15 silly audit   'is-date-object': [ '1.1.0' ],
+15 silly audit   'is-extglob': [ '2.1.1' ],
+15 silly audit   'is-finalizationregistry': [ '1.1.1' ],
+15 silly audit   'is-generator-function': [ '1.1.0' ],
+15 silly audit   'is-glob': [ '4.0.3' ],
+15 silly audit   'is-map': [ '2.0.3' ],
+15 silly audit   'is-module': [ '1.0.0' ],
+15 silly audit   'is-negative-zero': [ '2.0.3' ],
+15 silly audit   'is-number': [ '7.0.0' ],
+15 silly audit   'is-number-object': [ '1.1.1' ],
+15 silly audit   'is-regex': [ '1.2.1' ],
+15 silly audit   'is-set': [ '2.0.3' ],
+15 silly audit   'is-shared-array-buffer': [ '1.0.4' ],
+15 silly audit   'is-string': [ '1.1.1' ],
+15 silly audit   'is-symbol': [ '1.1.1' ],
+15 silly audit   'is-typed-array': [ '1.1.15' ],
+15 silly audit   'is-weakmap': [ '2.0.2' ],
+15 silly audit   'is-weakref': [ '1.1.1' ],
+15 silly audit   'is-weakset': [ '2.0.4' ],
+15 silly audit   isarray: [ '2.0.5' ],
+15 silly audit   isexe: [ '2.0.0' ],
+15 silly audit   isows: [ '1.0.7' ],
+15 silly audit   'iterator.prototype': [ '1.1.5' ],
+15 silly audit   jiti: [ '2.4.2' ],
+15 silly audit   'js-cookie': [ '3.0.5' ],
+15 silly audit   'js-tokens': [ '4.0.0' ],
+15 silly audit   'json-buffer': [ '3.0.1' ],
+15 silly audit   'json-schema-traverse': [ '0.4.1' ],
+15 silly audit   'json-stable-stringify-without-jsonify': [ '1.0.1' ],
+15 silly audit   json5: [ '1.0.2' ],
+15 silly audit   'jsx-ast-utils': [ '3.3.5' ],
+15 silly audit   keyv: [ '4.5.4' ],
+15 silly audit   'language-subtag-registry': [ '0.3.23' ],
+15 silly audit   'language-tags': [ '1.0.9' ],
+15 silly audit   levn: [ '0.4.1' ],
+15 silly audit   lightningcss: [ '1.30.1' ],
+15 silly audit   'lightningcss-win32-x64-msvc': [ '1.30.1' ],
+15 silly audit   'locate-path': [ '6.0.0' ],
+15 silly audit   'lodash.merge': [ '4.6.2' ],
+15 silly audit   'lucide-react': [ '0.522.0' ],
+15 silly audit   'magic-string': [ '0.30.17' ],
+15 silly audit   'math-intrinsics': [ '1.1.0' ],
+15 silly audit   merge2: [ '1.4.1' ],
+15 silly audit   micromatch: [ '4.0.8' ],
+15 silly audit   picomatch: [ '2.3.1', '4.0.2' ],
+15 silly audit   'mime-db': [ '1.52.0' ],
+15 silly audit   'mime-types': [ '2.1.35' ],
+15 silly audit   minimist: [ '1.2.8' ],
+15 silly audit   minipass: [ '7.1.2' ],
+15 silly audit   minizlib: [ '3.0.2' ],
+15 silly audit   ms: [ '2.1.3' ],
+15 silly audit   nanoid: [ '3.3.11' ],
+15 silly audit   'napi-postinstall': [ '0.2.4' ],
+15 silly audit   'natural-compare': [ '1.4.0' ],
+15 silly audit   next: [ '15.3.2' ],
+15 silly audit   postcss: [ '8.4.31', '8.5.6' ],
+15 silly audit   'object-assign': [ '4.1.1' ],
+15 silly audit   'object-inspect': [ '1.13.4' ],
+15 silly audit   'object-keys': [ '1.1.1' ],
+15 silly audit   'object.assign': [ '4.1.7' ],
+15 silly audit   'object.entries': [ '1.1.9' ],
+15 silly audit   'object.fromentries': [ '2.0.8' ],
+15 silly audit   'object.groupby': [ '1.0.3' ],
+15 silly audit   'object.values': [ '1.2.1' ],
+15 silly audit   optionator: [ '0.9.4' ],
+15 silly audit   'own-keys': [ '1.0.1' ],
+15 silly audit   'p-limit': [ '3.1.0' ],
+15 silly audit   'p-locate': [ '5.0.0' ],
+15 silly audit   'parent-module': [ '1.0.1' ],
+15 silly audit   'path-exists': [ '4.0.0' ],
+15 silly audit   'path-key': [ '3.1.1' ],
+15 silly audit   'path-parse': [ '1.0.7' ],
+15 silly audit   picocolors: [ '1.1.1' ],
+15 silly audit   'possible-typed-array-names': [ '1.1.0' ],
+15 silly audit   'prelude-ls': [ '1.2.1' ],
+15 silly audit   'prop-types': [ '15.8.1' ],
+15 silly audit   'loose-envify': [ '1.4.0' ],
+15 silly audit   'proxy-from-env': [ '1.1.0' ],
+15 silly audit   punycode: [ '2.3.1' ],
+15 silly audit   'queue-microtask': [ '1.2.3' ],
+15 silly audit   react: [ '19.1.0' ],
+15 silly audit   'react-dom': [ '19.1.0' ],
+15 silly audit   'react-icons': [ '5.5.0' ],
+15 silly audit   'react-is': [ '16.13.1' ],
+15 silly audit   'react-remove-scroll': [ '2.7.1' ],
+15 silly audit   'react-remove-scroll-bar': [ '2.3.8' ],
+15 silly audit   'react-style-singleton': [ '2.2.3' ],
+15 silly audit   'reflect.getprototypeof': [ '1.0.10' ],
+15 silly audit   'regexp.prototype.flags': [ '1.5.4' ],
+15 silly audit   'resolve-from': [ '4.0.0' ],
+15 silly audit   'resolve-pkg-maps': [ '1.0.0' ],
+15 silly audit   reusify: [ '1.1.0' ],
+15 silly audit   rollup: [ '4.44.0' ],
+15 silly audit   fsevents: [ '2.3.3' ],
+15 silly audit   'run-parallel': [ '1.2.0' ],
+15 silly audit   'safe-array-concat': [ '1.1.3' ],
+15 silly audit   'safe-push-apply': [ '1.0.0' ],
+15 silly audit   'safe-regex-test': [ '1.1.0' ],
+15 silly audit   scheduler: [ '0.26.0' ],
+15 silly audit   'set-function-length': [ '1.2.2' ],
+15 silly audit   'set-function-name': [ '2.0.2' ],
+15 silly audit   'set-proto': [ '1.0.0' ],
+15 silly audit   sharp: [ '0.34.2' ],
+15 silly audit   '@img/sharp-darwin-arm64': [ '0.34.2' ],
+15 silly audit   '@img/sharp-darwin-x64': [ '0.34.2' ],
+15 silly audit   '@img/sharp-libvips-darwin-arm64': [ '1.1.0' ],
+15 silly audit   '@img/sharp-libvips-darwin-x64': [ '1.1.0' ],
+15 silly audit   '@img/sharp-libvips-linux-arm': [ '1.1.0' ],
+15 silly audit   '@img/sharp-libvips-linux-arm64': [ '1.1.0' ],
+15 silly audit   '@img/sharp-libvips-linux-ppc64': [ '1.1.0' ],
+15 silly audit   '@img/sharp-libvips-linux-s390x': [ '1.1.0' ],
+15 silly audit   '@img/sharp-libvips-linux-x64': [ '1.1.0' ],
+15 silly audit   '@img/sharp-libvips-linuxmusl-arm64': [ '1.1.0' ],
+15 silly audit   '@img/sharp-libvips-linuxmusl-x64': [ '1.1.0' ],
+15 silly audit   '@img/sharp-linux-arm': [ '0.34.2' ],
+15 silly audit   '@img/sharp-linux-arm64': [ '0.34.2' ],
+15 silly audit   '@img/sharp-linux-s390x': [ '0.34.2' ],
+15 silly audit   '@img/sharp-linux-x64': [ '0.34.2' ],
+15 silly audit   '@img/sharp-linuxmusl-arm64': [ '0.34.2' ],
+15 silly audit   '@img/sharp-linuxmusl-x64': [ '0.34.2' ],
+15 silly audit   '@img/sharp-wasm32': [ '0.34.2' ],
+15 silly audit   '@img/sharp-win32-arm64': [ '0.34.2' ],
+15 silly audit   '@img/sharp-win32-ia32': [ '0.34.2' ],
+15 silly audit   'shebang-command': [ '2.0.0' ],
+15 silly audit   'shebang-regex': [ '3.0.0' ],
+15 silly audit   'side-channel': [ '1.1.0' ],
+15 silly audit   'side-channel-list': [ '1.0.0' ],
+15 silly audit   'side-channel-map': [ '1.0.1' ],
+15 silly audit   'side-channel-weakmap': [ '1.0.2' ],
+15 silly audit   'simple-swizzle': [ '0.2.2' ],
+15 silly audit   'source-map-js': [ '1.2.1' ],
+15 silly audit   'stable-hash': [ '0.0.5' ],
+15 silly audit   'stop-iteration-iterator': [ '1.1.0' ],
+15 silly audit   streamsearch: [ '1.1.0' ],
+15 silly audit   'string.prototype.includes': [ '2.0.1' ],
+15 silly audit   'string.prototype.matchall': [ '4.0.12' ],
+15 silly audit   'string.prototype.repeat': [ '1.0.0' ],
+15 silly audit   'string.prototype.trim': [ '1.2.10' ],
+15 silly audit   'string.prototype.trimend': [ '1.0.9' ],
+15 silly audit   'string.prototype.trimstart': [ '1.0.8' ],
+15 silly audit   'strip-bom': [ '3.0.0' ],
+15 silly audit   'strip-json-comments': [ '3.1.1' ],
+15 silly audit   'styled-jsx': [ '5.1.6' ],
+15 silly audit   'supports-color': [ '7.2.0' ],
+15 silly audit   'supports-preserve-symlinks-flag': [ '1.0.0' ],
+15 silly audit   'tailwind-merge': [ '3.3.1' ],
+15 silly audit   tailwindcss: [ '4.1.10' ],
+15 silly audit   tapable: [ '2.2.2' ],
+15 silly audit   tar: [ '7.4.3' ],
+15 silly audit   mkdirp: [ '3.0.1' ],
+15 silly audit   tinyglobby: [ '0.2.14' ],
+15 silly audit   'to-regex-range': [ '5.0.1' ],
+15 silly audit   tr46: [ '0.0.3' ],
+15 silly audit   'ts-api-utils': [ '2.1.0' ],
+15 silly audit   'tsconfig-paths': [ '3.15.0' ],
+15 silly audit   tslib: [ '2.8.1' ],
+15 silly audit   'tw-animate-css': [ '1.3.4' ],
+15 silly audit   'type-check': [ '0.4.0' ],
+15 silly audit   'typed-array-buffer': [ '1.0.3' ],
+15 silly audit   'typed-array-byte-length': [ '1.0.3' ],
+15 silly audit   'typed-array-byte-offset': [ '1.0.4' ],
+15 silly audit   'typed-array-length': [ '1.0.7' ],
+15 silly audit   typescript: [ '5.8.3' ],
+15 silly audit   'unbox-primitive': [ '1.1.0' ],
+15 silly audit   'undici-types': [ '6.21.0' ],
+15 silly audit   'unrs-resolver': [ '1.9.1' ],
+15 silly audit   'uri-js': [ '4.4.1' ],
+15 silly audit   'use-callback-ref': [ '1.3.3' ],
+15 silly audit   'use-sidecar': [ '1.1.3' ],
+15 silly audit   vite: [ '6.3.5' ],
+15 silly audit   '@esbuild/aix-ppc64': [ '0.25.6' ],
+15 silly audit   '@esbuild/android-arm': [ '0.25.6' ],
+15 silly audit   '@esbuild/android-arm64': [ '0.25.6' ],
+15 silly audit   '@esbuild/android-x64': [ '0.25.6' ],
+15 silly audit   '@esbuild/darwin-arm64': [ '0.25.6' ],
+15 silly audit   '@esbuild/darwin-x64': [ '0.25.6' ],
+15 silly audit   '@esbuild/freebsd-arm64': [ '0.25.6' ],
+15 silly audit   '@esbuild/freebsd-x64': [ '0.25.6' ],
+15 silly audit   '@esbuild/linux-arm': [ '0.25.6' ],
+15 silly audit   '@esbuild/linux-arm64': [ '0.25.6' ],
+15 silly audit   '@esbuild/linux-ia32': [ '0.25.6' ],
+15 silly audit   '@esbuild/linux-loong64': [ '0.25.6' ],
+15 silly audit   '@esbuild/linux-mips64el': [ '0.25.6' ],
+15 silly audit   '@esbuild/linux-ppc64': [ '0.25.6' ],
+15 silly audit   '@esbuild/linux-riscv64': [ '0.25.6' ],
+15 silly audit   '@esbuild/linux-s390x': [ '0.25.6' ],
+15 silly audit   '@esbuild/linux-x64': [ '0.25.6' ],
+15 silly audit   '@esbuild/netbsd-arm64': [ '0.25.6' ],
+15 silly audit   '@esbuild/netbsd-x64': [ '0.25.6' ],
+15 silly audit   '@esbuild/openbsd-arm64': [ '0.25.6' ],
+15 silly audit   '@esbuild/openbsd-x64': [ '0.25.6' ],
+15 silly audit   '@esbuild/openharmony-arm64': [ '0.25.6' ],
+15 silly audit   '@esbuild/sunos-x64': [ '0.25.6' ],
+15 silly audit   '@esbuild/win32-arm64': [ '0.25.6' ],
+15 silly audit   '@esbuild/win32-ia32': [ '0.25.6' ],
+15 silly audit   esbuild: [ '0.25.6' ],
+15 silly audit   'webidl-conversions': [ '3.0.1' ],
+15 silly audit   'whatwg-url': [ '5.0.0' ],
+15 silly audit   which: [ '2.0.2' ],
+15 silly audit   'which-boxed-primitive': [ '1.1.1' ],
+15 silly audit   'which-builtin-type': [ '1.2.1' ],
+15 silly audit   'which-collection': [ '1.0.2' ],
+15 silly audit   'which-typed-array': [ '1.1.19' ],
+15 silly audit   'word-wrap': [ '1.2.5' ],
+15 silly audit   ws: [ '8.18.3' ],
+15 silly audit   yallist: [ '5.0.0' ],
+15 silly audit   'yocto-queue': [ '0.1.0' ],
+15 silly audit   zustand: [ '5.0.6' ]
+15 silly audit }
+16 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\fsevents
+17 silly reify mark deleted [
+17 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\fsevents'
+17 silly reify ]
+18 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\win32-ia32
+19 silly reify mark deleted [
+19 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\win32-ia32'
+19 silly reify ]
+20 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\win32-arm64
+21 silly reify mark deleted [
+21 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\win32-arm64'
+21 silly reify ]
+22 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\sunos-x64
+23 silly reify mark deleted [
+23 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\sunos-x64'
+23 silly reify ]
+24 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\openharmony-arm64
+25 silly reify mark deleted [
+25 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\openharmony-arm64'
+25 silly reify ]
+26 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\openbsd-x64
+27 silly reify mark deleted [
+27 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\openbsd-x64'
+27 silly reify ]
+28 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\openbsd-arm64
+29 silly reify mark deleted [
+29 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\openbsd-arm64'
+29 silly reify ]
+30 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\netbsd-x64
+31 silly reify mark deleted [
+31 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\netbsd-x64'
+31 silly reify ]
+32 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\netbsd-arm64
+33 silly reify mark deleted [
+33 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\netbsd-arm64'
+33 silly reify ]
+34 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\linux-x64
+35 silly reify mark deleted [
+35 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\linux-x64'
+35 silly reify ]
+36 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\linux-s390x
+37 silly reify mark deleted [
+37 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\linux-s390x'
+37 silly reify ]
+38 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\linux-riscv64
+39 silly reify mark deleted [
+39 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\linux-riscv64'
+39 silly reify ]
+40 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\linux-ppc64
+41 silly reify mark deleted [
+41 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\linux-ppc64'
+41 silly reify ]
+42 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\linux-mips64el
+43 silly reify mark deleted [
+43 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\linux-mips64el'
+43 silly reify ]
+44 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\linux-loong64
+45 silly reify mark deleted [
+45 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\linux-loong64'
+45 silly reify ]
+46 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\linux-ia32
+47 silly reify mark deleted [
+47 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\linux-ia32'
+47 silly reify ]
+48 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\linux-arm64
+49 silly reify mark deleted [
+49 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\linux-arm64'
+49 silly reify ]
+50 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\linux-arm
+51 silly reify mark deleted [
+51 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\linux-arm'
+51 silly reify ]
+52 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\freebsd-x64
+53 silly reify mark deleted [
+53 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\freebsd-x64'
+53 silly reify ]
+54 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\freebsd-arm64
+55 silly reify mark deleted [
+55 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\freebsd-arm64'
+55 silly reify ]
+56 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\darwin-x64
+57 silly reify mark deleted [
+57 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\darwin-x64'
+57 silly reify ]
+58 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\darwin-arm64
+59 silly reify mark deleted [
+59 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\darwin-arm64'
+59 silly reify ]
+60 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\android-x64
+61 silly reify mark deleted [
+61 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\android-x64'
+61 silly reify ]
+62 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\android-arm64
+63 silly reify mark deleted [
+63 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\android-arm64'
+63 silly reify ]
+64 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\android-arm
+65 silly reify mark deleted [
+65 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\android-arm'
+65 silly reify ]
+66 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\vite\node_modules\@esbuild\aix-ppc64
+67 silly reify mark deleted [
+67 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\vite\\node_modules\\@esbuild\\aix-ppc64'
+67 silly reify ]
+68 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-win32-ia32
+69 silly reify mark deleted [
+69 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-win32-ia32'
+69 silly reify ]
+70 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-win32-arm64
+71 silly reify mark deleted [
+71 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-win32-arm64'
+71 silly reify ]
+72 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-wasm32
+73 silly reify mark deleted [
+73 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-wasm32'
+73 silly reify ]
+74 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@emnapi\runtime
+75 silly reify mark deleted [
+75 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@emnapi\\runtime'
+75 silly reify ]
+76 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-linuxmusl-x64
+77 silly reify mark deleted [
+77 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-linuxmusl-x64'
+77 silly reify ]
+78 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-linuxmusl-arm64
+79 silly reify mark deleted [
+79 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-linuxmusl-arm64'
+79 silly reify ]
+80 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-linux-x64
+81 silly reify mark deleted [
+81 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-linux-x64'
+81 silly reify ]
+82 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-linux-s390x
+83 silly reify mark deleted [
+83 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-linux-s390x'
+83 silly reify ]
+84 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-linux-arm64
+85 silly reify mark deleted [
+85 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-linux-arm64'
+85 silly reify ]
+86 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-linux-arm
+87 silly reify mark deleted [
+87 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-linux-arm'
+87 silly reify ]
+88 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-libvips-linuxmusl-x64
+89 silly reify mark deleted [
+89 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-libvips-linuxmusl-x64'
+89 silly reify ]
+90 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-libvips-linuxmusl-arm64
+91 silly reify mark deleted [
+91 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-libvips-linuxmusl-arm64'
+91 silly reify ]
+92 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-libvips-linux-x64
+93 silly reify mark deleted [
+93 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-libvips-linux-x64'
+93 silly reify ]
+94 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-libvips-linux-s390x
+95 silly reify mark deleted [
+95 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-libvips-linux-s390x'
+95 silly reify ]
+96 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-libvips-linux-ppc64
+97 silly reify mark deleted [
+97 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-libvips-linux-ppc64'
+97 silly reify ]
+98 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-libvips-linux-arm64
+99 silly reify mark deleted [
+99 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-libvips-linux-arm64'
+99 silly reify ]
+100 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-libvips-linux-arm
+101 silly reify mark deleted [
+101 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-libvips-linux-arm'
+101 silly reify ]
+102 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-libvips-darwin-x64
+103 silly reify mark deleted [
+103 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-libvips-darwin-x64'
+103 silly reify ]
+104 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-libvips-darwin-arm64
+105 silly reify mark deleted [
+105 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-libvips-darwin-arm64'
+105 silly reify ]
+106 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-darwin-x64
+107 silly reify mark deleted [
+107 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-darwin-x64'
+107 silly reify ]
+108 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\sharp\node_modules\@img\sharp-darwin-arm64
+109 silly reify mark deleted [
+109 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\sharp\\node_modules\\@img\\sharp-darwin-arm64'
+109 silly reify ]
+110 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\rollup\node_modules\fsevents
+111 silly reify mark deleted [
+111 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\rollup\\node_modules\\fsevents'
+111 silly reify ]
+112 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-win32-ia32-msvc
+113 silly reify mark deleted [
+113 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-win32-ia32-msvc'
+113 silly reify ]
+114 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-win32-arm64-msvc
+115 silly reify mark deleted [
+115 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-win32-arm64-msvc'
+115 silly reify ]
+116 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-linux-x64-musl
+117 silly reify mark deleted [
+117 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-linux-x64-musl'
+117 silly reify ]
+118 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-linux-x64-gnu
+119 silly reify mark deleted [
+119 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-linux-x64-gnu'
+119 silly reify ]
+120 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-linux-s390x-gnu
+121 silly reify mark deleted [
+121 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-linux-s390x-gnu'
+121 silly reify ]
+122 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-linux-riscv64-musl
+123 silly reify mark deleted [
+123 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-linux-riscv64-musl'
+123 silly reify ]
+124 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-linux-riscv64-gnu
+125 silly reify mark deleted [
+125 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-linux-riscv64-gnu'
+125 silly reify ]
+126 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-linux-powerpc64le-gnu
+127 silly reify mark deleted [
+127 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-linux-powerpc64le-gnu'
+127 silly reify ]
+128 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-linux-loongarch64-gnu
+129 silly reify mark deleted [
+129 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-linux-loongarch64-gnu'
+129 silly reify ]
+130 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-linux-arm64-musl
+131 silly reify mark deleted [
+131 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-linux-arm64-musl'
+131 silly reify ]
+132 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-linux-arm64-gnu
+133 silly reify mark deleted [
+133 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-linux-arm64-gnu'
+133 silly reify ]
+134 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-linux-arm-musleabihf
+135 silly reify mark deleted [
+135 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-linux-arm-musleabihf'
+135 silly reify ]
+136 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-linux-arm-gnueabihf
+137 silly reify mark deleted [
+137 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-linux-arm-gnueabihf'
+137 silly reify ]
+138 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-freebsd-x64
+139 silly reify mark deleted [
+139 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-freebsd-x64'
+139 silly reify ]
+140 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-freebsd-arm64
+141 silly reify mark deleted [
+141 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-freebsd-arm64'
+141 silly reify ]
+142 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-darwin-x64
+143 silly reify mark deleted [
+143 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-darwin-x64'
+143 silly reify ]
+144 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-darwin-arm64
+145 silly reify mark deleted [
+145 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-darwin-arm64'
+145 silly reify ]
+146 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-android-arm64
+147 silly reify mark deleted [
+147 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-android-arm64'
+147 silly reify ]
+148 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@rollup\rollup-android-arm-eabi
+149 silly reify mark deleted [
+149 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@rollup\\rollup-android-arm-eabi'
+149 silly reify ]
+150 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@next\swc-win32-arm64-msvc
+151 silly reify mark deleted [
+151 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@next\\swc-win32-arm64-msvc'
+151 silly reify ]
+152 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@next\swc-linux-x64-musl
+153 silly reify mark deleted [
+153 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@next\\swc-linux-x64-musl'
+153 silly reify ]
+154 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@next\swc-linux-x64-gnu
+155 silly reify mark deleted [
+155 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@next\\swc-linux-x64-gnu'
+155 silly reify ]
+156 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@next\swc-linux-arm64-musl
+157 silly reify mark deleted [
+157 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@next\\swc-linux-arm64-musl'
+157 silly reify ]
+158 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@next\swc-linux-arm64-gnu
+159 silly reify mark deleted [
+159 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@next\\swc-linux-arm64-gnu'
+159 silly reify ]
+160 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@next\swc-darwin-x64
+161 silly reify mark deleted [
+161 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@next\\swc-darwin-x64'
+161 silly reify ]
+162 verbose reify failed optional dependency C:\Users\Zahra\Desktop\recentMerge\social-network\frontend\node_modules\@next\swc-darwin-arm64
+163 silly reify mark deleted [
+163 silly reify   'C:\\Users\\Zahra\\Desktop\\recentMerge\\social-network\\frontend\\node_modules\\@next\\swc-darwin-arm64'
+163 silly reify ]
+164 silly tarball no local data for zustand@https://registry.npmjs.org/zustand/-/zustand-5.0.6.tgz. Extracting by manifest.
+165 silly tarball no local data for ws@https://registry.npmjs.org/ws/-/ws-8.18.3.tgz. Extracting by manifest.
+166 silly tarball no local data for whatwg-url@https://registry.npmjs.org/whatwg-url/-/whatwg-url-5.0.0.tgz. Extracting by manifest.
+167 silly tarball no local data for webidl-conversions@https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-3.0.1.tgz. Extracting by manifest.
+168 silly tarball no local data for tr46@https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz. Extracting by manifest.
+169 silly tarball no local data for isows@https://registry.npmjs.org/isows/-/isows-1.0.7.tgz. Extracting by manifest.
+170 silly tarball no local data for flairup@https://registry.npmjs.org/flairup/-/flairup-1.0.0.tgz. Extracting by manifest.
+171 silly tarball no local data for eslint@https://registry.npmjs.org/eslint/-/eslint-9.30.1.tgz. Extracting by manifest.
+172 silly tarball no local data for emoji-picker-react@https://registry.npmjs.org/emoji-picker-react/-/emoji-picker-react-4.12.3.tgz. Extracting by manifest.
+173 silly tarball no local data for @types/ws@https://registry.npmjs.org/@types/ws/-/ws-8.18.1.tgz. Extracting by manifest.
+174 silly tarball no local data for @types/phoenix@https://registry.npmjs.org/@types/phoenix/-/phoenix-1.6.6.tgz. Extracting by manifest.
+175 silly tarball no local data for @supabase/supabase-js@https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.50.5.tgz. Extracting by manifest.
+176 silly tarball no local data for @supabase/storage-js@https://registry.npmjs.org/@supabase/storage-js/-/storage-js-2.7.1.tgz. Extracting by manifest.
+177 silly tarball no local data for @supabase/realtime-js@https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.11.15.tgz. Extracting by manifest.
+178 silly tarball no local data for @supabase/postgrest-js@https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-1.19.4.tgz. Extracting by manifest.
+179 silly tarball no local data for @supabase/node-fetch@https://registry.npmjs.org/@supabase/node-fetch/-/node-fetch-2.6.15.tgz. Extracting by manifest.
+180 silly tarball no local data for @supabase/functions-js@https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.4.5.tgz. Extracting by manifest.
+181 silly tarball no local data for @supabase/auth-js@https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.70.0.tgz. Extracting by manifest.
+182 silly tarball no local data for @emnapi/runtime@https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.4.4.tgz. Extracting by manifest.
+183 http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 2761ms
+184 silly audit report {
+184 silly audit report   next: [
+184 silly audit report     {
+184 silly audit report       id: 1105949,
+184 silly audit report       url: 'https://github.com/advisories/GHSA-r2fc-ccr8-96c4',
+184 silly audit report       title: 'Next.js has a Cache poisoning vulnerability due to omission of the Vary header',
+184 silly audit report       severity: 'low',
+184 silly audit report       vulnerable_versions: '>=15.3.0 <15.3.3',
+184 silly audit report       cwe: [Array],
+184 silly audit report       cvss: [Object]
+184 silly audit report     }
+184 silly audit report   ]
+184 silly audit report }
+185 http fetch GET 200 https://registry.npmjs.org/@types/phoenix/-/phoenix-1.6.6.tgz 4493ms (cache miss)
+186 http fetch GET 200 https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-3.0.1.tgz 4539ms (cache miss)
+187 http fetch GET 200 https://registry.npmjs.org/which-boxed-primitive 5297ms (cache miss)
+188 http fetch GET 200 https://registry.npmjs.org/which-collection 5408ms (cache miss)
+189 http fetch GET 200 https://registry.npmjs.org/word-wrap 5484ms (cache miss)
+190 http fetch GET 200 https://registry.npmjs.org/use-callback-ref 5506ms (cache miss)
+191 http fetch GET 200 https://registry.npmjs.org/use-sidecar 5539ms (cache miss)
+192 http fetch GET 200 https://registry.npmjs.org/yocto-queue 5589ms (cache miss)
+193 http fetch GET 200 https://registry.npmjs.org/which-typed-array 5598ms (cache miss)
+194 http fetch GET 200 https://registry.npmjs.org/undici-types 5587ms (cache miss)
+195 http fetch GET 200 https://registry.npmjs.org/uri-js 5619ms (cache miss)
+196 http fetch GET 200 https://registry.npmjs.org/yallist 5665ms (cache miss)
+197 http fetch GET 200 https://registry.npmjs.org/which-builtin-type 5663ms (cache miss)
+198 http fetch GET 200 https://registry.npmjs.org/unrs-resolver 5658ms (cache miss)
+199 http fetch GET 200 https://registry.npmjs.org/@types/ws/-/ws-8.18.1.tgz 5177ms (cache miss)
+200 http fetch GET 200 https://registry.npmjs.org/which 5793ms (cache miss)
+201 http fetch GET 200 https://registry.npmjs.org/typed-array-byte-length 5827ms (cache miss)
+202 http fetch GET 200 https://registry.npmjs.org/typed-array-length 5934ms (cache miss)
+203 http fetch GET 200 https://registry.npmjs.org/unbox-primitive 5939ms (cache miss)
+204 http fetch GET 200 https://registry.npmjs.org/to-regex-range 5952ms (cache miss)
+205 http fetch GET 200 https://registry.npmjs.org/typed-array-buffer 5965ms (cache miss)
+206 http fetch GET 200 https://registry.npmjs.org/type-check 5995ms (cache miss)
+207 http fetch GET 200 https://registry.npmjs.org/tw-animate-css 6055ms (cache miss)
+208 http fetch GET 200 https://registry.npmjs.org/supports-preserve-symlinks-flag 6054ms (cache miss)
+209 http fetch GET 200 https://registry.npmjs.org/typed-array-byte-offset 6131ms (cache miss)
+210 http fetch GET 200 https://registry.npmjs.org/string.prototype.repeat 6112ms (cache miss)
+211 http fetch GET 200 https://registry.npmjs.org/tinyglobby 6147ms (cache miss)
+212 http fetch GET 200 https://registry.npmjs.org/strip-json-comments 6141ms (cache miss)
+213 http fetch GET 200 https://registry.npmjs.org/string.prototype.trimend 6148ms (cache miss)
+214 http fetch GET 200 https://registry.npmjs.org/streamsearch 6181ms (cache miss)
+215 http fetch GET 200 https://registry.npmjs.org/tslib 6242ms (cache miss)
+216 http fetch GET 200 https://registry.npmjs.org/whatwg-url/-/whatwg-url-5.0.0.tgz 5769ms (cache miss)
+217 http fetch GET 200 https://registry.npmjs.org/stop-iteration-iterator 6253ms (cache miss)
+218 http fetch GET 200 https://registry.npmjs.org/string.prototype.includes 6270ms (cache miss)
+219 http fetch GET 200 https://registry.npmjs.org/tsconfig-paths 6446ms (cache miss)
+220 http fetch GET 200 https://registry.npmjs.org/which-boxed-primitive/-/which-boxed-primitive-1.1.1.tgz 1150ms (cache hit)
+221 http fetch GET 200 https://registry.npmjs.org/strip-bom 6434ms (cache miss)
+222 http fetch GET 200 https://registry.npmjs.org/which-collection/-/which-collection-1.0.2.tgz 1083ms (cache hit)
+223 http fetch GET 200 https://registry.npmjs.org/string.prototype.matchall 6450ms (cache miss)
+224 http fetch GET 200 https://registry.npmjs.org/source-map-js 6443ms (cache miss)
+225 http fetch GET 200 https://registry.npmjs.org/string.prototype.trim 6463ms (cache miss)
+226 http fetch GET 200 https://registry.npmjs.org/stable-hash 6455ms (cache miss)
+227 http fetch GET 200 https://registry.npmjs.org/side-channel-map 6459ms (cache miss)
+228 http fetch GET 200 https://registry.npmjs.org/side-channel-list 6462ms (cache miss)
+229 http fetch GET 200 https://registry.npmjs.org/simple-swizzle 6474ms (cache miss)
+230 http fetch GET 200 https://registry.npmjs.org/shebang-command 6468ms (cache miss)
+231 http fetch GET 200 https://registry.npmjs.org/word-wrap/-/word-wrap-1.2.5.tgz 1062ms (cache hit)
+232 http fetch GET 200 https://registry.npmjs.org/use-callback-ref/-/use-callback-ref-1.3.3.tgz 1068ms (cache hit)
+233 http fetch GET 200 https://registry.npmjs.org/set-proto 6538ms (cache miss)
+234 http fetch GET 200 https://registry.npmjs.org/set-function-name 6547ms (cache miss)
+235 http fetch GET 200 https://registry.npmjs.org/side-channel-weakmap 6567ms (cache miss)
+236 http fetch GET 200 https://registry.npmjs.org/use-sidecar/-/use-sidecar-1.1.3.tgz 1091ms (cache hit)
+237 http fetch GET 200 https://registry.npmjs.org/side-channel 6607ms (cache miss)
+238 http fetch GET 200 https://registry.npmjs.org/yocto-queue/-/yocto-queue-0.1.0.tgz 1122ms (cache hit)
+239 http fetch GET 200 https://registry.npmjs.org/which-typed-array/-/which-typed-array-1.1.19.tgz 1115ms (cache hit)
+240 http fetch GET 200 https://registry.npmjs.org/undici-types/-/undici-types-6.21.0.tgz 1108ms (cache hit)
+241 http fetch GET 200 https://registry.npmjs.org/shebang-regex 6657ms (cache miss)
+242 http fetch GET 200 https://registry.npmjs.org/yallist/-/yallist-5.0.0.tgz 1093ms (cache hit)
+243 http fetch GET 200 https://registry.npmjs.org/uri-js/-/uri-js-4.4.1.tgz 1112ms (cache hit)
+244 http fetch GET 200 https://registry.npmjs.org/which-builtin-type/-/which-builtin-type-1.2.1.tgz 1077ms (cache hit)
+245 http fetch GET 200 https://registry.npmjs.org/unrs-resolver/-/unrs-resolver-1.9.1.tgz 1074ms (cache hit)
+246 http fetch GET 200 https://registry.npmjs.org/flairup/-/flairup-1.0.0.tgz 6221ms (cache miss)
+247 http fetch GET 200 https://registry.npmjs.org/ts-api-utils 6728ms (cache miss)
+248 http fetch GET 200 https://registry.npmjs.org/set-function-length 6708ms (cache miss)
+249 http fetch GET 200 https://registry.npmjs.org/safe-regex-test 6712ms (cache miss)
+250 http fetch GET 200 https://registry.npmjs.org/which/-/which-2.0.2.tgz 1007ms (cache hit)
+251 http fetch GET 200 https://registry.npmjs.org/resolve-from 6723ms (cache miss)
+252 http fetch GET 200 https://registry.npmjs.org/safe-array-concat 6753ms (cache miss)
+253 http fetch GET 200 https://registry.npmjs.org/tapable 6828ms (cache miss)
+254 http fetch GET 200 https://registry.npmjs.org/typed-array-byte-length/-/typed-array-byte-length-1.0.3.tgz 1017ms (cache hit)
+255 http fetch GET 200 https://registry.npmjs.org/run-parallel 6778ms (cache miss)
+256 http fetch GET 200 https://registry.npmjs.org/reflect.getprototypeof 6873ms (cache miss)
+257 http fetch GET 200 https://registry.npmjs.org/supports-color 6992ms (cache miss)
+258 http fetch GET 200 https://registry.npmjs.org/regexp.prototype.flags 6975ms (cache miss)
+259 http fetch GET 200 https://registry.npmjs.org/typed-array-length/-/typed-array-length-1.0.7.tgz 1139ms (cache hit)
+260 http fetch GET 200 https://registry.npmjs.org/unbox-primitive/-/unbox-primitive-1.1.0.tgz 1156ms (cache hit)
+261 http fetch GET 200 https://registry.npmjs.org/to-regex-range/-/to-regex-range-5.0.1.tgz 1183ms (cache hit)
+262 http fetch GET 200 https://registry.npmjs.org/typed-array-buffer/-/typed-array-buffer-1.0.3.tgz 1191ms (cache hit)
+263 http fetch GET 200 https://registry.npmjs.org/reusify 7099ms (cache miss)
+264 http fetch GET 200 https://registry.npmjs.org/resolve 7152ms (cache miss)
+265 http fetch GET 200 https://registry.npmjs.org/react-remove-scroll 7155ms (cache miss)
+266 http fetch GET 200 https://registry.npmjs.org/type-check/-/type-check-0.4.0.tgz 1251ms (cache hit)
+267 http fetch GET 200 https://registry.npmjs.org/resolve-pkg-maps 7176ms (cache miss)
+268 http fetch GET 200 https://registry.npmjs.org/prelude-ls 7155ms (cache miss)
+269 http fetch GET 200 https://registry.npmjs.org/proxy-from-env 7161ms (cache miss)
+270 http fetch GET 200 https://registry.npmjs.org/tw-animate-css/-/tw-animate-css-1.3.4.tgz 1251ms (cache hit)
+271 http fetch GET 200 https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz 1240ms (cache hit)
+272 http fetch GET 200 https://registry.npmjs.org/queue-microtask 7229ms (cache miss)
+273 http fetch GET 200 https://registry.npmjs.org/react-remove-scroll-bar 7360ms (cache miss)
+274 http fetch GET 200 https://registry.npmjs.org/punycode 7360ms (cache miss)
+275 http fetch GET 200 https://registry.npmjs.org/typed-array-byte-offset/-/typed-array-byte-offset-1.0.4.tgz 1372ms (cache hit)
+276 http fetch GET 200 https://registry.npmjs.org/string.prototype.repeat/-/string.prototype.repeat-1.0.0.tgz 1375ms (cache hit)
+277 http fetch GET 200 https://registry.npmjs.org/tinyglobby/-/tinyglobby-0.2.14.tgz 1362ms (cache hit)
+278 http fetch GET 200 https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-3.1.1.tgz 1359ms (cache hit)
+279 http fetch GET 200 https://registry.npmjs.org/string.prototype.trimend/-/string.prototype.trimend-1.0.9.tgz 1357ms (cache hit)
+280 http fetch GET 200 https://registry.npmjs.org/react-icons 7460ms (cache miss)
+281 http fetch GET 200 https://registry.npmjs.org/tar 7558ms (cache miss)
+282 http fetch GET 200 https://registry.npmjs.org/picocolors 7468ms (cache miss)
+283 http fetch GET 200 https://registry.npmjs.org/streamsearch/-/streamsearch-1.1.0.tgz 1361ms (cache hit)
+284 http fetch GET 200 https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz 1412ms (cache hit)
+285 http fetch GET 200 https://registry.npmjs.org/react-style-singleton 7582ms (cache miss)
+286 http fetch GET 200 https://registry.npmjs.org/path-parse 7565ms (cache miss)
+287 http fetch GET 200 https://registry.npmjs.org/path-exists 7566ms (cache miss)
+288 http fetch GET 200 https://registry.npmjs.org/possible-typed-array-names 7574ms (cache miss)
+289 http fetch GET 200 https://registry.npmjs.org/path-key 7580ms (cache miss)
+290 http fetch GET 200 https://registry.npmjs.org/stop-iteration-iterator/-/stop-iteration-iterator-1.1.0.tgz 1403ms (cache hit)
+291 http fetch GET 200 https://registry.npmjs.org/string.prototype.includes/-/string.prototype.includes-2.0.1.tgz 1425ms (cache hit)
+292 http fetch GET 200 https://registry.npmjs.org/p-locate 7787ms (cache miss)
+293 http fetch GET 200 https://registry.npmjs.org/optionator 7825ms (cache miss)
+294 http fetch GET 200 https://registry.npmjs.org/strip-bom/-/strip-bom-3.0.0.tgz 1565ms (cache hit)
+295 http fetch GET 200 https://registry.npmjs.org/tsconfig-paths/-/tsconfig-paths-3.15.0.tgz 1573ms (cache hit)
+296 http fetch GET 200 https://registry.npmjs.org/semver 7971ms (cache miss)
+297 http fetch GET 200 https://registry.npmjs.org/string.prototype.matchall/-/string.prototype.matchall-4.0.12.tgz 1578ms (cache hit)
+298 http fetch GET 200 https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.1.tgz 1576ms (cache hit)
+299 http fetch GET 200 https://registry.npmjs.org/stable-hash/-/stable-hash-0.0.5.tgz 1582ms (cache hit)
+300 http fetch GET 200 https://registry.npmjs.org/string.prototype.trim/-/string.prototype.trim-1.2.10.tgz 1586ms (cache hit)
+301 http fetch GET 200 https://registry.npmjs.org/side-channel-map/-/side-channel-map-1.0.1.tgz 1571ms (cache hit)
+302 http fetch GET 200 https://registry.npmjs.org/simple-swizzle/-/simple-swizzle-0.2.2.tgz 1561ms (cache hit)
+303 http fetch GET 200 https://registry.npmjs.org/side-channel-list/-/side-channel-list-1.0.0.tgz 1573ms (cache hit)
+304 http fetch GET 200 https://registry.npmjs.org/shebang-command/-/shebang-command-2.0.0.tgz 1568ms (cache hit)
+305 http fetch GET 200 https://registry.npmjs.org/picomatch 7997ms (cache miss)
+306 http fetch GET 200 https://registry.npmjs.org/set-proto/-/set-proto-1.0.0.tgz 1539ms (cache hit)
+307 http fetch GET 200 https://registry.npmjs.org/set-function-name/-/set-function-name-2.0.2.tgz 1535ms (cache hit)
+308 http fetch GET 200 https://registry.npmjs.org/side-channel-weakmap/-/side-channel-weakmap-1.0.2.tgz 1525ms (cache hit)
+309 http fetch GET 200 https://registry.npmjs.org/side-channel/-/side-channel-1.1.0.tgz 1491ms (cache hit)
+310 http fetch GET 200 https://registry.npmjs.org/sharp 8155ms (cache miss)
+311 http fetch GET 200 https://registry.npmjs.org/shebang-regex/-/shebang-regex-3.0.0.tgz 1511ms (cache hit)
+312 http fetch GET 200 https://registry.npmjs.org/styled-jsx 8248ms (cache miss)
+313 http fetch GET 200 https://registry.npmjs.org/ts-api-utils/-/ts-api-utils-2.1.0.tgz 1542ms (cache hit)
+314 http fetch GET 200 https://registry.npmjs.org/string.prototype.trimstart 8327ms (cache miss)
+315 http fetch GET 200 https://registry.npmjs.org/prop-types 8290ms (cache miss)
+316 http fetch GET 200 https://registry.npmjs.org/object.entries 8280ms (cache miss)
+317 http fetch GET 200 https://registry.npmjs.org/object.fromentries 8291ms (cache miss)
+318 http fetch GET 200 https://registry.npmjs.org/own-keys 8306ms (cache miss)
+319 http fetch GET 200 https://registry.npmjs.org/object.groupby 8308ms (cache miss)
+320 http fetch GET 200 https://registry.npmjs.org/object.assign 8308ms (cache miss)
+321 http fetch GET 200 https://registry.npmjs.org/parent-module 8333ms (cache miss)
+322 http fetch GET 200 https://registry.npmjs.org/set-function-length/-/set-function-length-1.2.2.tgz 1678ms (cache hit)
+323 http fetch GET 200 https://registry.npmjs.org/natural-compare 8329ms (cache miss)
+324 http fetch GET 200 https://registry.npmjs.org/safe-regex-test/-/safe-regex-test-1.1.0.tgz 1699ms (cache hit)
+325 http fetch GET 200 https://registry.npmjs.org/p-limit 8370ms (cache miss)
+326 http fetch GET 200 https://registry.npmjs.org/object-inspect 8373ms (cache miss)
+327 http fetch GET 200 https://registry.npmjs.org/object-assign 8392ms (cache miss)
+328 http fetch GET 200 https://registry.npmjs.org/object.values 8403ms (cache miss)
+329 http fetch GET 200 https://registry.npmjs.org/minizlib 8434ms (cache miss)
+330 http fetch GET 200 https://registry.npmjs.org/resolve-from/-/resolve-from-4.0.0.tgz 1776ms (cache hit)
+331 http fetch GET 200 https://registry.npmjs.org/minimist 8835ms (cache miss)
+332 http fetch GET 200 https://registry.npmjs.org/object-keys 8890ms (cache miss)
+333 http fetch GET 200 https://registry.npmjs.org/safe-array-concat/-/safe-array-concat-1.1.3.tgz 2234ms (cache hit)
+334 http fetch GET 200 https://registry.npmjs.org/ms 8993ms (cache miss)
+335 http fetch GET 200 https://registry.npmjs.org/tapable/-/tapable-2.2.2.tgz 2324ms (cache hit)
+336 http fetch GET 200 https://registry.npmjs.org/@supabase/node-fetch/-/node-fetch-2.6.15.tgz 8640ms (cache miss)
+337 http fetch GET 200 https://registry.npmjs.org/run-parallel/-/run-parallel-1.2.0.tgz 2318ms (cache hit)
+338 http fetch GET 200 https://registry.npmjs.org/lodash.merge 9219ms (cache miss)
+339 http fetch GET 200 https://registry.npmjs.org/math-intrinsics 9227ms (cache miss)
+340 http fetch GET 200 https://registry.npmjs.org/reflect.getprototypeof/-/reflect.getprototypeof-1.0.10.tgz 2450ms (cache hit)
+341 http fetch GET 200 https://registry.npmjs.org/levn 9306ms (cache miss)
+342 http fetch GET 200 https://registry.npmjs.org/language-tags 9319ms (cache miss)
+343 http fetch GET 200 https://registry.npmjs.org/locate-path 9337ms (cache miss)
+344 http fetch GET 200 https://registry.npmjs.org/supports-color/-/supports-color-7.2.0.tgz 2556ms (cache hit)
+345 http fetch GET 200 https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz 9080ms (cache miss)
+346 http fetch GET 200 https://registry.npmjs.org/regexp.prototype.flags/-/regexp.prototype.flags-1.5.4.tgz 2514ms (cache hit)
+347 http fetch GET 200 https://registry.npmjs.org/mime-db 9437ms (cache miss)
+348 http fetch GET 200 https://registry.npmjs.org/safe-push-apply 9515ms (cache miss)
+349 http fetch GET 200 https://registry.npmjs.org/language-subtag-registry 9441ms (cache miss)
+350 http fetch GET 200 https://registry.npmjs.org/tailwind-merge 9577ms (cache miss)
+351 http fetch GET 200 https://registry.npmjs.org/merge2 9469ms (cache miss)
+352 http fetch GET 200 https://registry.npmjs.org/lightningcss-win32-x64-msvc 9548ms (cache miss)
+353 http fetch GET 200 https://registry.npmjs.org/json5 9548ms (cache miss)
+354 http fetch GET 200 https://registry.npmjs.org/reusify/-/reusify-1.1.0.tgz 2622ms (cache hit)
+355 http fetch GET 200 https://registry.npmjs.org/mime-types 9671ms (cache miss)
+356 http fetch GET 200 https://registry.npmjs.org/json-stable-stringify-without-jsonify 9669ms (cache miss)
+357 http fetch GET 200 https://registry.npmjs.org/js-tokens 9674ms (cache miss)
+358 http fetch GET 200 https://registry.npmjs.org/isexe 9672ms (cache miss)
+359 http fetch GET 200 https://registry.npmjs.org/json-schema-traverse 9679ms (cache miss)
+360 http fetch GET 200 https://registry.npmjs.org/isarray 9684ms (cache miss)
+361 http fetch GET 200 https://registry.npmjs.org/is-weakmap 9686ms (cache miss)
+362 http fetch GET 200 https://registry.npmjs.org/is-weakset 9691ms (cache miss)
+363 http fetch GET 200 https://registry.npmjs.org/is-weakref 9696ms (cache miss)
+364 http fetch GET 200 https://registry.npmjs.org/iterator.prototype 9702ms (cache miss)
+365 http fetch GET 200 https://registry.npmjs.org/react-remove-scroll/-/react-remove-scroll-2.7.1.tgz 2671ms (cache hit)
+366 http fetch GET 200 https://registry.npmjs.org/resolve/-/resolve-1.22.10.tgz 2678ms (cache hit)
+367 http fetch GET 200 https://registry.npmjs.org/json-buffer 9773ms (cache miss)
+368 http fetch GET 200 https://registry.npmjs.org/resolve-pkg-maps/-/resolve-pkg-maps-1.0.0.tgz 2675ms (cache hit)
+369 http fetch GET 200 https://registry.npmjs.org/is-shared-array-buffer 9783ms (cache miss)
+370 http fetch GET 200 https://registry.npmjs.org/is-string 9790ms (cache miss)
+371 http fetch GET 200 https://registry.npmjs.org/prelude-ls/-/prelude-ls-1.2.1.tgz 2697ms (cache hit)
+372 http fetch GET 200 https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz 2695ms (cache hit)
+373 http fetch GET 200 https://registry.npmjs.org/is-negative-zero 9797ms (cache miss)
+374 http fetch GET 200 https://registry.npmjs.org/micromatch 9828ms (cache miss)
+375 http fetch GET 200 https://registry.npmjs.org/is-generator-function 9804ms (cache miss)
+376 http fetch GET 200 https://registry.npmjs.org/is-typed-array 9926ms (cache miss)
+377 http fetch GET 200 https://registry.npmjs.org/is-regex 9925ms (cache miss)
+378 http fetch GET 200 https://registry.npmjs.org/queue-microtask/-/queue-microtask-1.2.3.tgz 2803ms (cache hit)
+379 http fetch GET 200 https://registry.npmjs.org/is-number 9961ms (cache miss)
+380 http fetch GET 200 https://registry.npmjs.org/is-set 9968ms (cache miss)
+381 http fetch GET 200 https://registry.npmjs.org/napi-postinstall 10015ms (cache miss)
+382 http fetch GET 200 https://registry.npmjs.org/is-date-object 9969ms (cache miss)
+383 http fetch GET 200 https://registry.npmjs.org/is-data-view 9974ms (cache miss)
+384 http fetch GET 200 https://registry.npmjs.org/is-number-object 10718ms (cache miss)
+385 http fetch GET 200 https://registry.npmjs.org/is-bigint 10714ms (cache miss)
+386 http fetch GET 200 https://registry.npmjs.org/jsx-ast-utils 10749ms (cache miss)
+387 http fetch GET 200 https://registry.npmjs.org/keyv 10753ms (cache miss)
+388 http fetch GET 200 https://registry.npmjs.org/is-finalizationregistry 10736ms (cache miss)
+389 http fetch GET 200 https://registry.npmjs.org/react-remove-scroll-bar/-/react-remove-scroll-bar-2.3.8.tgz 3539ms (cache hit)
+390 http fetch GET 200 https://registry.npmjs.org/punycode/-/punycode-2.3.1.tgz 3529ms (cache hit)
+391 http fetch GET 200 https://registry.npmjs.org/is-glob 10827ms (cache miss)
+392 http fetch GET 200 https://registry.npmjs.org/is-callable 10827ms (cache miss)
+393 http fetch GET 200 https://registry.npmjs.org/is-bun-module 10833ms (cache miss)
+394 http fetch GET 200 https://registry.npmjs.org/is-extglob 10841ms (cache miss)
+395 http fetch GET 200 https://registry.npmjs.org/is-map 10846ms (cache miss)
+396 http fetch GET 200 https://registry.npmjs.org/lightningcss 10880ms (cache miss)
+397 http fetch GET 200 https://registry.npmjs.org/js-cookie 10878ms (cache miss)
+398 http fetch GET 200 https://registry.npmjs.org/tar/-/tar-7.4.3.tgz 3499ms (cache hit)
+399 http fetch GET 200 https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz 3498ms (cache hit)
+400 http fetch GET 200 https://registry.npmjs.org/react-icons/-/react-icons-5.5.0.tgz 3596ms (cache hit)
+401 http fetch GET 200 https://registry.npmjs.org/is-boolean-object 10977ms (cache miss)
+402 http fetch GET 200 https://registry.npmjs.org/is-array-buffer 10977ms (cache miss)
+403 http fetch GET 200 https://registry.npmjs.org/react-style-singleton/-/react-style-singleton-2.2.3.tgz 3499ms (cache hit)
+404 http fetch GET 200 https://registry.npmjs.org/path-exists/-/path-exists-4.0.0.tgz 3495ms (cache hit)
+405 http fetch GET 200 https://registry.npmjs.org/possible-typed-array-names/-/possible-typed-array-names-1.1.0.tgz 3495ms (cache hit)
+406 http fetch GET 200 https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz 3502ms (cache hit)
+407 http fetch GET 200 https://registry.npmjs.org/nanoid 11053ms (cache miss)
+408 http fetch GET 200 https://registry.npmjs.org/path-key/-/path-key-3.1.1.tgz 3504ms (cache hit)
+409 http fetch GET 200 https://registry.npmjs.org/imurmurhash 11022ms (cache miss)
+410 http fetch GET 200 https://registry.npmjs.org/is-core-module 11029ms (cache miss)
+411 http fetch GET 200 https://registry.npmjs.org/hasown 11029ms (cache miss)
+412 http fetch GET 200 https://registry.npmjs.org/minimatch 11078ms (cache miss)
+413 http fetch GET 200 https://registry.npmjs.org/has-tostringtag 11094ms (cache miss)
+414 http fetch GET 200 https://registry.npmjs.org/has-property-descriptors 11097ms (cache miss)
+415 http fetch GET 200 https://registry.npmjs.org/internal-slot 11106ms (cache miss)
+416 http fetch GET 200 https://registry.npmjs.org/has-flag 11103ms (cache miss)
+417 http fetch GET 200 https://registry.npmjs.org/is-arrayish 11115ms (cache miss)
+418 http fetch GET 200 https://registry.npmjs.org/has-proto 11110ms (cache miss)
+419 http fetch GET 200 https://registry.npmjs.org/magic-string 11159ms (cache miss)
+420 http fetch GET 200 https://registry.npmjs.org/is-module 11157ms (cache miss)
+421 http fetch GET 200 https://registry.npmjs.org/p-locate/-/p-locate-5.0.0.tgz 3429ms (cache hit)
+422 http fetch GET 200 https://registry.npmjs.org/has-symbols 11205ms (cache miss)
+423 http fetch GET 200 https://registry.npmjs.org/gopd 11203ms (cache miss)
+424 http fetch GET 200 https://registry.npmjs.org/minipass 11281ms (cache miss)
+425 http fetch GET 200 https://registry.npmjs.org/optionator/-/optionator-0.9.4.tgz 3480ms (cache hit)
+426 http fetch GET 200 https://registry.npmjs.org/has-bigints 11229ms (cache miss)
+427 http fetch GET 200 https://registry.npmjs.org/is-async-function 11248ms (cache miss)
+428 http fetch GET 200 https://registry.npmjs.org/import-fresh 11252ms (cache miss)
+429 http fetch GET 200 https://registry.npmjs.org/semver/-/semver-7.7.2.tgz 3401ms (cache hit)
+430 http fetch GET 200 https://registry.npmjs.org/get-symbol-description 11280ms (cache miss)
+431 http fetch GET 200 https://registry.npmjs.org/graphemer 11312ms (cache miss)
+432 http fetch GET 200 https://registry.npmjs.org/get-nonce 11307ms (cache miss)
+433 http fetch GET 200 https://registry.npmjs.org/get-proto 11352ms (cache miss)
+434 http fetch GET 200 https://registry.npmjs.org/picomatch/-/picomatch-4.0.2.tgz 3491ms (cache hit)
+435 http fetch GET 200 https://registry.npmjs.org/glob-parent 11460ms (cache miss)
+436 http fetch GET 200 https://registry.npmjs.org/flowbite-datepicker 11592ms (cache miss)
+437 http fetch GET 200 https://registry.npmjs.org/sharp/-/sharp-0.34.2.tgz 3591ms (cache hit)
+438 http fetch GET 200 https://registry.npmjs.org/function-bind 11604ms (cache miss)
+439 http fetch GET 200 https://registry.npmjs.org/functions-have-names 11611ms (cache miss)
+440 http fetch GET 200 https://registry.npmjs.org/globalthis 11621ms (cache miss)
+441 http fetch GET 200 https://registry.npmjs.org/fast-levenshtein 11640ms (cache miss)
+442 http fetch GET 200 https://registry.npmjs.org/styled-jsx/-/styled-jsx-5.1.6.tgz 3653ms (cache hit)
+443 http fetch GET 200 https://registry.npmjs.org/get-intrinsic 11750ms (cache miss)
+444 http fetch GET 200 https://registry.npmjs.org/function.prototype.name 11755ms (cache miss)
+445 http fetch GET 200 https://registry.npmjs.org/fast-json-stable-stringify 11807ms (cache miss)
+446 http fetch GET 200 https://registry.npmjs.org/string.prototype.trimstart/-/string.prototype.trimstart-1.0.8.tgz 3707ms (cache hit)
+447 http fetch GET 200 https://registry.npmjs.org/flatted 11882ms (cache miss)
+448 http fetch GET 200 https://registry.npmjs.org/get-tsconfig 11920ms (cache miss)
+449 http fetch GET 200 https://registry.npmjs.org/fill-range 11910ms (cache miss)
+450 http fetch GET 200 https://registry.npmjs.org/find-up 11916ms (cache miss)
+451 http fetch GET 200 https://registry.npmjs.org/for-each 11936ms (cache miss)
+452 http fetch GET 200 https://registry.npmjs.org/fastq 11977ms (cache miss)
+453 http fetch GET 200 https://registry.npmjs.org/esutils 12002ms (cache miss)
+454 http fetch GET 200 https://registry.npmjs.org/jiti 12104ms (cache miss)
+455 http fetch GET 200 https://registry.npmjs.org/ignore 12093ms (cache miss)
+456 http fetch GET 200 https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz 3895ms (cache hit)
+457 http fetch GET 200 https://registry.npmjs.org/object.fromentries/-/object.fromentries-2.0.8.tgz 3882ms (cache hit)
+458 http fetch GET 200 https://registry.npmjs.org/object.entries/-/object.entries-1.1.9.tgz 3909ms (cache hit)
+459 http fetch GET 200 https://registry.npmjs.org/own-keys/-/own-keys-1.0.1.tgz 3887ms (cache hit)
+460 http fetch GET 200 https://registry.npmjs.org/object.groupby/-/object.groupby-1.0.3.tgz 3886ms (cache hit)
+461 http fetch GET 200 https://registry.npmjs.org/object.assign/-/object.assign-4.1.7.tgz 3883ms (cache hit)
+462 http fetch GET 200 https://registry.npmjs.org/parent-module/-/parent-module-1.0.1.tgz 3873ms (cache hit)
+463 http fetch GET 200 https://registry.npmjs.org/flat-cache 12110ms (cache miss)
+464 http fetch GET 200 https://registry.npmjs.org/estraverse 12107ms (cache miss)
+465 http fetch GET 200 https://registry.npmjs.org/esrecurse 12111ms (cache miss)
+466 http fetch GET 200 https://registry.npmjs.org/fast-deep-equal 12164ms (cache miss)
+467 http fetch GET 200 https://registry.npmjs.org/natural-compare/-/natural-compare-1.4.0.tgz 3938ms (cache hit)
+468 http fetch GET 200 https://registry.npmjs.org/globals 12201ms (cache miss)
+469 http fetch GET 200 https://registry.npmjs.org/p-limit/-/p-limit-3.1.0.tgz 3942ms (cache hit)
+470 http fetch GET 200 https://registry.npmjs.org/object-inspect/-/object-inspect-1.13.4.tgz 3950ms (cache hit)
+471 http fetch GET 200 https://registry.npmjs.org/object-assign/-/object-assign-4.1.1.tgz 3942ms (cache hit)
+472 http fetch GET 200 https://registry.npmjs.org/flowbite 12249ms (cache miss)
+473 http fetch GET 200 https://registry.npmjs.org/object.values/-/object.values-1.2.1.tgz 3960ms (cache hit)
+474 http fetch GET 200 https://registry.npmjs.org/form-data 12279ms (cache miss)
+475 http fetch GET 200 https://registry.npmjs.org/file-entry-cache 12276ms (cache miss)
+476 http fetch GET 200 https://registry.npmjs.org/estree-walker 12273ms (cache miss)
+477 http fetch GET 200 https://registry.npmjs.org/esquery 12312ms (cache miss)
+478 http fetch GET 200 https://registry.npmjs.org/minizlib/-/minizlib-3.0.2.tgz 3990ms (cache hit)
+479 http fetch GET 200 https://registry.npmjs.org/eslint-import-resolver-node 12311ms (cache miss)
+480 http fetch GET 200 https://registry.npmjs.org/minimist/-/minimist-1.2.8.tgz 3603ms (cache hit)
+481 http fetch GET 200 https://registry.npmjs.org/postcss 12481ms (cache miss)
+482 http fetch GET 200 https://registry.npmjs.org/object-keys/-/object-keys-1.1.1.tgz 3586ms (cache hit)
+483 http fetch GET 200 https://registry.npmjs.org/eslint-scope 12371ms (cache miss)
+484 http fetch GET 200 https://registry.npmjs.org/eslint-module-utils 12397ms (cache miss)
+485 http fetch GET 200 https://registry.npmjs.org/ms/-/ms-2.1.3.tgz 3550ms (cache hit)
+486 http fetch GET 200 https://registry.npmjs.org/es-errors 12423ms (cache miss)
+487 http fetch GET 200 https://registry.npmjs.org/es-shim-unscopables 12432ms (cache miss)
+488 http fetch GET 200 https://registry.npmjs.org/eslint-visitor-keys 12459ms (cache miss)
+489 http fetch GET 200 https://registry.npmjs.org/es-set-tostringtag 12443ms (cache miss)
+490 http fetch GET 200 https://registry.npmjs.org/es-to-primitive 12451ms (cache miss)
+491 http fetch GET 200 https://registry.npmjs.org/es-object-atoms 12454ms (cache miss)
+492 http fetch GET 200 https://registry.npmjs.org/follow-redirects 12540ms (cache miss)
+493 http fetch GET 200 https://registry.npmjs.org/fdir 12537ms (cache miss)
+494 http fetch GET 200 https://registry.npmjs.org/lodash.merge/-/lodash.merge-4.6.2.tgz 3407ms (cache hit)
+495 http fetch GET 200 https://registry.npmjs.org/math-intrinsics/-/math-intrinsics-1.1.0.tgz 3434ms (cache hit)
+496 http fetch GET 200 https://registry.npmjs.org/escape-string-regexp 12578ms (cache miss)
+497 http fetch GET 200 https://registry.npmjs.org/dunder-proto 12571ms (cache miss)
+498 http fetch GET 200 https://registry.npmjs.org/levn/-/levn-0.4.1.tgz 3469ms (cache hit)
+499 http fetch GET 200 https://registry.npmjs.org/language-tags/-/language-tags-1.0.9.tgz 3473ms (cache hit)
+500 http fetch GET 200 https://registry.npmjs.org/locate-path/-/locate-path-6.0.0.tgz 3476ms (cache hit)
+501 http fetch GET 200 https://registry.npmjs.org/define-properties 12688ms (cache miss)
+502 http fetch GET 200 https://registry.npmjs.org/delayed-stream 12697ms (cache miss)
+503 http fetch GET 200 https://registry.npmjs.org/detect-libc 12705ms (cache miss)
+504 http fetch GET 200 https://registry.npmjs.org/data-view-byte-offset 12701ms (cache miss)
+505 http fetch GET 200 https://registry.npmjs.org/deep-is 12705ms (cache miss)
+506 http fetch GET 200 https://registry.npmjs.org/fast-glob 12874ms (cache miss)
+507 http fetch GET 200 https://registry.npmjs.org/mime-db/-/mime-db-1.52.0.tgz 3556ms (cache hit)
+508 http fetch GET 200 https://registry.npmjs.org/safe-push-apply/-/safe-push-apply-1.0.0.tgz 3570ms (cache hit)
+509 http fetch GET 200 https://registry.npmjs.org/language-subtag-registry/-/language-subtag-registry-0.3.23.tgz 3574ms (cache hit)
+510 http fetch GET 200 https://registry.npmjs.org/tailwind-merge/-/tailwind-merge-3.3.1.tgz 3565ms (cache hit)
+511 http fetch GET 200 https://registry.npmjs.org/merge2/-/merge2-1.4.1.tgz 3559ms (cache hit)
+512 http fetch GET 200 https://registry.npmjs.org/doctrine 12905ms (cache miss)
+513 http fetch GET 200 https://registry.npmjs.org/data-view-byte-length 12905ms (cache miss)
+514 http fetch GET 200 https://registry.npmjs.org/es-define-property 12922ms (cache miss)
+515 http fetch GET 200 https://registry.npmjs.org/concat-map 12916ms (cache miss)
+516 http fetch GET 200 https://registry.npmjs.org/damerau-levenshtein 12920ms (cache miss)
+517 http fetch GET 200 https://registry.npmjs.org/data-view-buffer 12926ms (cache miss)
+518 http fetch GET 200 https://registry.npmjs.org/json5/-/json5-1.0.2.tgz 4243ms (cache hit)
+519 http fetch GET 200 https://registry.npmjs.org/lightningcss-win32-x64-msvc/-/lightningcss-win32-x64-msvc-1.30.1.tgz 4400ms (cache hit)
+520 http fetch GET 200 https://registry.npmjs.org/mime-types/-/mime-types-2.1.35.tgz 4985ms (cache hit)
+521 http fetch GET 200 https://registry.npmjs.org/js-tokens/-/js-tokens-4.0.0.tgz 5005ms (cache hit)
+522 http fetch GET 200 https://registry.npmjs.org/json-stable-stringify-without-jsonify/-/json-stable-stringify-without-jsonify-1.0.1.tgz 5023ms (cache hit)
+523 http fetch GET 200 https://registry.npmjs.org/json-schema-traverse/-/json-schema-traverse-0.4.1.tgz 5105ms (cache hit)
+524 http fetch GET 200 https://registry.npmjs.org/isexe/-/isexe-2.0.0.tgz 5180ms (cache hit)
+525 http fetch GET 200 https://registry.npmjs.org/isarray/-/isarray-2.0.5.tgz 5170ms (cache hit)
+526 http fetch GET 200 https://registry.npmjs.org/is-weakmap/-/is-weakmap-2.0.2.tgz 5459ms (cache hit)
+527 http fetch GET 200 https://registry.npmjs.org/is-weakset/-/is-weakset-2.0.4.tgz 5456ms (cache hit)
+528 http fetch GET 200 https://registry.npmjs.org/is-weakref/-/is-weakref-1.1.1.tgz 5572ms (cache hit)
+529 http fetch GET 200 https://registry.npmjs.org/iterator.prototype/-/iterator.prototype-1.1.5.tgz 5656ms (cache hit)
+530 http fetch GET 200 https://registry.npmjs.org/define-data-property 15358ms (cache miss)
+531 http fetch GET 200 https://registry.npmjs.org/combined-stream 15360ms (cache miss)
+532 http fetch GET 200 https://registry.npmjs.org/es-iterator-helpers 15392ms (cache miss)
+533 http fetch GET 200 https://registry.npmjs.org/detect-node-es 15392ms (cache miss)
+534 http fetch GET 200 https://registry.npmjs.org/deepmerge 15396ms (cache miss)
+535 http fetch GET 200 https://registry.npmjs.org/cross-spawn 15407ms (cache miss)
+536 http fetch GET 200 https://registry.npmjs.org/json-buffer/-/json-buffer-3.0.1.tgz 5912ms (cache hit)
+537 http fetch GET 200 https://registry.npmjs.org/is-shared-array-buffer/-/is-shared-array-buffer-1.0.4.tgz 5902ms (cache hit)
+538 http fetch GET 200 https://registry.npmjs.org/is-string/-/is-string-1.1.1.tgz 6126ms (cache hit)
+539 http fetch GET 200 https://registry.npmjs.org/client-only 15859ms (cache miss)
+540 http fetch GET 200 https://registry.npmjs.org/call-bound 15859ms (cache miss)
+541 http fetch GET 200 https://registry.npmjs.org/is-negative-zero/-/is-negative-zero-2.0.3.tgz 6188ms (cache hit)
+542 http fetch GET 200 https://registry.npmjs.org/micromatch/-/micromatch-4.0.8.tgz 6187ms (cache hit)
+543 http fetch GET 200 https://registry.npmjs.org/is-generator-function/-/is-generator-function-1.1.0.tgz 6188ms (cache hit)
+544 http fetch GET 200 https://registry.npmjs.org/eslint-plugin-jsx-a11y 15920ms (cache miss)
+545 http fetch GET 200 https://registry.npmjs.org/clsx 15901ms (cache miss)
+546 http fetch GET 200 https://registry.npmjs.org/debug 15917ms (cache miss)
+547 http fetch GET 200 https://registry.npmjs.org/is-typed-array/-/is-typed-array-1.1.15.tgz 6123ms (cache hit)
+548 http fetch GET 200 https://registry.npmjs.org/callsites 15922ms (cache miss)
+549 http fetch GET 200 https://registry.npmjs.org/is-regex/-/is-regex-1.2.1.tgz 6133ms (cache hit)
+550 http fetch GET 200 https://registry.npmjs.org/chownr 15939ms (cache miss)
+551 http fetch GET 200 https://registry.npmjs.org/call-bind 15983ms (cache miss)
+552 http fetch GET 200 https://registry.npmjs.org/is-number/-/is-number-7.0.0.tgz 6155ms (cache hit)
+553 http fetch GET 200 https://registry.npmjs.org/is-set/-/is-set-2.0.3.tgz 6153ms (cache hit)
+554 http fetch GET 200 https://registry.npmjs.org/napi-postinstall/-/napi-postinstall-0.2.4.tgz 6151ms (cache hit)
+555 http fetch GET 200 https://registry.npmjs.org/is-date-object/-/is-date-object-1.1.0.tgz 6149ms (cache hit)
+556 http fetch GET 200 https://registry.npmjs.org/is-data-view/-/is-data-view-1.0.2.tgz 6148ms (cache hit)
+557 http fetch GET 200 https://registry.npmjs.org/is-number-object/-/is-number-object-1.1.1.tgz 5413ms (cache hit)
+558 http fetch GET 200 https://registry.npmjs.org/is-bigint/-/is-bigint-1.1.0.tgz 5410ms (cache hit)
+559 http fetch GET 200 https://registry.npmjs.org/keyv/-/keyv-4.5.4.tgz 5407ms (cache hit)
+560 http fetch GET 200 https://registry.npmjs.org/jsx-ast-utils/-/jsx-ast-utils-3.3.5.tgz 5423ms (cache hit)
+561 http fetch GET 200 https://registry.npmjs.org/busboy 16035ms (cache miss)
+562 http fetch GET 200 https://registry.npmjs.org/color-convert 16048ms (cache miss)
+563 http fetch GET 200 https://registry.npmjs.org/espree 16111ms (cache miss)
+564 http fetch GET 200 https://registry.npmjs.org/is-finalizationregistry/-/is-finalizationregistry-1.1.1.tgz 5444ms (cache hit)
+565 http fetch GET 200 https://registry.npmjs.org/eslint-import-resolver-typescript 16098ms (cache miss)
+566 http fetch GET 200 https://registry.npmjs.org/color-string 16088ms (cache miss)
+567 http fetch GET 200 https://registry.npmjs.org/call-bind-apply-helpers 16108ms (cache miss)
+568 http fetch GET 200 https://registry.npmjs.org/color-name 16179ms (cache miss)
+569 http fetch GET 200 https://registry.npmjs.org/is-glob/-/is-glob-4.0.3.tgz 5473ms (cache hit)
+570 http fetch GET 200 https://registry.npmjs.org/is-bun-module/-/is-bun-module-2.0.0.tgz 5464ms (cache hit)
+571 http fetch GET 200 https://registry.npmjs.org/is-callable/-/is-callable-1.2.7.tgz 5485ms (cache hit)
+572 http fetch GET 200 https://registry.npmjs.org/is-extglob/-/is-extglob-2.1.1.tgz 5507ms (cache hit)
+573 http fetch GET 200 https://registry.npmjs.org/is-map/-/is-map-2.0.3.tgz 5509ms (cache hit)
+574 http fetch GET 200 https://registry.npmjs.org/lightningcss/-/lightningcss-1.30.1.tgz 5503ms (cache hit)
+575 http fetch GET 200 https://registry.npmjs.org/balanced-match 16237ms (cache miss)
+576 http fetch GET 200 https://registry.npmjs.org/js-cookie/-/js-cookie-3.0.5.tgz 5529ms (cache hit)
+577 http fetch GET 200 https://registry.npmjs.org/class-variance-authority 16292ms (cache miss)
+578 http fetch GET 200 https://registry.npmjs.org/color 16303ms (cache miss)
+579 http fetch GET 200 https://registry.npmjs.org/chalk 16341ms (cache miss)
+580 http fetch GET 200 https://registry.npmjs.org/brace-expansion 16405ms (cache miss)
+581 http fetch GET 200 https://registry.npmjs.org/emoji-regex 16463ms (cache miss)
+582 http fetch GET 200 https://registry.npmjs.org/async-function 16464ms (cache miss)
+583 http fetch GET 200 https://registry.npmjs.org/axobject-query 16504ms (cache miss)
+584 http fetch GET 200 https://registry.npmjs.org/is-boolean-object/-/is-boolean-object-1.2.2.tgz 5669ms (cache hit)
+585 http fetch GET 200 https://registry.npmjs.org/is-array-buffer/-/is-array-buffer-3.0.5.tgz 5681ms (cache hit)
+586 http fetch GET 200 https://registry.npmjs.org/nanoid/-/nanoid-3.3.11.tgz 5683ms (cache hit)
+587 http fetch GET 200 https://registry.npmjs.org/ast-types-flow 16611ms (cache miss)
+588 http fetch GET 200 https://registry.npmjs.org/array.prototype.tosorted 16626ms (cache miss)
+589 http fetch GET 200 https://registry.npmjs.org/arraybuffer.prototype.slice 16631ms (cache miss)
+590 http fetch GET 200 https://registry.npmjs.org/isows/-/isows-1.0.7.tgz 16453ms (cache miss)
+591 http fetch GET 200 https://registry.npmjs.org/is-core-module/-/is-core-module-2.16.1.tgz 5764ms (cache hit)
+592 http fetch GET 200 https://registry.npmjs.org/imurmurhash/-/imurmurhash-0.1.4.tgz 5775ms (cache hit)
+593 http fetch GET 200 https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz 5784ms (cache hit)
+594 http fetch GET 200 https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz 5778ms (cache hit)
+595 http fetch GET 200 https://registry.npmjs.org/enhanced-resolve 16749ms (cache miss)
+596 http fetch GET 200 https://registry.npmjs.org/braces 16733ms (cache miss)
+597 http fetch GET 200 https://registry.npmjs.org/asynckit 16795ms (cache miss)
+598 http fetch GET 200 https://registry.npmjs.org/array.prototype.findlast 16790ms (cache miss)
+599 http fetch GET 200 https://registry.npmjs.org/array.prototype.flat 16804ms (cache miss)
+600 http fetch GET 200 https://registry.npmjs.org/has-tostringtag/-/has-tostringtag-1.0.2.tgz 5840ms (cache hit)
+601 http fetch GET 200 https://registry.npmjs.org/has-flag/-/has-flag-4.0.0.tgz 5835ms (cache hit)
+602 http fetch GET 200 https://registry.npmjs.org/has-property-descriptors/-/has-property-descriptors-1.0.2.tgz 5846ms (cache hit)
+603 http fetch GET 200 https://registry.npmjs.org/internal-slot/-/internal-slot-1.1.0.tgz 5852ms (cache hit)
+604 http fetch GET 200 https://registry.npmjs.org/is-arrayish/-/is-arrayish-0.3.2.tgz 5854ms (cache hit)
+605 http fetch GET 200 https://registry.npmjs.org/has-proto/-/has-proto-1.2.0.tgz 5851ms (cache hit)
+606 http fetch GET 200 https://registry.npmjs.org/magic-string/-/magic-string-0.30.17.tgz 5878ms (cache hit)
+607 http fetch GET 200 https://registry.npmjs.org/is-module/-/is-module-1.0.0.tgz 5872ms (cache hit)
+608 http fetch GET 200 https://registry.npmjs.org/has-symbols/-/has-symbols-1.1.0.tgz 5819ms (cache hit)
+609 http fetch GET 200 https://registry.npmjs.org/eslint-plugin-import 16960ms (cache miss)
+610 http fetch GET 200 https://registry.npmjs.org/gopd/-/gopd-1.2.0.tgz 5872ms (cache hit)
+611 http fetch GET 200 https://registry.npmjs.org/available-typed-arrays 16971ms (cache miss)
+612 http fetch GET 200 https://registry.npmjs.org/array.prototype.findlastindex 16970ms (cache miss)
+613 http fetch GET 200 https://registry.npmjs.org/aria-hidden 16974ms (cache miss)
+614 http fetch GET 200 https://registry.npmjs.org/minipass/-/minipass-7.1.2.tgz 5895ms (cache hit)
+615 http fetch GET 200 https://registry.npmjs.org/has-bigints/-/has-bigints-1.1.0.tgz 5908ms (cache hit)
+616 http fetch GET 200 https://registry.npmjs.org/is-async-function/-/is-async-function-2.1.1.tgz 5905ms (cache hit)
+617 http fetch GET 200 https://registry.npmjs.org/import-fresh/-/import-fresh-3.3.1.tgz 5899ms (cache hit)
+618 http fetch GET 200 https://registry.npmjs.org/es-abstract 17080ms (cache miss)
+619 http fetch GET 200 https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.4.4.tgz 16880ms (cache miss)
+620 http fetch GET 200 https://registry.npmjs.org/aria-query 17166ms (cache miss)
+621 http fetch GET 200 https://registry.npmjs.org/is-symbol 17171ms (cache miss)
