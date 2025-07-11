@@ -10,27 +10,25 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/lib/supabase";
 import { Mail, Lock, User, UserPlus, Calendar } from "lucide-react";
 
-export async function uploadProfilePicture(
-    file: File
-  ): Promise<string | null> {
-    const filePath = `profiles/${Date.now()}-${file.name}`;
-    const { data, error } = await supabase.storage
-      .from("social") // or whatever your bucket is named
-      .upload(filePath, file, {
-        cacheControl: "3600",
-        upsert: false,
-      });
+export async function uploadProfilePicture(file: File): Promise<string | null> {
+  const filePath = `profiles/${Date.now()}-${file.name}`;
+  const { data, error } = await supabase.storage
+    .from("social")
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
 
-    if (error) {
-      console.error("Upload failed:", error);
-      return null;
-    }
-
-    const { data: publicUrlData } = supabase.storage
-      .from("social")
-      .getPublicUrl(filePath);
-    return publicUrlData?.publicUrl || null;
+  if (error) {
+    console.error("Upload failed:", error);
+    return null;
   }
+
+  const { data: publicUrlData } = supabase.storage
+    .from("social")
+    .getPublicUrl(filePath);
+  return publicUrlData?.publicUrl || null;
+}
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -173,12 +171,14 @@ export default function RegisterPage() {
               </Label>
               <input
                 type="file"
-                accept="image/*"
-                onChange={(e) => {
+                accept="image/png,image/jpeg,image/gif"
+                onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (file) {
-                    const imageUrl = uploadProfilePicture(file);
-                    setFormData({ ...formData, avatar: imageUrl });
+                    const imageUrl = await uploadProfilePicture(file);
+                    if (imageUrl) {
+                      setFormData((prev) => ({ ...prev, avatar: imageUrl }));
+                    }
                   }
                 }}
               />

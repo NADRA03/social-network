@@ -10,25 +10,6 @@ import { ProfileStats } from "@/components/ProfileStats";
 import { ProfileTabs } from "@/components/ProfileTabs";
 import AMPMToggle from "@/components/AMPMToggle";
 
-export async function uploadProfilePictures(file: File): Promise<string | null> {
-  const filePath = `profiles/${Date.now()}-${file.name}`;
-
-  const { data, error } = await supabase.storage
-  .from("social")
-  .upload(filePath, file)
-
-  if (error) {
-    console.error("Upload failed:", error);
-    return null;
-  }
-
-  const { data: publicUrlData } = await supabase.storage
-  .from("social")
-  .getPublicUrl(filePath);
-
-  return publicUrlData?.publicUrl || null;
-}
-
 const Profile = () => {
   // const { params } = useParams();
   const { id } = useParams();
@@ -64,7 +45,7 @@ const Profile = () => {
 
       <ProfileHeader
         name={profile.username}
-        title={profile.title || "Member"}
+        bio={profile.bio || " "}
         email={profile.email}
         joinDate={profile.joinDate || ""}
         avatarUrl={profile.avatar || ""}

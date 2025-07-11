@@ -123,3 +123,27 @@ func UnfollowHandler(db *sql.DB) http.HandlerFunc {
 		w.Write([]byte("Unfollowed"))
 	}
 }
+
+func UpdateAvatarHandler(w http.ResponseWriter, r *http.Request) {
+	userID, err := auth.GetUserIDFromSession(r)
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	var input struct {
+		Avatar string `json:"avatar"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
+	_, err = sqlite.DB.Exec(`UPDATE users SET avatar_url = ? WHERE id = ?`, input.Avatar, userID)
+	if err != nil {
+		http.Error(w, "Failed to update avatar", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}

@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
+import { useParams } from "next/navigation";
+import Link from "next/link";
 import {
   House,
   MessageSquareMore,
@@ -9,11 +11,19 @@ import {
   Search,
   Plus,
   Paperclip,
-  MapPin,
+  Users,
   Camera,
   MessageCircle,
   X,
   Send,
+  TrendingUp,
+  Hash,
+  Star,
+  Heart,
+  Share,
+  Bookmark,
+  MoreHorizontal,
+  Earth,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,6 +37,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import axios from "axios";
 
+enum postVisibility {
+  Public = 0,
+  FollowersOnly = 1,
+  CloseFriends = 2,
+}
+
 interface Post {
   id: number;
   username: string;
@@ -34,6 +50,7 @@ interface Post {
   content: string;
   image?: string;
   created_at: string;
+  visibility: postVisibility;
 }
 
 interface Comment {
@@ -63,6 +80,7 @@ export async function uploadImageToSupabase(
 }
 
 export default function Home() {
+  const { username } = useParams();
   const [showForm, setShowForm] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
@@ -72,10 +90,21 @@ export default function Home() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [visibility, setVisibility] = useState(0);
+  const [suggestedUsers, setSuggestedUsers] = useState<
+    {
+      id: number;
+      name: string;
+      username: string;
+      avatar?: string;
+    }[]
+  >([]);
 
   // Fetch posts
   useEffect(() => {
-    axios
+    const loadData = async () => {
+      // await fetchNonFollowedUsers();
+      axios
       .get("http://localhost:8080/feed", { withCredentials: true })
       .then((res) => {
         console.log("Fetched posts:", res.data);
@@ -83,6 +112,8 @@ export default function Home() {
         setPosts(res.data);
       })
       .catch((err) => console.error("Failed to load posts", err));
+    };
+    loadData();
   }, []);
 
   // Submit new post
@@ -101,12 +132,13 @@ export default function Home() {
     axios
       .post(
         "http://localhost:8080/post",
-        { content, image: imageUrl || "" },
+        { content, image: imageUrl || "", visibility },
         { withCredentials: true }
       )
       .then(() => {
         setContent("");
         setImageFile(null);
+        setVisibility(0);
         setShowForm(false);
         return axios.get("http://localhost:8080/feed", {
           withCredentials: true,
@@ -137,7 +169,6 @@ export default function Home() {
     fetchComments(post.id);
   };
 
-  // Submit comment
   const submitComment = async () => {
     if (!commentContent.trim() || !selectedPost) return;
 
@@ -158,6 +189,25 @@ export default function Home() {
     }
   };
 
+  // const fetchNonFollowedUsers = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       "http://localhost:8080/users/not-followed",
+  //       {
+  //         withCredentials: true,
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
+  //     console.log("Suggested users response:", response.data); 
+  //     setSuggestedUsers(response.data || []);
+  //   } catch (err) {
+  //     console.error("Failed to fetch suggested users:", err);
+  //     setSuggestedUsers([]);
+  //   }
+  // };
+
   const fetchComments = async (postId: number) => {
     try {
       const res = await axios.get(
@@ -171,29 +221,59 @@ export default function Home() {
     }
   };
 
+  const handleFollow = async (userId: number) => {
+    try {
+      await axios.post(
+        `http://localhost:8080/follow/${userId}`,
+        {},
+        { withCredentials: true }
+      );
+      // fetchNonFollowedUsers();
+    } catch (err) {
+      console.error("Failed to follow user", err);
+    }
+  };
+
   return (
-    <main className="flex min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-100">
-      {/* Navigation Bar with Gradient */}
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-100">
+      {/* Enhanced Navigation Bar */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-white/20 shadow-lg">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex-1">
+        <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+          <div className="flex items-center gap-8">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Social Network
             </h1>
+
+            {/* Quick Navigation */}
+            <nav className="hidden md:flex items-center gap-4">
+              <Button
+                variant="ghost"
+                className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 rounded-xl px-4 py-2"
+              >
+                <House className="w-4 h-4" />
+                Home
+              </Button>
+              <Button
+                variant="ghost"
+                className="flex items-center gap-2 text-gray-600 hover:bg-white/50 rounded-xl px-4 py-2"
+              >
+                <MessageSquareMore className="w-4 h-4" />
+                Messages
+              </Button>
+            </nav>
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Search Bar with Modern Styling */}
+            {/* Enhanced Search bar */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <input
                 type="search"
-                placeholder="Search"
-                className="pl-10 pr-4 py-2 bg-white/70 backdrop-blur-sm border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent shadow-sm"
+                placeholder="Search posts, users, topics..."
+                className="pl-10 pr-4 py-2 w-80 bg-white/70 backdrop-blur-sm border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent shadow-sm transition-all duration-200"
               />
             </div>
 
-            {/* Notifications with Modern Button */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -202,19 +282,21 @@ export default function Home() {
                   className="relative bg-white/30 hover:bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl"
                 >
                   <Bell className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 h-3 w-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full"></span>
+                  <span className="absolute -top-1 -right-1 h-3 w-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full animate-pulse"></span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
                 className="bg-white/90 backdrop-blur-md border-white/20"
               >
-                <DropdownMenuItem>Notifications</DropdownMenuItem>
+                <DropdownMenuItem>New follower: Sarah Chen</DropdownMenuItem>
+                <DropdownMenuItem>Mike liked your post</DropdownMenuItem>
+                <DropdownMenuItem>New comment on your post</DropdownMenuItem>
                 <DropdownMenuItem>Mark all as read</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Profile Menu with Enhanced Styling */}
+            {/* Profile Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -232,10 +314,9 @@ export default function Home() {
                 align="end"
                 className="bg-white/90 backdrop-blur-md border-white/20"
               >
-                <DropdownMenuItem>Home</DropdownMenuItem>
-                <DropdownMenuItem>Dashboard</DropdownMenuItem>
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href={`/profile/${username}`}>Profile</Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -243,137 +324,152 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex w-full pt-20">
-        {/* Sidebar with Gradient */}
-        <div className="w-64 h-screen bg-gradient-to-b from-white/40 to-white/20 backdrop-blur-md border-r border-white/20 fixed left-0 top-20 shadow-xl">
-          <div className="p-6">
-            <nav className="space-y-3">
-              <Button className="w-full justify-start bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg">
-                <House className="w-4 h-4 mr-3" />
-                Home
-              </Button>
+      {/* Main Content Layout */}
+      <div className="pt-20 max-w-7xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="lg:col-span-2 lg:col-start-2">
+            <div className="space-y-6">
 
-              <Button
-                variant="ghost"
-                className="w-full justify-start bg-white/30 hover:bg-white/50 backdrop-blur-sm border border-white/20 text-gray-700"
-              >
-                <MessageSquareMore className="w-4 h-4 mr-3" />
-                Dashboard
-              </Button>
+              {/* Posts Feed */}
+              {Array.isArray(posts) && posts.length > 0 ? (
+                posts.map((post, index) => (
+                  <Card
+                    key={index}
+                    className="bg-white/70 backdrop-blur-md border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 rounded-2xl overflow-hidden group"
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        <img
+                          src={
+                            post.avatar ||
+                            "https://img.daisyui.com/images/profile/demo/gordon@192.webp"
+                          }
+                          alt="Profile"
+                          className="w-12 h-12 rounded-full border-2 border-white/50 shadow-lg"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <span className="font-bold text-gray-800">
+                                {post.username}
+                              </span>
+                              <span className="text-sm text-gray-500 bg-white/40 px-2 py-1 rounded-full backdrop-blur-sm">
+                                {new Date(post.created_at).toLocaleString()}
+                              </span>
+                              {post.visibility === postVisibility.Public && (
+                                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                                  Public
+                                </span>
+                              )}
+                              {post.visibility ===
+                                postVisibility.FollowersOnly && (
+                                <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+                                  Followers Only
+                                </span>
+                              )}
+                              {post.visibility ===
+                                postVisibility.CloseFriends && (
+                                <span className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
+                                  Close Friends
+                                </span>
+                              )}
+                            </div>
+                          </div>
 
-              <Button
-                variant="ghost"
-                className="w-full justify-start bg-white/30 hover:bg-white/50 backdrop-blur-sm border border-white/20 text-gray-700"
-              >
-                <svg
-                  className="w-4 h-4 mr-3"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
-                </svg>
-                Profile
-              </Button>
+                          <p className="text-gray-700 mb-4 text-base leading-relaxed">
+                            {post.content}
+                          </p>
 
-              <Button
-                variant="ghost"
-                className="w-full justify-start bg-white/30 hover:bg-white/50 backdrop-blur-sm border border-white/20 text-gray-700"
-              >
-                <svg
-                  className="w-4 h-4 mr-3"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M18 7.5h-.423l-.452-1.09.3-.3a1.5 1.5 0 0 0 0-2.121L16.01 2.575a1.5 1.5 0 0 0-2.121 0l-.3.3-1.089-.452V2A1.5 1.5 0 0 0 11 .5H9A1.5 1.5 0 0 0 7.5 2v.423l-1.09.452-.3-.3a1.5 1.5 0 0 0-2.121 0L2.576 3.99a1.5 1.5 0 0 0 0 2.121l.3.3L2.423 7.5H2A1.5 1.5 0 0 0 .5 9v2A1.5 1.5 0 0 0 2 12.5h.423l.452 1.09-.3.3a1.5 1.5 0 0 0 0 2.121l1.415 1.413a1.5 1.5 0 0 0 2.121 0l.3-.3 1.09.452V18A1.5 1.5 0 0 0 9 19.5h2a1.5 1.5 0 0 0 1.5-1.5v-.423l1.09-.452.3.3a1.5 1.5 0 0 0 2.121 0l1.415-1.414a1.5 1.5 0 0 0 0-2.121l-.3-.3.452-1.09H18a1.5 1.5 0 0 0 1.5-1.5V9A1.5 1.5 0 0 0 18 7.5Zm-8 6a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" />
-                </svg>
-                Settings
-              </Button>
-            </nav>
-          </div>
-        </div>
+                          {post.image && (
+                            <div className="relative group/image mb-4">
+                              <img
+                                src={post.image}
+                                alt="Post content"
+                                className="w-full rounded-xl shadow-lg border border-white/20 transition-transform duration-300 group-hover/image:scale-[1.02]"
+                              />
+                            </div>
+                          )}
 
-        <Separator orientation="vertical" className="ml-64 bg-white/20" />
-
-        {/* Centered Posts Feed */}
-        <div className="flex w-full justify-center pl-64">
-          <div className="w-full max-w-3xl px-8 py-12">
-            <div className="space-y-8">
-              {posts.map((post, index) => (
-                <Card
-                  key={index}
-                  className="bg-white/70 backdrop-blur-md border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:-translate-y-2 rounded-2xl overflow-hidden"
-                >
-                  <CardContent className="p-8">
-                    <div className="flex items-start gap-6">
-                      <img
-                        src={
-                          post.avatar ||
-                          "https://img.daisyui.com/images/profile/demo/gordon@192.webp"
-                        }
-                        alt="Profile"
-                        className="w-14 h-14 rounded-full border-3 border-white/50 shadow-xl ring-2 ring-gradient-to-r ring-from-blue-400 ring-to-purple-400"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-4 mb-4">
-                          <span className="font-bold text-gray-800 text-xl">
-                            {post.username}
-                          </span>
-                          <span className="text-sm text-gray-500 bg-white/40 px-3 py-1 rounded-full backdrop-blur-sm">
-                            {new Date(post.created_at).toLocaleString()}
-                          </span>
-                        </div>
-                        <p className="text-gray-700 mb-6 text-lg leading-relaxed">
-                          {post.content}
-                        </p>
-                        {post.image && (
-                          <div className="relative group mb-6">
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/30 to-purple-600/30 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                          <div className="flex items-center justify-between pt-4 border-t border-white/20">
+                            <div className="flex items-center gap-2">
                               <Button
+                                onClick={() => handleCommentClick(post)}
                                 variant="ghost"
-                                size="icon"
-                                className="bg-white/40 hover:bg-white/60 text-white border border-white/30 shadow-lg rounded-full w-12 h-12"
+                                size="sm"
+                                className="flex items-center gap-2 bg-white/30 hover:bg-blue-50 hover:text-blue-600 transition-colors rounded-xl px-4 py-2"
                               >
-                                <svg
-                                  className="w-6 h-6"
-                                  fill="none"
-                                  viewBox="0 0 16 18"
-                                >
-                                  <path
-                                    stroke="currentColor"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3"
-                                  />
-                                </svg>
+                                <MessageCircle className="w-4 h-4" />
+                                <span className="font-medium">Comment</span>
                               </Button>
                             </div>
-                            <img
-                              src={post.image}
-                              alt="Post content"
-                              className="w-full rounded-2xl shadow-xl border border-white/20"
-                            />
                           </div>
-                        )}
-
-                        {/* Comment Button */}
-                        <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/20">
-                          <Button
-                            onClick={() => handleCommentClick(post)}
-                            variant="ghost"
-                            className="flex items-center gap-2 bg-white/30 hover:bg-white/50 backdrop-blur-sm border border-white/20 text-gray-700 rounded-xl px-6 py-3 transition-all duration-200 hover:scale-105"
-                          >
-                            <MessageCircle className="w-5 h-5" />
-                            <span className="font-medium">Comment</span>
-                          </Button>
                         </div>
                       </div>
-                    </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <Card className="bg-white/70 backdrop-blur-md border-white/20 shadow-xl rounded-2xl">
+                  <CardContent className="p-12 text-center">
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">
+                      Welcome to Social Network!
+                    </h3>
+                    <p className="text-gray-500 mb-6">
+                      No posts have been created yet.
+                    </p>
+                    <Button
+                      onClick={() => setShowForm(true)}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl"
+                    >
+                      Create Your First Post
+                    </Button>
                   </CardContent>
                 </Card>
-              ))}
+              )}
             </div>
+          </div>
+
+          <div className="hidden lg:block space-y-6">
+            {/* Suggested Users */}
+            {/* <Card className="bg-white/70 backdrop-blur-md border-white/20 shadow-xl rounded-2xl overflow-hidden">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <Users className="w-5 h-5 text-purple-600" />
+                  <h3 className="font-bold text-gray-800">
+                    People You Might Know
+                  </h3>
+                </div>
+                <div className="space-y-4">
+                  {suggestedUsers.map((user) => (
+                    <div
+                      key={user.id}
+                      className="flex items-center gap-3 p-3 bg-white/40 rounded-xl hover:bg-white/60 transition-colors"
+                    >
+                      <img
+                        src={
+                          user.avatar ||
+                          "https://img.daisyui.com/images/profile/demo/gordon@192.webp"
+                        }
+                        alt={user.name}
+                        className="w-10 h-10 rounded-full border-2 border-white/50"
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-800 text-sm">
+                          {user.username}
+                        </p>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-xs px-3 py-1 rounded-lg"
+                        onClick={() => handleFollow(user.id)}
+                      >
+                        Follow
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card> */}
           </div>
         </div>
       </div>
@@ -468,53 +564,62 @@ export default function Home() {
         </div>
       )}
 
-      {/* Post Form Modal with Modern Design */}
+      {/* Enhanced Post Form */}
       {showForm && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <Card className="w-full max-w-md mx-4 bg-white/95 backdrop-blur-md border-white/20 shadow-3xl rounded-2xl">
+          <Card className="w-full max-w-lg mx-4 bg-white/95 backdrop-blur-md border-white/20 shadow-3xl rounded-2xl">
             <CardContent className="p-8">
-              <Button
-                onClick={() => setShowForm(false)}
-                variant="ghost"
-                size="icon"
-                className="absolute top-4 right-4 bg-white/30 hover:bg-white/50 rounded-full z-10"
-              >
-                <X className="w-5 h-5" />
-              </Button>
-              <h3 className="text-xl font-bold text-gray-800 mb-6">
-                Create New Post
-              </h3>
-              <div className="mb-6">
-                <Textarea
-                  placeholder="What's on your mind?"
-                  rows={4}
-                  className="w-full bg-white/50 border-white/30 focus:border-blue-500/50 rounded-xl"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                />
-              </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-gray-800">
+                  Create New Post
+                </h3>
                 <Button
-                  onClick={handlePost}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg px-8 py-3 rounded-xl"
+                  onClick={() => setShowForm(false)}
+                  variant="ghost"
+                  size="icon"
+                  className="bg-white/30 hover:bg-white/50 rounded-full"
                 >
-                  Post
+                  <X className="w-5 h-5" />
                 </Button>
+              </div>
+
+              <div className="flex items-start gap-4 mb-6">
+                <img
+                  src="https://img.daisyui.com/images/profile/demo/gordon@192.webp"
+                  alt="Your profile"
+                  className="w-12 h-12 rounded-full border-2 border-white/50 shadow-lg"
+                />
+                <div className="flex-1">
+                  <Textarea
+                    placeholder="What's happening?"
+                    rows={4}
+                    className="w-full bg-white/50 border-white/30 focus:border-blue-500/50 rounded-xl resize-none text-lg"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {imageFile && (
+                <div className="mb-6 relative">
+                  <img
+                    src={URL.createObjectURL(imageFile)}
+                    alt="Preview"
+                    className="w-full rounded-xl border border-white/20"
+                  />
+                  <Button
+                    onClick={() => setImageFile(null)}
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="bg-white/30 hover:bg-white/50 border border-white/20 rounded-xl"
-                  >
-                    <Paperclip className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="bg-white/30 hover:bg-white/50 border border-white/20 rounded-xl"
-                  >
-                    <MapPin className="w-4 h-4" />
-                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -530,17 +635,51 @@ export default function Home() {
                       className="hidden"
                     />
                   </Button>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="bg-white/30 hover:bg-white/50 border border-white/20 rounded-xl"
+                      >
+                        <Users className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => setVisibility(0)}>
+                        {visibility == 0 && <span className="mr-2">✓</span>}
+                        <Earth /> Public
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setVisibility(1)}>
+                        {visibility == 1 && <span className="mr-2">✓</span>}
+                        <Users /> Followers Only
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setVisibility(2)}>
+                        {visibility == 2 && <span className="mr-2">✓</span>}
+                        <Star /> Close Friends
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
+
+                <Button
+                  onClick={handlePost}
+                  disabled={!content.trim()}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white shadow-lg px-8 py-3 rounded-xl transition-all duration-200"
+                >
+                  Post
+                </Button>
               </div>
             </CardContent>
           </Card>
         </div>
       )}
 
-      {/* Floating Action Button with Gradient */}
+      {/* Floating Action Button */}
       <Button
         onClick={() => setShowForm(!showForm)}
-        className="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110"
+        className="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 z-40"
         size="icon"
       >
         <Plus className="w-7 h-7" />
