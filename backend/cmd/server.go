@@ -8,6 +8,7 @@ import (
 
 	"social-network/pkg/auth"
 	"social-network/pkg/db/sqlite"
+	"social-network/pkg/posts"
 	"social-network/pkg/profile"
 	"social-network/pkg/chat"
     "social-network/pkg/notification"
@@ -43,9 +44,26 @@ func main() {
     r.Handle("/ws", auth.AuthMiddleware(http.HandlerFunc(auth.UserWebSocket))).Methods("GET")
     r.Handle("/getSession", auth.AuthMiddleware(http.HandlerFunc(auth.GetSessionHandler))).Methods("GET")
 	// Profile routes (with auth middleware)
-	r.Handle("/profile/me", auth.AuthMiddleware(http.HandlerFunc(profile.GetOwnProfileHandler))).Methods("GET")
-	r.HandleFunc("/users/{id}", profile.GetUserProfileHandler).Methods("GET")
+	// r.Handle("/profile/me", auth.AuthMiddleware(http.HandlerFunc(profile.GetOwnProfileHandler))).Methods("GET")
+	// r.HandleFunc("/users/{id}", profile.GetUserProfileHandler).Methods("GET")
+
+	// Profile routes
+	r.Handle("/profile/{username}", auth.AuthMiddleware(http.HandlerFunc(profile.GetOwnProfileHandler))).Methods("GET")
+	r.Handle("/users/{username}", auth.AuthMiddleware(http.HandlerFunc(profile.GetUserProfileHandler))).Methods("GET")
 	r.Handle("/profile/privacy", auth.AuthMiddleware(http.HandlerFunc(profile.TogglePrivacyHandler(sqlite.DB)))).Methods("PATCH")
+	r.Handle("/profile/avatar", auth.AuthMiddleware(http.HandlerFunc(profile.UpdateAvatarHandler))).Methods("PATCH")
+	r.Handle("/follow/{username}", auth.AuthMiddleware(profile.FollowHandler(sqlite.DB))).Methods("POST")
+	r.Handle("/unfollow/{username}", auth.AuthMiddleware(profile.UnfollowHandler(sqlite.DB))).Methods("DELETE")
+	r.Handle("/followers", auth.AuthMiddleware(http.HandlerFunc(profile.GetFollowersHandler))).Methods("GET")
+	r.Handle("/profile/close-friends", auth.AuthMiddleware(http.HandlerFunc(profile.GetCloseFriendsHandler))).Methods("GET")
+	r.Handle("/profile/close-friends", auth.AuthMiddleware(http.HandlerFunc(profile.CloseFriendsHandler))).Methods("PATCH")
+	r.Handle("/users/not-followed", auth.AuthMiddleware(http.HandlerFunc(profile.GetNotFollowedUsersHandler))).Methods("GET")
+	// Post routes
+	r.Handle("/post", auth.AuthMiddleware(http.HandlerFunc(posts.CreatePostHandler))).Methods("POST")
+	r.Handle("/feed", auth.AuthMiddleware(http.HandlerFunc(posts.FeedHandler))).Methods("GET")
+	r.Handle("/comment", auth.AuthMiddleware(http.HandlerFunc(posts.CreateCommentHandler))).Methods("POST")
+	r.Handle("/comments", auth.AuthMiddleware(http.HandlerFunc(posts.GetCommentsHandler))).Methods("GET")
+
 	r.Handle("/follow/{id}", auth.AuthMiddleware(profile.FollowHandler(sqlite.DB))).Methods("POST")
 	r.Handle("/unfollow/{id}", auth.AuthMiddleware(profile.UnfollowHandler(sqlite.DB))).Methods("DELETE")
 	//chat 
@@ -78,7 +96,7 @@ func main() {
 // CORS Middleware
 func enableCORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000") // your frontend origin
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
