@@ -85,6 +85,8 @@ func main() {
 	r.Handle("/notifications", auth.AuthMiddleware(http.HandlerFunc(notification.CreateNotificationHandler))).Methods("POST")
 	r.Handle("/notifications/status", auth.AuthMiddleware(http.HandlerFunc(notification.UpdateNotificationStatusHandler))).Methods("POST")
 	r.Handle("/notifications/mark-all-read", auth.AuthMiddleware(http.HandlerFunc(notification.MarkAllNotificationsReadHandler))).Methods("POST")
+
+	r.Handle("/followAccept", auth.AuthMiddleware(profile.AcceptFollowRequestHandler(sqlite.DB))).Methods("POST")
 	
 	// Apply CORS middleware
 	handler := enableCORS(r)

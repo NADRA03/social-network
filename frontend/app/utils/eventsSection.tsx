@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useGroupStore } from "./store";
 import { votePoll, createGroupEvent, getGroupEvents } from "../api";
+import { showToastU } from "./toast";
 
 type Poll = {
   id: number;
@@ -60,26 +61,34 @@ export default function EventsSection() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedGroupId) return;
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!selectedGroupId) return;
 
-    try {
-      const payload = {
-        ...formData,
-        group_id: selectedGroupId,
-        polls: pollOptions.filter(opt => opt.trim() !== '').map(opt => ({ option_text: opt.trim() }))
-      };
+  const cleanedPolls = pollOptions
+    .map((opt) => opt.trim())
+    .filter((opt) => opt !== "");
 
-      const newEvent = await createGroupEvent(payload);
-      console.log(newEvent);
-      setEvents((prev) => [...prev, newEvent]);
-      setFormData({ name: "", description: "", time: "", location: "" });
-      setPollOptions([""]);
-    } catch (err) {
-      console.error("Failed to create event", err);
-    }
-  };
+  if (cleanedPolls.length < 2) {
+    showToastU("You must provide at least two poll options.");
+    return;
+  }
+
+  try {
+    const payload = {
+      ...formData,
+      group_id: selectedGroupId,
+      polls: cleanedPolls.map((opt) => ({ option_text: opt })),
+    };
+
+    const newEvent = await createGroupEvent(payload);
+    setEvents((prev) => [...(prev || []), newEvent]);
+    setFormData({ name: "", description: "", time: "", location: "" });
+    setPollOptions([""]);
+  } catch (err) {
+    console.error("Failed to create event", err);
+  }
+};
 
   const updatePollOption = (index: number, value: string) => {
     const newOptions = [...pollOptions];

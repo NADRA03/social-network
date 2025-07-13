@@ -292,23 +292,12 @@ return (
   {activeTab === "chat" && (
     <div
       className="absolute inset-0 z-0"
-      style={{
-        backgroundImage: `url('bg.png')`,
-        backgroundRepeat: "repeat",
-        backgroundSize: "contain",
-      }}
     ></div>
   )}
 
   {(selectedUserId === null && selectedGroupId === null) || activeTab !== "chat" ? (
     <div
       className="absolute inset-0 z-0"
-      style={{
-        backgroundImage:
-          "linear-gradient(to bottom right, #faf5ff, #f8f5ff, #fefcff)",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
     ></div>
   ) : null}
 
@@ -316,7 +305,7 @@ return (
     <div className="flex items-center justify-center flex-col mt-80 text-center text-gray-500">
   <div className="flex flex-col items-center justify-center h-full text-gray-600 z-10">
     {/* <MessageCircle className="w-12 h-12 text-purple-500 animate-bounce" /> */}
-    <p className="mt-4 text-lg font-medium text-purple-500">Select a user or group to start chatting!</p>
+    <p className="mt-4 text-lg font-medium text-purple-500"></p>
   </div>
     </div>
   ) : selectedGroupId !== null ? (
@@ -461,10 +450,14 @@ return (
 </div>
 
   <div className="divider divider-horizontal"></div>
-  <div className="overflow-hidden w-3/7 min-h-screen">
+  <div className="overflow-hidden w-3/7 h-full">
 
 
-    <div id="details" className="h-full relative z-10 inline-block text-sm text-gray-900 dark:text-gray-400 w-full before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:bg-gradient-to-b before:from-purple-600 before:to-transparent before:opacity-20 before:z-0">
+    <div id="details"     className="h-full relative z-10 inline-block text-sm text-gray-900 dark:text-gray-400 w-full 
+    before:absolute before:inset-x-0 before:top-0 before:h-1/1
+    before:bg-gradient-to-b before:from-purple-600 before:via-indigo-600 before:to-indigo-800
+    before:opacity-50 before:z-0"
+     >
     <Details />
     </div>
 

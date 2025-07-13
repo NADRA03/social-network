@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"social-network/pkg/auth"
 	"social-network/pkg/db/sqlite"
-
 	"github.com/gorilla/mux"
+	"log"
 )
 
 func GetOwnProfileHandler(w http.ResponseWriter, r *http.Request) {
@@ -70,18 +70,80 @@ func FollowHandler(db *sql.DB) http.HandlerFunc {
 		vars := mux.Vars(r)
 		username := vars["username"]
 		var followedID int
-		err = sqlite.DB.QueryRow("SELECT id FROM users WHERE username = ?", username).Scan(&followedID)
-		// followedID, err := strconv.Atoi(vars["id"])
+		var isPrivate bool
+
+		err = sqlite.DB.QueryRow(
+			"SELECT id, is_private FROM users WHERE username = ?", username,
+		).Scan(&followedID, &isPrivate)
+
 		if err != nil {
-			http.Error(w, "user not found", http.StatusNotFound)
+			http.Error(w, "User not found", http.StatusNotFound)
 			return
 		}
 
 		if followedID == followerID {
 			http.Error(w, "Cannot follow your own account", http.StatusBadRequest)
+			return
 		}
 
-		_, err = db.Exec(`INSERT OR IGNORE INTO followers (follower_id, followed_id) VALUES (?, ?)`, followerID, followedID)
+		if isPrivate {
+			// Only send follow request notification, don't insert into followers
+			message := "You have a new follow request."
+
+			_, err := sqlite.DB.Exec(`
+				INSERT INTO notifications (user_id, inviter_id, type, message, status)
+				VALUES (?, ?, ?, ?, ?)`,
+				followedID, followerID, "follow_request", message, "unread")
+
+			if err != nil {
+				log.Println("Failed to create follow request notification:", err)
+			} else if conn, ok := auth.ActiveUsers[followedID]; ok {
+				// Live update if online
+				rows, err := sqlite.DB.Query(`
+					SELECT id, inviter_id, group_id, event_id, type, message, status, created_at, read
+					FROM notifications WHERE user_id = ?`, followedID)
+
+				if err == nil {
+					var notifs []map[string]interface{}
+					for rows.Next() {
+						var id, inviterID int
+						var groupID, eventID sql.NullInt64
+						var notifType, message, status, createdAt string
+						var read bool
+						if err := rows.Scan(&id, &inviterID, &groupID, &eventID, &notifType, &message, &status, &createdAt, &read); err == nil {
+							notif := map[string]interface{}{
+								"id": id, "inviter_id": inviterID, "group_id": nil, "event_id": nil,
+								"type": notifType, "message": message, "status": status,
+								"created_at": createdAt, "read": read,
+							}
+							if groupID.Valid {
+								notif["group_id"] = groupID.Int64
+							}
+							if eventID.Valid {
+								notif["event_id"] = eventID.Int64
+							}
+							notifs = append(notifs, notif)
+						}
+					}
+					rows.Close()
+
+					conn.WriteJSON(map[string]interface{}{
+						"type":          "notifications-list",
+						"notifications": notifs,
+					})
+				}
+			}
+
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("Follow request sent"))
+			return
+		}
+
+		// Public account: insert directly
+		_, err = db.Exec(`
+			INSERT OR IGNORE INTO followers (follower_id, followed_id)
+			VALUES (?, ?)`, followerID, followedID)
+
 		if err != nil {
 			http.Error(w, "Follow failed", http.StatusInternalServerError)
 			return
@@ -91,6 +153,8 @@ func FollowHandler(db *sql.DB) http.HandlerFunc {
 		w.Write([]byte("Followed"))
 	}
 }
+
+
 
 func UnfollowHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -147,3 +211,31 @@ func UpdateAvatarHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 }
+
+func AcceptFollowRequestHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID, err := auth.GetUserIDFromSession(r) 
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		var req struct {
+			InviterID    int `json:"inviter_id"`    
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid JSON", http.StatusBadRequest)
+			return
+		}
+
+		_, err = db.Exec(`INSERT OR IGNORE INTO followers (follower_id, followed_id) VALUES (?, ?)`, req.InviterID, userID)
+		if err != nil {
+			http.Error(w, "Failed to accept follow request", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Follow request accepted"))
+	}
+}
+

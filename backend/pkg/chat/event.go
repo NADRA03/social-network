@@ -63,7 +63,7 @@ func CreateEvent(e Event) (int64, error) {
 }
 
 func GetEventsByGroup(groupID int) ([]Event, error) {
-	query := `SELECT id, name, description, host_id, group_id, time, location, created_at FROM events WHERE group_id = ? ORDER BY time ASC`
+	query := `SELECT id, name, description, host_id, group_id, time, location, created_at FROM events WHERE group_id = ?`
 	rows, err := sqlite.DB.Query(query, groupID)
 	if err != nil {
 		return nil, err
@@ -101,7 +101,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 	var insertedPolls []Poll
 	var votedOptionID *int
 
-	if len(payload.Polls) > 0 {
+	if len(payload.Polls) >= 2 {
 		err := CreatePollOptions(int(eventID), payload.Polls)
 		if err != nil {
 			http.Error(w, "Event created but failed to create polls", http.StatusInternalServerError)

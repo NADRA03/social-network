@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Home, Bell } from "lucide-react";
+import { Home, Bell, User, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { connectWebSocket } from "../api"; 
 import { joinGroup } from "../api";
@@ -9,6 +9,10 @@ import { updateNotificationStatus } from "../api";
 import { session } from "./session";
 import { setNotificationUpdater } from "./notifications";
 import { markAllNotificationsAsRead } from "../api";
+import { acceptFollowRequest } from "../api";
+import { showToastU } from "./toast";
+
+
 
 type Notification = {
   id: number;
@@ -28,6 +32,10 @@ export default function BottomLeftNavigation() {
   const [showNotifications, setShowNotifications] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const isMounted = useRef(false);
+  const initialNotificationIDs = useRef<Set<number>>(new Set());
+  const didInit = useRef(false);
+
 
 
 useEffect(() => {
@@ -45,9 +53,26 @@ useEffect(() => {
 
 useEffect(() => {
   setNotificationUpdater((newNotifications: Notification[]) => {
-    setNotifications(newNotifications);
     const unread = newNotifications.filter(n => !n.read).length;
     setUnreadCount(unread);
+
+    // ✅ On first time only: record all current notification IDs
+    if (!didInit.current) {
+      initialNotificationIDs.current = new Set(newNotifications.map(n => n.id));
+      setNotifications(newNotifications);
+      didInit.current = true;
+      return;
+    }
+
+    // ✅ On later updates only: show toast for any new unread notification
+    const previous = initialNotificationIDs.current;
+    const newUnread = newNotifications.filter(n => !n.read && !previous.has(n.id));
+
+    newUnread.forEach(n => showToastU(n.message));
+
+    // Update notifications and tracked IDs
+    setNotifications(newNotifications);
+    newNotifications.forEach(n => previous.add(n.id)); // Add any new ones to avoid future repeats
   });
 
   connectWebSocket(() => {});
@@ -64,19 +89,32 @@ function handleNotificationResponse(id: number, action: "accepted" | "rejected")
       console.log(`Notification ${id} status updated to ${action}`);
 
       if (
-        action === "accepted" &&
-        notif.group_id &&
-        ["group_invite", "join_request"].includes(notif.type)
+        action === "accepted"
       ) {
-        const user_id =
-          notif.type === "group_invite" ? session.UserID : notif.inviter_id;
-        return joinGroup(notif.group_id, user_id)
-          .then(() => {
-            console.log(`Joined group ${notif.group_id}`);
-          })
-          .catch((err) => {
-            console.error("Failed to join group, but status updated:", err);
-          });
+        if (
+          notif.group_id &&
+          ["group_invite", "join_request"].includes(notif.type)
+        ) {
+          const user_id =
+            notif.type === "group_invite" ? session.UserID : notif.inviter_id;
+          return joinGroup(notif.group_id, user_id)
+            .then(() => {
+              console.log(`Joined group ${notif.group_id}`);
+            })
+            .catch((err) => {
+              console.error("Failed to join group, but status updated:", err);
+            });
+        }
+
+        if (notif.type === "follow_request") {
+          return acceptFollowRequest(notif.inviter_id)
+            .then(() => {
+              console.log(`Accepted follow request from ${notif.inviter_id}`);
+            })
+            .catch((err) => {
+              console.error("Failed to accept follow request:", err);
+            });
+        }
       }
     })
     .finally(() => {
@@ -90,37 +128,50 @@ function handleNotificationResponse(id: number, action: "accepted" | "rejected")
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-4 items-start">
-      <Link href="/" className="group">
-        <div className="p-3 bg-white shadow-md rounded-full hover:bg-purple-100 transition">
-          <Home className="w-5 h-5 text-purple-600 group-hover:scale-110 transition-transform" />
-        </div>
-      </Link>
+    {/* Home */}
+  <Link href="/" className="group">
+    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 p-2 rounded-full shadow-md hover:shadow-purple-500/40 hover:scale-105 transition">
+      <Home className="w-full h-full text-white" />
+    </div>
+  </Link>
+
+    {/* Profile */}
+<Link href={`/profile/${session?.Username}`} className="group">
+  <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 p-2 rounded-full shadow-md hover:shadow-purple-500/40 hover:scale-105 transition">
+    <User className="w-full h-full text-white" />
+  </div>
+</Link>
+
+    {/* Messages */}
+  <Link href="/chat" className="group">
+    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 p-2 rounded-full shadow-md hover:shadow-purple-500/40 hover:scale-105 transition">
+      <MessageSquare className="w-full h-full text-white" />
+    </div>
+  </Link>
 
       <div className="relative" ref={panelRef}>
-<button
-  onClick={() => {
-    setShowNotifications(prev => {
-      const newState = !prev;
-      if (newState) {
-        markAllNotificationsAsRead().then(() => {
-          setUnreadCount(0);
-          setNotifications(prev =>
-            prev.map(n => ({ ...n, read: 1 }))
-          );
+    <button
+      onClick={() => {
+        setShowNotifications(prev => {
+          const newState = !prev;
+          if (newState) {
+            markAllNotificationsAsRead().then(() => {
+              setUnreadCount(0);
+              setNotifications(prev => prev.map(n => ({ ...n, read: 1 })));
+            });
+          }
+          return newState;
         });
-      }
-      return newState;
-    });
-  }}
-  className="relative p-3 bg-white shadow-md rounded-full hover:bg-purple-100 transition group"
->
-  <Bell className="w-5 h-5 text-purple-600 group-hover:scale-110 transition-transform" />
-  {unreadCount > 0 && (
-    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-      {unreadCount}
-    </span>
-  )}
-</button>
+      }}
+      className="relative w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 p-2 rounded-full shadow-md hover:shadow-purple-500/40 hover:scale-105 transition"
+    >
+      <Bell className="w-full h-full text-white" />
+      {unreadCount > 0 && (
+        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+          {unreadCount}
+        </span>
+      )}
+    </button>
 
         {showNotifications && (
 <div className="absolute right-14 bottom-0 mb-1 w-64 max-h-72 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg p-3 space-y-2 z-50">

@@ -66,7 +66,7 @@ const handleCreate = async () => {
   setDescription("");
   setSelectedUsers([]);
   setShowForm(false);
-  alert("Group created and invitations sent");
+  showToastU("Group created and invitations sent");
 };
 
   const handleSelectUser = (user: any) => {
@@ -230,6 +230,12 @@ function sendGroupMessageToSocket(text: string): void {
 }
 
 
+useEffect(() => {
+  if (showForm) {
+    handleSearch("");
+  }
+}, [showForm]);
+
 
 
   return (
@@ -286,18 +292,22 @@ function sendGroupMessageToSocket(text: string): void {
           />
 
           <div className="mt-1 space-y-1 max-h-32 overflow-y-auto">
-          {results.map((user) => (
-            <div
-              key={user.ID}
-              className="flex items-center gap-2 px-2 py-1 rounded hover:bg-base-200 cursor-pointer"
-              onClick={() => handleSelectUser(user)}
-            >
-              <div className="w-6 h-6 rounded-full bg-base-300 flex items-center justify-center text-xs font-semibold">
-                {user.Username[0]?.toUpperCase()}
-              </div>
-              <span>{user.Username}</span>
-            </div>
-          ))}
+            {Array.isArray(results) && results.length > 0 ? (
+              results.map((user) => (
+                <div
+                  key={user.ID}
+                  className="flex items-center gap-2 px-2 py-1 rounded hover:bg-base-200 cursor-pointer"
+                  onClick={() => handleSelectUser(user)}
+                >
+                  <div className="w-6 h-6 rounded-full bg-base-300 flex items-center justify-center text-xs font-semibold">
+                    {user.Username[0]?.toUpperCase()}
+                  </div>
+                  <span>{user.Username}</span>
+                </div>
+              ))
+            ) : search.trim() !== "" ? (
+              <div className="text-xs text-gray-400 italic px-2">No users found.</div>
+            ) : null}
           </div>
 
 <div className="w-full flex justify-center">
