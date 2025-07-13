@@ -124,7 +124,11 @@ const handleCommentSubmit = async (postId: number) => {
                     </p>
 
                     <div className="relative p-5 bg-base-100 dark:bg-base-300 rounded-lg shadow-md border border-base-200 space-y-2 overflow-hidden">
-                      <p className="text-sm">{post.content}</p>
+                      <p className="text-sm"                       style={{
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    overflowX: "hidden",
+  }}>{post.content}</p>
                       {post.image_url && (
                         <img
                           src={post.image_url}

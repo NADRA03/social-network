@@ -31,8 +31,42 @@ func RegisterHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		if len(req.Username) < 3 || len(req.Username) > 15 {
+			http.Error(w, "Username must be between 3 and 15 characters", http.StatusBadRequest)
+			return
+		}
+		if len(req.FirstName) > 15 || len(req.LastName) > 15 {
+			http.Error(w, "Name fields must be less than 15 characters", http.StatusBadRequest)
+			return
+		}
+		if len(req.Bio) > 300 {
+			http.Error(w, "Bio must be less than 300 characters", http.StatusBadRequest)
+			return
+		}
+		if len(req.Avatar) > 2048 {
+			http.Error(w, "Avatar URL is too long", http.StatusBadRequest)
+			return
+		}
+
 		if !validEmail(req.Email) {
 			http.Error(w, "Invalid Email Format", http.StatusBadRequest)
+			return
+		}
+
+		var exists int
+		err := db.QueryRow("SELECT COUNT(1) FROM users WHERE email = ?", req.Email).Scan(&exists)
+		if err != nil {
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			log.Println("Email check error:", err)
+			return
+		}
+		if exists > 0 {
+			http.Error(w, "Email is already registered", http.StatusConflict)
+			return
+		}
+
+		if !validPassword(req.Password) {
+			http.Error(w, "Password must be at least 8 characters and include a letter and number", http.StatusBadRequest)
 			return
 		}
 
@@ -66,6 +100,24 @@ func RegisterHandler(db *sql.DB) http.HandlerFunc {
 		w.Write([]byte("Registered successfully"))
 	}
 }
+
+func validPassword(pw string) bool {
+	if len(pw) < 8 {
+		return false
+	}
+	hasLetter := false
+	hasNumber := false
+	for _, c := range pw {
+		switch {
+		case 'a' <= c && c <= 'z', 'A' <= c && c <= 'Z':
+			hasLetter = true
+		case '0' <= c && c <= '9':
+			hasNumber = true
+		}
+	}
+	return hasLetter && hasNumber
+}
+
 
 func validEmail(email string) bool {
 	email_pattern := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)

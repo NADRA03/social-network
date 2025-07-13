@@ -102,6 +102,7 @@ export const ProfileHeader = ({
         { withCredentials: true }
       );
       setPrivateStatus((prev) => !prev);
+      window.location.reload();
     } catch (err) {
       console.error("Failed to toggle privacy", err);
     }
@@ -122,6 +123,7 @@ export const ProfileHeader = ({
         );
       }
       setFollowing(!following);
+      window.location.reload();
     } catch (err) {
       console.error("Failed to follow/unfollow", err);
     } finally {

@@ -127,7 +127,11 @@ const handleSubmit = async (e: React.FormEvent) => {
                       {host?.Username || "Unknown"} <span className="text-xs text-gray-400 ml-1">{createdDate}</span>
                     </p>
 
-                    <div className="relative p-5 bg-base-100 dark:bg-base-300 rounded-lg shadow-md border border-base-200 space-y-2 overflow-hidden">
+                    <div className="relative p-5 bg-base-100 dark:bg-base-300 rounded-lg shadow-md border border-base-200 space-y-2 overflow-hidden"                       style={{
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    overflowX: "hidden",
+  }}>
                       <h4 className="text-sm">{event.name}</h4>
                       <p className="text-sm text-gray-500">🕒 {new Date(event.time).toLocaleString()}</p>
                       <p className="text-sm">{event.description}</p>

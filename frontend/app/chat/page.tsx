@@ -296,9 +296,13 @@ return (
   )}
 
   {(selectedUserId === null && selectedGroupId === null) || activeTab !== "chat" ? (
-    <div
-      className="absolute inset-0 z-0"
-    ></div>
+<div className="absolute inset-0 z-0 flex items-center justify-center">
+  {/* <img
+    src="loading2.gif"
+    alt="Background"
+    className="object-cover w-20 h-20"
+  /> */}
+</div>
   ) : null}
 
   {selectedUserId === null && selectedGroupId === null ? (

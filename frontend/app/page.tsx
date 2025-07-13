@@ -423,7 +423,11 @@ export default function Home() {
                             </div>
                           </div>
 
-                          <p className="text-gray-700 mb-4 text-base leading-relaxed">
+                          <p className="text-gray-700 mb-4 text-base leading-relaxed"   style={{
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    overflowX: "hidden",
+  }}>
                             {post.content}
                           </p>
 
@@ -560,7 +564,11 @@ export default function Home() {
                       {new Date(selectedPost.created_at).toLocaleString()}
                     </span>
                   </div>
-                  <p className="text-gray-700">{selectedPost.content}</p>
+                  <p className="text-gray-700"   style={{
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    overflowX: "hidden",
+  }}>{selectedPost.content}</p>
                 </div>
               </div>
             </div>
@@ -584,7 +592,11 @@ export default function Home() {
                         {new Date(comment.created_at).toLocaleString()}
                       </span>
                     </div>
-                    <p className="text-gray-700 text-sm">{comment.content}</p>
+                    <p className="text-gray-700 text-sm"   style={{
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    overflowX: "hidden",
+  }}>{comment.content}</p>
                   </div>
                 </div>
               ))}
@@ -650,6 +662,11 @@ export default function Home() {
                     className="w-full bg-white/50 border-white/30 focus:border-blue-500/50 rounded-xl resize-none text-lg"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
+                      style={{
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    overflowX: "hidden",
+  }}
                   />
                 </div>
               </div>

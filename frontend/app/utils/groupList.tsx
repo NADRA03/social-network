@@ -44,30 +44,56 @@ export default function GroupList() {
   };
 
 const handleCreate = async () => {
-  if (!groupName || selectedUsers.length === 0) return;
+  const maxNameLength = 15;
+  const maxDescLength = 150;
 
-  const res = await createGroup({ name: groupName, description });
-  const groupID = res.group_id;
-
-  const currentUserID = session.UserID;
-
-  for (const user of selectedUsers) {
-    await createNotification({
-      user_id: user.ID,
-      inviter_id: currentUserID,
-      group_id: groupID,
-      type: "group_invite",
-      message: `You’ve been invited to join the group "${groupName}"`,
-      status: "unread",
-    });
+  if (!groupName.trim()) {
+    showToastU("Group name is required");
+    return;
   }
 
-  setGroupName("");
-  setDescription("");
-  setSelectedUsers([]);
-  setShowForm(false);
-  showToastU("Group created and invitations sent");
+  if (groupName.length > maxNameLength) {
+    showToastU(`Group name must be less than ${maxNameLength} characters`);
+    return;
+  }
+
+  if (description.length > maxDescLength) {
+    showToastU(`Description must be less than ${maxDescLength} characters`);
+    return;
+  }
+
+  if (selectedUsers.length === 0) {
+    showToastU("Please select at least one member to invite");
+    return;
+  }
+
+  try {
+    const res = await createGroup({ name: groupName, description });
+    const groupID = res.group_id;
+    const currentUserID = session.UserID;
+
+    for (const user of selectedUsers) {
+      await createNotification({
+        user_id: user.ID,
+        inviter_id: currentUserID,
+        group_id: groupID,
+        type: "group_invite",
+        message: `You’ve been invited to join the group "${groupName}"`,
+        status: "unread",
+      });
+    }
+
+    setGroupName("");
+    setDescription("");
+    setSelectedUsers([]);
+    setShowForm(false);
+    showToastU("Group created and invitations sent");
+  } catch (err) {
+    console.error("Error creating group:", err);
+    showToastU("Failed to create group. Try again.");
+  }
 };
+
 
   const handleSelectUser = (user: any) => {
     if (!selectedUsers.find((u) => u.ID === user.ID)) {

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { showToastU } from "../utils/toast";
 import { supabase } from "@/lib/supabase";
 import { Mail, Lock, User, UserPlus, Calendar } from "lucide-react";
 
@@ -50,17 +51,26 @@ export default function RegisterPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post("http://localhost:8080/register", formData, {
-        withCredentials: true,
-      });
-      router.push(`/login`);
-    } catch (err: any) {
-      alert("Registration failed.");
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    const res = await axios.post("http://localhost:8080/register", formData, {
+      withCredentials: true,
+      validateStatus: () => true, 
+    });
+
+    if (res.status !== 201) {
+      const message = res.data || "Registration failed";
+      showToastU(message);
+      return;
     }
-  };
+
+    router.push("/login");
+  } catch (err: any) {
+    showToastU("Server error. Please try again.");
+    console.error(err);
+  }
+};
 
   return (
     <div className="min-h-screen bg-fixed bg-no-repeat bg-cover bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 flex items-center justify-center p-6">

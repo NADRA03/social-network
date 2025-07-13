@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useGroupStore } from "./store";
 import { searchUsers, createNotification } from "../api";
 import { Search, SquarePlus, TicketSlash } from "lucide-react";
+import { showToastU } from "./toast";
 
 export default function Details() {
   const { selectedGroupId, selectedGroupDetails } = useGroupStore();
@@ -54,10 +55,10 @@ export default function Details() {
         message: `You've been invited to join the group "${name}"`,
         status: "unread",
       });
-      alert(`Invitation sent to ${username}`);
+      showToastU(`Invitation sent to ${username}`);
     } catch (err) {
       console.error("Failed to send invite:", err);
-      alert("Failed to send invite");
+      showToastU("Failed to send invite");
     }
   };
 

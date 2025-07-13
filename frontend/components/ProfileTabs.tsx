@@ -66,11 +66,6 @@ export const ProfileTabs = ({ canViewContent, userId }: ProfileTabsProps) => {
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">
       <Tabs defaultValue="posts" className="w-full">
-        <TabsList className="w-full">
-          <TabsTrigger className="w-full h-12 text-lg" value="posts">
-            User Posts
-          </TabsTrigger>
-        </TabsList>
 
         <TabsContent value="posts" className="space-y-6">
           <Card>

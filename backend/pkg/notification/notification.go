@@ -21,16 +21,14 @@ func CreateNotification(userID, inviterID int, groupID, eventID sql.NullInt64, n
 }
 
 func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
-	// userID := auth.Session.UserID
-
 	var payload struct {
 		UserID    int    `json:"user_id"`
 		InviterID int    `json:"inviter_id"`
-		GroupID   *int   `json:"group_id"`  
-		EventID   *int   `json:"event_id"`  
+		GroupID   *int   `json:"group_id"`
+		EventID   *int   `json:"event_id"`
 		Type      string `json:"type"`
 		Message   string `json:"message"`
-		Status    string `json:"status"`    
+		Status    string `json:"status"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
@@ -38,14 +36,13 @@ func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// if payload.InviterID != userID {
-	// 	http.Error(w, "Forbidden: inviter ID must match session user", http.StatusForbidden)
-	// 	return
-	// }
-
 	if payload.UserID == payload.InviterID {
 		http.Error(w, "Cannot send notification to yourself", http.StatusForbidden)
 		return
+	}
+
+	if payload.Status == "" {
+		payload.Status = "pending"
 	}
 
 	groupID := sql.NullInt64{}
@@ -58,8 +55,35 @@ func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		eventID = sql.NullInt64{Int64: int64(*payload.EventID), Valid: true}
 	}
 
-	if payload.Status == "" {
-		payload.Status = "pending"
+	query := `
+		SELECT COUNT(*) FROM notifications
+		WHERE user_id = ? AND inviter_id = ? AND type = ? AND status IN ('unread', 'pending')
+	`
+	args := []interface{}{payload.UserID, payload.InviterID, payload.Type}
+
+	if groupID.Valid {
+		query += " AND group_id = ?"
+		args = append(args, groupID.Int64)
+	} else {
+		query += " AND group_id IS NULL"
+	}
+
+	if eventID.Valid {
+		query += " AND event_id = ?"
+		args = append(args, eventID.Int64)
+	} else {
+		query += " AND event_id IS NULL"
+	}
+
+	var count int
+	if err := sqlite.DB.QueryRow(query, args...).Scan(&count); err != nil {
+		http.Error(w, "Failed to check existing notifications", http.StatusInternalServerError)
+		return
+	}
+	if count > 0 {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Notification already exists"))
+		return
 	}
 
 	err := CreateNotification(payload.UserID, payload.InviterID, groupID, eventID, payload.Type, payload.Message, payload.Status)

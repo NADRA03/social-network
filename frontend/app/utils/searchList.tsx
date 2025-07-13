@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { searchGroups, createNotification } from "../api";
 import { Search } from "lucide-react";
 import { session } from "./session";
+import { showToastU } from "./toast";
 
 type Group = {
   id: number;
@@ -49,7 +50,7 @@ export default function SearchList() {
         message: `"${session.Username}" has requested to join your group "${group.name}".`,
         status: "unread",
       });
-      alert("Join request sent!");
+      showToastU("Join request sent!");
     } catch (err) {
       console.error("Failed to send join request:", err);
     }

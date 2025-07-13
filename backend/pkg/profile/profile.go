@@ -90,60 +90,68 @@ func FollowHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		if isPrivate {
-			// Send notification only
-			message := "You have a new follow request."
+if isPrivate {
+	var existingCount int
+	err = db.QueryRow(`
+		SELECT COUNT(*) FROM notifications
+		WHERE user_id = ? AND inviter_id = ? AND type = ? AND status = ?`,
+		followedID, followerID, "follow_request", "unread").Scan(&existingCount)
 
-			_, err := db.Exec(`
-				INSERT INTO notifications (user_id, inviter_id, type, message, status)
-				VALUES (?, ?, ?, ?, ?)`,
-				followedID, followerID, "follow_request", message, "unread")
+	if err != nil {
+		log.Println("Failed to check existing notifications:", err)
+	} else if existingCount == 0 {
+		message := "You have a new follow request."
+		_, err := db.Exec(`
+			INSERT INTO notifications (user_id, inviter_id, type, message, status)
+			VALUES (?, ?, ?, ?, ?)`,
+			followedID, followerID, "follow_request", message, "unread")
 
-			if err != nil {
-				log.Println("Failed to create follow request notification:", err)
-			} else if conn, ok := auth.ActiveUsers[followedID]; ok {
-				// Live update if online
-				rows, err := db.Query(`
-					SELECT id, inviter_id, group_id, event_id, type, message, status, created_at, read
-					FROM notifications WHERE user_id = ?`, followedID)
+		if err != nil {
+			log.Println("Failed to create follow request notification:", err)
+		} else if conn, ok := auth.ActiveUsers[followedID]; ok {
+			rows, err := db.Query(`
+				SELECT id, inviter_id, group_id, event_id, type, message, status, created_at, read
+				FROM notifications WHERE user_id = ?`, followedID)
 
-				if err == nil {
-					var notifs []map[string]interface{}
-					for rows.Next() {
-						var id, inviterID int
-						var groupID, eventID sql.NullInt64
-						var notifType, message, status, createdAt string
-						var read bool
+			if err == nil {
+				var notifs []map[string]interface{}
+				for rows.Next() {
+					var id, inviterID int
+					var groupID, eventID sql.NullInt64
+					var notifType, message, status, createdAt string
+					var read bool
 
-						if err := rows.Scan(&id, &inviterID, &groupID, &eventID, &notifType, &message, &status, &createdAt, &read); err == nil {
-							notif := map[string]interface{}{
-								"id": id, "inviter_id": inviterID,
-								"group_id": nil, "event_id": nil,
-								"type": notifType, "message": message,
-								"status": status, "created_at": createdAt, "read": read,
-							}
-							if groupID.Valid {
-								notif["group_id"] = groupID.Int64
-							}
-							if eventID.Valid {
-								notif["event_id"] = eventID.Int64
-							}
-							notifs = append(notifs, notif)
+					if err := rows.Scan(&id, &inviterID, &groupID, &eventID, &notifType, &message, &status, &createdAt, &read); err == nil {
+						notif := map[string]interface{}{
+							"id": id, "inviter_id": inviterID,
+							"group_id": nil, "event_id": nil,
+							"type": notifType, "message": message,
+							"status": status, "created_at": createdAt, "read": read,
 						}
+						if groupID.Valid {
+							notif["group_id"] = groupID.Int64
+						}
+						if eventID.Valid {
+							notif["event_id"] = eventID.Int64
+						}
+						notifs = append(notifs, notif)
 					}
-					rows.Close()
-
-					conn.WriteJSON(map[string]interface{}{
-						"type":          "notifications-list",
-						"notifications": notifs,
-					})
 				}
-			}
+				rows.Close()
 
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("Follow request sent"))
-			return
+				conn.WriteJSON(map[string]interface{}{
+					"type":          "notifications-list",
+					"notifications": notifs,
+				})
+			}
 		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Follow request sent"))
+	return
+}
+
 
 		// Public account: insert directly
 		_, err = db.Exec(`

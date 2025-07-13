@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, User } from "lucide-react";
+import { showToastU } from "../utils/toast";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -30,7 +31,7 @@ export default function LoginPage() {
       await new Promise((r) => setTimeout(r, 100));
       router.push(`/`);
     } catch (err: any) {
-      alert("Login failed.");
+      showToastU("Login failed. Please try again.");
     }
   };
 
