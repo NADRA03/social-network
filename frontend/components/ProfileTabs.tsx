@@ -1,10 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { session } from "@/app/utils/session";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Lock } from "lucide-react";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 interface ProfileTabsProps {
@@ -42,25 +39,35 @@ export const ProfileTabs = ({ canViewContent, userId }: ProfileTabsProps) => {
     if (!userId) return;
 
     setIsLoading(true);
-    axios.get(`http://localhost:8080/profile/${userId}/posts`, {
-      withCredentials: true,
-    })
-    .then((res) => {
-      if (res.data && res.data.status === "private") {
-        setIsPrivate(true);
-        setPosts([]);
-      } else {
+    axios
+      .get(`http://localhost:8080/profile/${userId}/posts`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        console.log("API response:", res.data);
+
+        if (res.data && res.data.status === "private") {
+          setIsPrivate(true);
+          setPosts([]);
+        } else {
+          const extractedPosts = Array.isArray(res.data.posts)
+            ? res.data.posts
+            : Array.isArray(res.data)
+            ? res.data
+            : [];
+
+          setIsPrivate(false);
+          setPosts(extractedPosts);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load posts", err);
         setIsPrivate(false);
-        setPosts(Array.isArray(res.data) ? res.data : []);
-      }
-    })
-    .catch(() => {
-      setIsPrivate(false);
-      setPosts([]);
-    })
-    .finally(() => {
-      setIsLoading(false);
-    });
+        setPosts([]);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, [userId]);
 
   return (
@@ -83,16 +90,24 @@ export const ProfileTabs = ({ canViewContent, userId }: ProfileTabsProps) => {
               ) : (
                 <div className="flex justify-center p-8">
                   <div className="w-full max-w-2xl">
-                    {posts.length > 0 ? (
+                    {Array.isArray(posts) && posts.length > 0 ? (
                       posts.map((post) => (
                         <Card
                           key={post.id}
                           className="bg-white/70 backdrop-blur-md border-white/20 m-10 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 rounded-2xl overflow-hidden group"
+                          style={{
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    overflowX: "hidden",
+  }}
                         >
                           <CardContent className="p-6">
                             <div className="flex items-start gap-4">
                               <img
-                                src={ post.avatar_url || "https://img.daisyui.com/images/profile/demo/gordon@192.webp"}
+                                src={
+                                  post.avatar_url ||
+                                  "https://img.daisyui.com/images/profile/demo/gordon@192.webp"
+                                }
                                 alt="Profile"
                                 className="w-12 h-12 rounded-full border-2 border-white/50 shadow-lg"
                               />
@@ -103,19 +118,23 @@ export const ProfileTabs = ({ canViewContent, userId }: ProfileTabsProps) => {
                                       {post.display_name}
                                     </span>
                                     <span className="text-sm text-gray-500 bg-white/40 px-2 py-1 rounded-full backdrop-blur-sm">
-                                      {new Date(post.created_at).toLocaleString()}
+                                      {new Date(
+                                        post.created_at
+                                      ).toLocaleString()}
                                     </span>
                                     {post.visibility === postVisibility.Public && (
                                       <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
                                         Public
                                       </span>
                                     )}
-                                    {post.visibility === postVisibility.FollowersOnly && (
+                                    {post.visibility ===
+                                      postVisibility.FollowersOnly && (
                                       <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
                                         Followers Only
                                       </span>
                                     )}
-                                    {post.visibility === postVisibility.CloseFriends && (
+                                    {post.visibility ===
+                                      postVisibility.CloseFriends && (
                                       <span className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
                                         Close Friends
                                       </span>
@@ -135,7 +154,7 @@ export const ProfileTabs = ({ canViewContent, userId }: ProfileTabsProps) => {
                                       className="w-full rounded-xl shadow-lg border border-white/20 transition-transform duration-300 group-hover/image:scale-[1.02]"
                                       onError={(e) => {
                                         const target = e.target as HTMLImageElement;
-                                        target.style.display = 'none';
+                                        target.style.display = "none";
                                       }}
                                     />
                                   </div>
