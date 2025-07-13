@@ -5,9 +5,13 @@ import axios from "axios";
 import { Camera, Mail, Calendar, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
+import { logout } from "@/app/utils/auth";
 
 interface ProfileHeaderProps {
-  name: string;
+  id: number;
+  username: string | null;
+  fname: string;
+  lname: string;
   bio: string;
   email: string;
   joinDate: string;
@@ -15,7 +19,17 @@ interface ProfileHeaderProps {
   isOwner: boolean;
   isPrivate?: boolean;
   userId?: number;
-  isFollowing?: boolean;
+}
+
+interface Follower {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  display_identifier: string;
+  avatar: string;
+  is_close_friend: boolean;
 }
 
 export async function uploadProfilePicture(file: File): Promise<string | null> {
@@ -36,7 +50,10 @@ export async function uploadProfilePicture(file: File): Promise<string | null> {
 }
 
 export const ProfileHeader = ({
-  name,
+  id,
+  username,
+  fname,
+  lname,
   bio,
   email,
   joinDate,
@@ -44,27 +61,46 @@ export const ProfileHeader = ({
   isOwner,
   isPrivate = false,
   userId,
-  isFollowing = false,
 }: ProfileHeaderProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [privateStatus, setPrivateStatus] = useState(isPrivate);
-  const [following, setFollowing] = useState(isFollowing);
+  const [following, setFollowing] = useState(false);
   const [currentAvatar, setCurrentAvatar] = useState(avatarUrl);
-
   const [showCloseFriends, setShowCloseFriends] = useState(false);
-  const [followers, setFollowers] = useState<{ id: number; username: string }[]>([]);
-  const [selectedFollowers, setSelectedFollowers] = useState<number[]>([]);
+  const [followers, setFollowers] = useState<Follower[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isOwner) {
       fetchInitialData();
+    } else if (id) {
+      checkFollowingStatus();
     }
-  }, [isOwner]);
+  }, [id, isOwner]);
+
+  const checkFollowingStatus = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/is-following/${id}`,
+        { withCredentials: true }
+      );
+      setFollowing(response.data.isFollowing);
+    } catch (err) {
+      console.error("Failed to check following status", err);
+    }
+  };
+
+  const getDisplayName = () => {
+    return username ? username : `${fname} ${lname}`;
+  };
 
   const togglePrivacy = async () => {
     try {
-      await axios.patch(`http://localhost:8080/profile/privacy`, {}, { withCredentials: true });
+      await axios.patch(
+        `http://localhost:8080/profile/privacy`,
+        {},
+        { withCredentials: true }
+      );
       setPrivateStatus((prev) => !prev);
     } catch (err) {
       console.error("Failed to toggle privacy", err);
@@ -72,57 +108,69 @@ export const ProfileHeader = ({
   };
 
   const toggleFollow = async () => {
+    setIsLoading(true);
     try {
       if (following) {
-        await axios.delete(`http://localhost:8080/unfollow/${name}`, { withCredentials: true });
-        setFollowing(false);
+        await axios.delete(`http://localhost:8080/unfollow/${id}`, {
+          withCredentials: true,
+        });
       } else {
-        await axios.post(`http://localhost:8080/follow/${name}`, {}, { withCredentials: true });
-        setFollowing(true);
+        await axios.post(
+          `http://localhost:8080/follow/${id}`,
+          {},
+          { withCredentials: true }
+        );
       }
+      setFollowing(!following);
     } catch (err) {
       console.error("Failed to follow/unfollow", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const fetchInitialData = async () => {
     setIsLoading(true);
     try {
-      const [followersRes, closeFriendsRes] = await Promise.all([
-        axios.get("http://localhost:8080/followers", { withCredentials: true }),
-        axios.get("http://localhost:8080/profile/close-friends", { withCredentials: true }),
-      ]);
+      const followersRes = await axios.get<Follower[] | null>(
+        "http://localhost:8080/followers",
+        { withCredentials: true }
+      );
 
-      setFollowers(followersRes.data);
-      
-      const closeFriendsData = Array.isArray(closeFriendsRes?.data) 
-        ? closeFriendsRes.data 
-        : [];
-      
-      const ids = closeFriendsData.map(f => typeof f === 'object' ? f.id : f);
-      setSelectedFollowers(ids);
+      setFollowers(followersRes.data === null ? [] : followersRes.data || []);
     } catch (err) {
-      console.error("Failed to fetch initial data", err);
+      console.error("Failed to fetch followers:", err);
+      setFollowers([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fetchFollowersAndCloseFriends = async () => {
-    await fetchInitialData();
+  const toggleCloseFriend = (id: number) => {
+    setFollowers(
+      followers.map((f) =>
+        f.id === id ? { ...f, isCloseFriend: !f.is_close_friend } : f
+      )
+    );
   };
 
   const handleSaveCloseFriends = async () => {
+    setIsLoading(true);
     try {
+      const closeFriendIds = followers
+        .filter((f) => f.is_close_friend)
+        .map((f) => f.id);
+
       await axios.patch(
         "http://localhost:8080/profile/close-friends",
-        { friend_ids: selectedFollowers },
+        { friend_ids: closeFriendIds },
         { withCredentials: true }
       );
       setShowCloseFriends(false);
-      await fetchInitialData(); 
     } catch (err) {
       console.error("Failed to update close friends", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -147,22 +195,25 @@ export const ProfileHeader = ({
 
   return (
     <div className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 text-white overflow-hidden">
+      {/* Background overlays */}
       <div className="absolute inset-0 bg-black/20"></div>
       <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 to-purple-600/30"></div>
 
+      {/* Main content container */}
       <div className="relative max-w-6xl mx-auto px-6 py-16">
         <div className="flex flex-col lg:flex-row items-center lg:items-end gap-8">
+          {/* Avatar section */}
           <div className="relative group">
             <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-full border-4 border-white/30 overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-4xl font-bold shadow-2xl">
               {currentAvatar ? (
                 <img
                   src={currentAvatar}
-                  alt={name}
+                  alt={getDisplayName()}
                   className="w-full h-full object-cover"
                 />
               ) : (
                 <span>
-                  {name
+                  {getDisplayName()
                     .split(" ")
                     .map((n) => n[0])
                     .join("")}
@@ -170,10 +221,10 @@ export const ProfileHeader = ({
               )}
             </div>
             {isOwner && (
-              <>
+              <div className="absolute bottom-2 right-2">
                 <Button
                   size="sm"
-                  className="absolute bottom-2 right-2 rounded-full p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30"
+                  className="rounded-full p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30"
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <Camera className="w-4 h-4" />
@@ -185,15 +236,21 @@ export const ProfileHeader = ({
                   className="hidden"
                   onChange={handleAvatarChange}
                 />
-              </>
+              </div>
             )}
           </div>
 
-          <div className="flex-1 text-center lg:text-left">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-2 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
-              {name}
-            </h1>
-            <p className="text-xl lg:text-2xl text-blue-100 mb-4 font-light">{bio}</p>
+          {/* Profile info section */}
+          <div className="flex-1 text-center lg:text-left space-y-4">
+            <div>
+              <h1 className="text-4xl lg:text-5xl font-bold mb-2 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                {getDisplayName()}
+              </h1>
+              <p className="text-xl lg:text-2xl text-blue-100 font-light">
+                {bio}
+              </p>
+            </div>
+
             <div className="flex flex-wrap justify-center lg:justify-start gap-4 text-sm text-blue-100">
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />
@@ -206,82 +263,133 @@ export const ProfileHeader = ({
             </div>
           </div>
 
-          <div className="flex gap-3">
+          {/* Action buttons section */}
+          <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-3">
             {isOwner ? (
               <>
                 <Button
                   className="bg-white text-blue-600 hover:bg-blue-50 font-medium px-6"
                   onClick={() => {
-                    fetchFollowersAndCloseFriends();
+                    fetchInitialData();
                     setShowCloseFriends(true);
                   }}
+                  disabled={isLoading}
                 >
-                  Edit Close Friends
+                  {isLoading ? (
+                    <Loader2 className="animate-spin h-4 w-4" />
+                  ) : (
+                    "Edit Close Friends"
+                  )}
                 </Button>
-
-                {showCloseFriends && (
-                  <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex justify-center items-center">
-                    <div className="bg-white p-6 rounded-xl max-w-md w-full shadow-xl">
-                      <h2 className="text-black font-semibold mb-4">
-                        Select Close Friends
-                      </h2>
-                      {isLoading ? (
-                        <div className="flex justify-center py-8">
-                          <Loader2 className="animate-spin h-8 w-8 text-blue-500" />
-                        </div>
-                      ) : (
-                        <>
-                          <div className="max-h-64 overflow-y-auto space-y-2">
-                            {followers.map((follower) => (
-                              <label key={follower.id} className="flex items-center gap-2 text-black">
-                                <input
-                                  type="checkbox"
-                                  checked={selectedFollowers.includes(follower.id)}
-                                  onChange={(e) => {
-                                    const id = follower.id;
-                                    setSelectedFollowers(prev => 
-                                      e.target.checked 
-                                        ? [...prev, id] 
-                                        : prev.filter(fid => fid !== id)
-                                    );
-                                  }}
-                                />
-                                <span>{follower.username}</span>
-                              </label>
-                            ))}
-                          </div>
-
-                          <div className="flex justify-end mt-4 gap-2 text-black">
-                            <Button variant="ghost" onClick={() => setShowCloseFriends(false)}>
-                              Cancel
-                            </Button>
-                            <Button onClick={handleSaveCloseFriends}>
-                              Save
-                            </Button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
 
                 <Button
                   className="bg-white text-blue-600 hover:bg-blue-50 font-medium px-6"
                   onClick={togglePrivacy}
+                  disabled={isLoading}
                 >
                   {privateStatus ? "Make Public" : "Make Private"}
                 </Button>
+
+                <Button
+                  className="bg-white text-blue-600 hover:bg-blue-50 font-medium px-6"
+                  onClick={() => logout()}
+                >
+                  Logout
+                </Button>
               </>
-            ) : name ? (
+            ) : (
               <Button
                 className="bg-white text-blue-600 hover:bg-blue-50 font-medium px-6"
                 onClick={toggleFollow}
+                disabled={isLoading}
               >
-                {following ? "Unfollow" : "Follow"}
+                {isLoading ? (
+                  <Loader2 className="animate-spin h-4 w-4" />
+                ) : following ? (
+                  "Unfollow"
+                ) : (
+                  "Follow"
+                )}
               </Button>
-            ) : null}
+            )}
           </div>
         </div>
+
+        {/* Close Friends Modal */}
+        {showCloseFriends && (
+          <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex justify-center items-center">
+            <div className="bg-white p-6 rounded-xl max-w-md w-full shadow-xl">
+              <h2 className="text-black font-semibold mb-4">
+                Select Close Friends
+              </h2>
+              {isLoading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="animate-spin h-8 w-8 text-blue-500" />
+                </div>
+              ) : followers === null ? (
+                <div className="text-center py-8 text-gray-500">
+                  Could not load followers data
+                </div>
+              ) : followers.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  You have no followers to select from
+                  <div className="text-center pt-3">
+                  <Button
+                      variant="ghost"
+                      onClick={() => setShowCloseFriends(false)}
+                      className="text-black"
+                    >
+                      Exit
+                    </Button>
+                    </div>
+                </div>
+              ) : (
+                <>
+                  <div className="max-h-64 overflow-y-auto space-y-2">
+                    {followers.map((follower) => (
+                      <label
+                        key={follower.id}
+                        className="flex items-center gap-2 text-black"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={follower.is_close_friend}
+                          onChange={() => toggleCloseFriend(follower.id)}
+                        />
+                        <div>
+                          <div className="font-medium">{`${follower.first_name} ${follower.last_name}`}</div>
+                          <div className="text-sm text-gray-500">
+                            {follower.email}
+                          </div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+
+                  <div className="flex justify-end mt-4 gap-2">
+                    <Button
+                      variant="ghost"
+                      onClick={() => setShowCloseFriends(false)}
+                      className="text-black"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleSaveCloseFriends}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <Loader2 className="animate-spin h-4 w-4" />
+                      ) : (
+                        "Save"
+                      )}
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

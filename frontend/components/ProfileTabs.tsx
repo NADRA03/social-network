@@ -1,5 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { session } from "@/app/utils/session";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
 import { useState } from "react";
@@ -8,54 +9,78 @@ import axios from "axios";
 
 interface ProfileTabsProps {
   canViewContent: boolean;
+  userId: number;
+}
+
+enum postVisibility {
+  Public = 0,
+  FollowersOnly = 1,
+  CloseFriends = 2,
 }
 
 interface Post {
   id: number;
+  user_id: number;
   username: string;
-  avatar?: string;
+  first_name: string;
+  last_name: string;
+  display_name: string;
+  avatar_url?: string;
   content: string;
   image?: string;
-  time: string;
   created_at: string;
+  visibility: postVisibility;
 }
 
-export const ProfileTabs = ({ canViewContent }: ProfileTabsProps) => {
+export const ProfileTabs = ({ canViewContent, userId }: ProfileTabsProps) => {
   const isLocked = !canViewContent;
-
   const [posts, setPosts] = useState<Post[]>([]);
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/feed", { withCredentials: true })
-      .then((res) => {
-        if (Array.isArray(res.data)) {
-          setPosts(res.data);
-        } else {
-          setPosts([]);
-        }
-      })
-      .catch((err) => console.error("Failed to load posts", err));
-  }, []);
+    if (!userId) return;
+
+    setIsLoading(true);
+    axios.get(`http://localhost:8080/profile/${userId}/posts`, {
+      withCredentials: true,
+    })
+    .then((res) => {
+      if (res.data && res.data.status === "private") {
+        setIsPrivate(true);
+        setPosts([]);
+      } else {
+        setIsPrivate(false);
+        setPosts(Array.isArray(res.data) ? res.data : []);
+      }
+    })
+    .catch(() => {
+      setIsPrivate(false);
+      setPosts([]);
+    })
+    .finally(() => {
+      setIsLoading(false);
+    });
+  }, [userId]);
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">
       <Tabs defaultValue="posts" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-8">
-          <TabsTrigger value="posts">Posts</TabsTrigger>
-          <TabsTrigger value="groups">Groups Joined</TabsTrigger>
-          <TabsTrigger value="likes">Liked Posts</TabsTrigger>
-          <TabsTrigger value="comments">Comments</TabsTrigger>
+        <TabsList className="w-full">
+          <TabsTrigger className="w-full h-12 text-lg" value="posts">
+            User Posts
+          </TabsTrigger>
         </TabsList>
 
-        {/* Posts Tab */}
         <TabsContent value="posts" className="space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle>User Posts</CardTitle>
-            </CardHeader>
+            <CardHeader></CardHeader>
             <CardContent>
-              {isLocked ? (
+              {isLoading ? (
+                <div className="flex justify-center p-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400"></div>
+                </div>
+              ) : isLocked || isPrivate ? (
                 <div className="flex flex-col items-center text-gray-500 py-12">
                   <Lock className="w-10 h-10 mb-4" />
                   <p>This profile is private.</p>
@@ -63,61 +88,60 @@ export const ProfileTabs = ({ canViewContent }: ProfileTabsProps) => {
               ) : (
                 <div className="flex justify-center p-8">
                   <div className="w-full max-w-2xl">
-                    {Array.isArray(posts) && posts.length > 0 ? (
-                      posts.map((post, index) => (
+                    {posts.length > 0 ? (
+                      posts.map((post) => (
                         <Card
-                          key={index}
-                          className="mb-8 bg-white/60 backdrop-blur-md border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+                          key={post.id}
+                          className="bg-white/70 backdrop-blur-md border-white/20 m-10 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 rounded-2xl overflow-hidden group"
                         >
                           <CardContent className="p-6">
                             <div className="flex items-start gap-4">
                               <img
-                                src={
-                                  post.avatar ||
-                                  "https://img.daisyui.com/images/profile/demo/gordon@192.webp"
-                                }
+                                src={ post.avatar_url || "https://img.daisyui.com/images/profile/demo/gordon@192.webp"}
                                 alt="Profile"
-                                className="w-12 h-12 rounded-full border-2 border-white/40 shadow-lg"
+                                className="w-12 h-12 rounded-full border-2 border-white/50 shadow-lg"
                               />
                               <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-3">
-                                  <span className="font-semibold text-gray-800 text-lg">
-                                    {post.username}
-                                  </span>
-                                  <span className="text-sm text-gray-500">
-                                    {new Date(post.created_at).toLocaleString()}
-                                  </span>
+                                <div className="flex items-center justify-between mb-3">
+                                  <div className="flex items-center gap-3">
+                                    <span className="font-bold text-gray-800">
+                                      {post.display_name}
+                                    </span>
+                                    <span className="text-sm text-gray-500 bg-white/40 px-2 py-1 rounded-full backdrop-blur-sm">
+                                      {new Date(post.created_at).toLocaleString()}
+                                    </span>
+                                    {post.visibility === postVisibility.Public && (
+                                      <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                                        Public
+                                      </span>
+                                    )}
+                                    {post.visibility === postVisibility.FollowersOnly && (
+                                      <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+                                        Followers Only
+                                      </span>
+                                    )}
+                                    {post.visibility === postVisibility.CloseFriends && (
+                                      <span className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
+                                        Close Friends
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
-                                <p className="text-gray-700 mb-4 text-base">
+
+                                <p className="text-gray-700 mb-4 text-base leading-relaxed">
                                   {post.content}
                                 </p>
+
                                 {post.image && (
-                                  <div className="relative group">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-600/50 to-purple-600/50 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="bg-white/40 hover:bg-white/60 text-white border border-white/30 shadow-lg"
-                                      >
-                                        <svg
-                                          className="w-5 h-5"
-                                          fill="none"
-                                          viewBox="0 0 16 18"
-                                        >
-                                          <path
-                                            stroke="currentColor"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3"
-                                          />
-                                        </svg>
-                                      </Button>
-                                    </div>
+                                  <div className="relative group/image mb-4">
                                     <img
                                       src={post.image}
                                       alt="Post content"
-                                      className="w-full max-w-sm rounded-xl shadow-lg border border-white/20"
+                                      className="w-full rounded-xl shadow-lg border border-white/20 transition-transform duration-300 group-hover/image:scale-[1.02]"
+                                      onError={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        target.style.display = 'none';
+                                      }}
                                     />
                                   </div>
                                 )}
@@ -133,63 +157,6 @@ export const ProfileTabs = ({ canViewContent }: ProfileTabsProps) => {
                     )}
                   </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Groups Tab */}
-        <TabsContent value="groups" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>User Groups</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isLocked ? (
-                <div className="flex flex-col items-center text-gray-500 py-12">
-                  <Lock className="w-10 h-10 mb-4" />
-                  <p>This profile is private.</p>
-                </div>
-              ) : (
-                <p className="text-gray-500">No groups joined yet.</p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Liked Posts Tab */}
-        <TabsContent value="likes" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Liked Posts</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isLocked ? (
-                <div className="flex flex-col items-center text-gray-500 py-12">
-                  <Lock className="w-10 h-10 mb-4" />
-                  <p>This profile is private.</p>
-                </div>
-              ) : (
-                <p className="text-gray-500">No liked posts yet.</p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Comments Tab */}
-        <TabsContent value="comments" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>User Comments</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isLocked ? (
-                <div className="flex flex-col items-center text-gray-500 py-12">
-                  <Lock className="w-10 h-10 mb-4" />
-                  <p>This profile is private.</p>
-                </div>
-              ) : (
-                <p className="text-gray-500">No comments yet.</p>
               )}
             </CardContent>
           </Card>

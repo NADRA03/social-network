@@ -11,27 +11,36 @@ import (
 )
 
 type User struct {
-	ID        int
-	Username  string
-	Email     string
-	Bio       string
-	Avatar    string
-	IsPrivate bool
-	JoinDate  string
+	ID        int    `json:"id"`
+	Username  string `json:"username"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+	Bio       string `json:"bio"`
+	Avatar    string `json:"avatar"`
+	IsPrivate bool   `json:"is_private"`
+	JoinDate  string `json:"joinDate"`
 }
 
-// GET /users/{id} - returns a public user profile
 func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	username := vars["username"]
-	if username == "" {
-		http.Error(w, "Invalid username", http.StatusBadRequest)
+	id := vars["id"]
+	if id == "" {
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
 	}
-	// Try to get requester (viewer) from session
 	requesterID, _ := auth.GetUserIDFromSession(r)
 
-	user, err := getUserByUsername(username)
+	var user User
+
+	err := sqlite.DB.QueryRow(`
+        SELECT id, username, first_name, last_name, email, bio, avatar_url, is_private, created_at
+        FROM users
+        WHERE id = ?
+    `, id).Scan(
+		&user.ID, &user.Username, &user.FirstName, &user.LastName,
+		&user.Email, &user.Bio, &user.Avatar, &user.IsPrivate, &user.JoinDate)
+
 	if err != nil {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
@@ -46,7 +55,10 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM posts WHERE user_id = ?`, user.ID).Scan(&postCount)
 
 	response := map[string]interface{}{
+		"id":               user.ID,
 		"username":         user.Username,
+		"first_name":       user.FirstName,
+		"last_name":        user.LastName,
 		"email":            user.Email,
 		"bio":              user.Bio,
 		"avatar":           user.Avatar,
@@ -61,16 +73,16 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 		"post_count":       postCount,
 	}
 
-	isFollowing := false;
+	isFollowing := false
 
 	if !isOwner {
 		var count int
 		err := sqlite.DB.QueryRow(`
-			SELECT COUNT(*) FROM followers
-			WHERE followed_id = ? AND follower_id = ?
-		`, user.ID, requesterID).Scan(&count)
+            SELECT COUNT(*) FROM followers
+            WHERE followed_id = ? AND follower_id = ?
+        `, user.ID, requesterID).Scan(&count)
 
-		if err != nil && count > 0 {
+		if err == nil && count > 0 {
 			isFollowing = true
 		}
 
@@ -84,16 +96,15 @@ func GetUserProfileHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-// getUserByID fetches user info from the database
-func getUserByUsername(username string) (*User, error) {
+func getUserByID(id string) (*User, error) {
 	row := sqlite.DB.QueryRow(`
-		SELECT id, username, email, bio, avatar_url, is_private, created_at
-		FROM users
-		WHERE username = ?
-	`, username)
+        SELECT id, username, first_name, last_name, email, bio, avatar_url, is_private, created_at
+        FROM users
+        WHERE id = ?
+    `, id)
 
 	var u User
-	err := row.Scan(&u.ID, &u.Username, &u.Email, &u.Bio, &u.Avatar, &u.IsPrivate, &u.JoinDate)
+	err := row.Scan(&u.ID, &u.Username, &u.FirstName, &u.LastName, &u.Email, &u.Bio, &u.Avatar, &u.IsPrivate, &u.JoinDate)
 	if err != nil {
 		return nil, err
 	}

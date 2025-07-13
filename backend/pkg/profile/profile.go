@@ -11,52 +11,58 @@ import (
 )
 
 func GetOwnProfileHandler(w http.ResponseWriter, r *http.Request) {
-	userID, err := auth.GetUserIDFromSession(r)
-	if err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
+    userID, err := auth.GetUserIDFromSession(r)
+    if err != nil {
+        http.Error(w, "Unauthorized", http.StatusUnauthorized)
+        return
+    }
+    
+    var id int
+    var username, firstName, lastName, email, bio, avatar, joinDate string
+    var isPrivate bool
+    
+    err = sqlite.DB.QueryRow(`
+        SELECT id, username, first_name, last_name, email, bio, avatar_url, is_private, created_at
+        FROM users
+        WHERE id = ?`, userID).Scan(
+            &id, &username, &firstName, &lastName, &email, &bio, &avatar, &isPrivate, &joinDate)
 
-	var username, email, bio, avatar, joinDate string
-	var isPrivate bool
-	err = sqlite.DB.QueryRow(`
-	SELECT username, email, bio, avatar_url, is_private, created_at
-	FROM users
-	WHERE id = ?`, userID).Scan(&username, &email, &bio, &avatar, &isPrivate, &joinDate)
+    if err != nil {
+        http.Error(w, "User not found", http.StatusNotFound)
+        return
+    }
 
-	if err != nil {
-		http.Error(w, "User not found", http.StatusNotFound)
-		return
-	}
+    currentUserID, err := auth.GetUserIDFromSession(r)
+    isFollowing := false
+    if err != nil {
+        err = sqlite.DB.QueryRow(`SELECT 1 FROM followers WHERE follower_id = ? AND followed_id = ?`, currentUserID, userID).Scan(&isFollowing)
+        if err != nil {
+            isFollowing = true
+        }
+    }
 
-	currentUserID, err := auth.GetUserIDFromSession(r)
-	isFollowing := false
-	if err != nil {
-		err = sqlite.DB.QueryRow(`SELECT 1 FROM followers WHERE follower_id = ? AND followed_id = ?`, currentUserID, userID).Scan(&isFollowing)
-		if err != nil {
-			isFollowing = true
-		}
-	}
+    var followerCount, followingCount, postCount int
+    sqlite.DB.QueryRow(`SELECT COUNT(*) FROM followers WHERE followed_id = ?`, currentUserID).Scan(&followerCount)
+    sqlite.DB.QueryRow(`SELECT COUNT(*) FROM followers WHERE follower_id = ?`, currentUserID).Scan(&followingCount)
+    sqlite.DB.QueryRow(`SELECT COUNT(*) FROM posts WHERE user_id = ?`, currentUserID).Scan(&postCount)
 
-	var followerCount, followingCount, postCount int
-	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM followers WHERE followed_id = ?`, currentUserID).Scan(&followerCount)
-	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM followers WHERE follower_id = ?`, currentUserID).Scan(&followingCount)
-	sqlite.DB.QueryRow(`SELECT COUNT(*) FROM posts WHERE user_id = ?`, currentUserID).Scan(&postCount)
-
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"username":       username,	
-		"email":          email,
-		"bio":            bio,
-		"avatar":         avatar,
-		"is_private":     isPrivate,
-		"is_owner":       true,
-		"user_id":        userID,
-		"joinDate":       joinDate,
-		"isFollowing":    false,
-		"followerCount":  followerCount,
-		"followingCount": followingCount,
-		"postCount":      postCount,
-	})
+    json.NewEncoder(w).Encode(map[string]interface{}{
+        "id":             id,
+        "username":       username,
+        "first_name":     firstName,
+        "last_name":      lastName,
+        "email":          email,
+        "bio":            bio,
+        "avatar":         avatar,
+        "is_private":     isPrivate,
+        "is_owner":       true,
+        "user_id":        userID,
+        "joinDate":       joinDate,
+        "isFollowing":    false,
+        "followerCount":  followerCount,
+        "followingCount": followingCount,
+        "postCount":      postCount,
+    })
 }
 
 func FollowHandler(db *sql.DB) http.HandlerFunc {
@@ -68,9 +74,9 @@ func FollowHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		vars := mux.Vars(r)
-		username := vars["username"]
+		id := vars["id"]
 		var followedID int
-		err = sqlite.DB.QueryRow("SELECT id FROM users WHERE username = ?", username).Scan(&followedID)
+		err = sqlite.DB.QueryRow("SELECT id FROM users WHERE id = ?", id).Scan(&followedID)
 		// followedID, err := strconv.Atoi(vars["id"])
 		if err != nil {
 			http.Error(w, "user not found", http.StatusNotFound)
@@ -101,9 +107,9 @@ func UnfollowHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		vars := mux.Vars(r)
-		username := vars["username"]
+		id := vars["id"]
 		var followedID int
-		err = sqlite.DB.QueryRow("SELECT id FROM users WHERE username = ?", username).Scan(&followedID)
+		err = sqlite.DB.QueryRow("SELECT id FROM users WHERE id = ?", id).Scan(&followedID)
 		if err != nil {
 			http.Error(w, "User not found", http.StatusNotFound)
 			return

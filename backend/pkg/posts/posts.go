@@ -26,7 +26,8 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = sqlite.DB.Exec(`INSERT INTO posts (user_id, content, image_url, visibility) VALUES (?, ?, ?, ?)`, userID, input.Content, input.Image, input.Visibility)
+	_, err = sqlite.DB.Exec(`INSERT INTO posts (user_id, content, image_url, visibility) VALUES (?, ?, ?, ?)`,
+		userID, input.Content, input.Image, input.Visibility)
 	if err != nil {
 		http.Error(w, "Failed to create post", http.StatusInternalServerError)
 		return
@@ -36,62 +37,88 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func FeedHandler(w http.ResponseWriter, r *http.Request) {
-	userID, err := auth.GetUserIDFromSession(r)
-	if err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
+    userID, err := auth.GetUserIDFromSession(r)
+    if err != nil {
+        http.Error(w, "Unauthorized", http.StatusUnauthorized)
+        return
+    }
 
-	rows, err := sqlite.DB.Query(`
-		SELECT p.id, p.content, p.image_url, u.username, u.avatar_url, p.created_at, p.visibility
+    rows, err := sqlite.DB.Query(`
+        SELECT 
+            p.id, 
+            p.user_id,
+            p.content, 
+            p.image_url, 
+            u.username, 
+            u.first_name, 
+            u.last_name, 
+            u.avatar_url, 
+            p.created_at, 
+            p.visibility
         FROM posts p
         JOIN users u ON u.id = p.user_id
         LEFT JOIN followers f ON f.followed_id = p.user_id AND f.follower_id = ?
         LEFT JOIN close_friends cf ON cf.user_id = p.user_id AND cf.friend_id = ?
         WHERE (
-        -- Public posts
-        p.visibility = 0
-        -- OR posts visible to followers (if user is follower)
-        OR (p.visibility = 1 AND f.follower_id IS NOT NULL)
-        -- OR posts visible to close friends (if user is in author's close friends)
-        OR (p.visibility = 2 AND cf.friend_id IS NOT NULL)
-        -- OR user's own posts
-        OR p.user_id = ?
-    )
-    ORDER BY p.created_at DESC
-	`, userID, userID, userID)
-	if err != nil {
-		http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
-		return
-	}
-	defer rows.Close()
+            p.visibility = 0 OR
+            (p.visibility = 1 AND f.follower_id IS NOT NULL) OR
+            (p.visibility = 2 AND cf.friend_id IS NOT NULL) OR
+            p.user_id = ?
+        )
+        ORDER BY p.created_at DESC
+    `, userID, userID, userID)
+    
+    if err != nil {
+        log.Printf("Database query error: %v", err)
+        http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
+        return
+    }
+    defer rows.Close()
 
-	var posts []map[string]interface{}
-	for rows.Next() {
-		var id int
-		var content, image, username, avatar string
-		var createdAt time.Time
-		var visibility int
+    var posts []map[string]interface{}
+    for rows.Next() {
+        var id, postUserID int
+        var content, image, username, firstName, lastName, avatar string
+        var createdAt time.Time
+        var visibility int
 
-		if err := rows.Scan(&id, &content, &image, &username, &avatar, &createdAt, &visibility); err != nil {
-			log.Printf("Row scan error: %v", err)
-			// http.Error(w, "Failed to scan post", http.StatusInternalServerError)
-			continue
-		}
+        if err := rows.Scan(
+            &id, &postUserID, &content, &image, &username,
+            &firstName, &lastName, &avatar, &createdAt, &visibility,
+        ); err != nil {
+            log.Printf("Row scan error: %v", err)
+            continue
+        }
 
-		createdAtStr := createdAt.Format(time.RFC3339)
+        displayName := firstName + " " + lastName
+        if displayName == " " {
+            displayName = username
+        }
 
-		posts = append(posts, map[string]interface{}{
-			"id":         id,
-			"content":    content,
-			"image":      image,
-			"username":   username,
-			"avatar_url": avatar,
-			"created_at": createdAtStr,
-			"visibility": visibility,
-		})
-	}
-	
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(posts)
+        posts = append(posts, map[string]interface{}{
+            "id":          id,
+            "user_id":     postUserID,
+            "content":     content,
+            "image":       image,
+            "username":    username,
+            "first_name":  firstName,
+            "last_name":   lastName,
+            "display_name": displayName,
+            "avatar_url":  avatar,
+            "created_at":  createdAt.Format(time.RFC3339),
+            "visibility":  visibility,
+        })
+    }
+
+    if err = rows.Err(); err != nil {
+        log.Printf("Rows error: %v", err)
+        http.Error(w, "Failed to process posts", http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    if err := json.NewEncoder(w).Encode(posts); err != nil {
+        log.Printf("JSON encode error: %v", err)
+        http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+    }
 }

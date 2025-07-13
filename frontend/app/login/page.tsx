@@ -29,7 +29,7 @@ export default function LoginPage() {
       const username = res.data.username;
       alert("Login successful!");
       await new Promise((r) => setTimeout(r, 100));
-      router.push(`/profile/${username}`);
+      router.push(`/`);
     } catch (err: any) {
       alert("Login failed.");
     }
@@ -95,6 +95,15 @@ export default function LoginPage() {
             >
               Sign In
             </Button>
+            <p className="text-gray-600 mt-2 text-center">
+              Don't have an account? 
+              <span
+                className="text-gray-600 mt-2 cursor-pointer underline"
+                onClick={() => router.push(`/register`)}
+              >
+                  Register
+              </span>
+            </p>
           </form>
         </CardContent>
       </Card>

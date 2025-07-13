@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ export async function uploadProfilePicture(file: File): Promise<string | null> {
 }
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -55,6 +57,7 @@ export default function RegisterPage() {
         withCredentials: true,
       });
       alert("Registered successfully!");
+      router.push(`/login`);
     } catch (err: any) {
       alert("Registration failed.");
     }
@@ -62,8 +65,6 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-fixed bg-no-repeat bg-cover bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 flex items-center justify-center p-6">
-      <div className="absolute inset-0 bg-black/20"></div>
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 to-purple-600/30"></div>
 
       <Card className="relative w-full max-w-md bg-white/90 backdrop-blur-sm border-0 shadow-2xl">
         <CardHeader className="text-center pb-8">
@@ -73,7 +74,7 @@ export default function RegisterPage() {
           <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Create Account
           </CardTitle>
-          <p className="text-gray-600 mt-2">Join our community today</p>
+          <p className="text-gray-600 mt-2">Join our Social Network</p>
         </CardHeader>
 
         <CardContent>
@@ -152,7 +153,7 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <Label htmlFor="nickname" className="text-gray-700 font-medium">
-                Nickname
+                Nickname (Optional)
               </Label>
               <div className="relative">
                 <User className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
@@ -217,6 +218,15 @@ export default function RegisterPage() {
             >
               Create Account
             </Button>
+            <p className="text-gray-600 mt-2 text-center">
+              Already have an account?
+              <span
+                className="text-gray-600 mt-2 cursor-pointer underline"
+                onClick={() => router.push(`/login`)}
+              >
+                  Login
+              </span>
+            </p>
           </form>
         </CardContent>
       </Card>
