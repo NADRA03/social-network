@@ -18,15 +18,23 @@ import (
 )
 
 func main() {
-	cwd, err := os.Getwd()
-	if err != nil {
-		log.Fatal("Failed to get working directory:", err)
+	var dbPath, migrationPath string
+	
+	if os.Getenv("DOCKER") == "true" {
+		dbPath = "/app/social.db"
+		migrationPath = "file:///app/pkg/db/migrations"
+	} else {
+		cwd, err := os.Getwd()
+		if err != nil {
+			log.Fatal("Failed to get working directory:", err)
+		}
+		dbPath = filepath.Join(cwd, "..", "social.db")
+		migrationDir := filepath.Join(cwd, "..", "pkg", "db", "migrations")
+		migrationPath = "file://" + filepath.ToSlash(migrationDir)
 	}
 
-	migrationDir := filepath.Join(cwd, "..", "pkg", "db", "migrations")
-	migrationPath := "file://" + filepath.ToSlash(migrationDir)
-
-	dbPath := filepath.Join(cwd, "..", "social.db")
+	log.Println("DB Path:", dbPath)
+	log.Println("Migration Path:", migrationPath)
 
 	sqlite.InitDB(dbPath, migrationPath)
 	defer sqlite.DB.Close()

@@ -1,0 +1,22 @@
+# Use official Go image
+FROM golang:1.23.1
+
+ENV DOCKER=true
+
+# Set working directory inside container
+WORKDIR /app
+
+# Copy all backend source files (including cmd/server.go)
+COPY . .
+
+# Download dependencies
+RUN go mod tidy
+
+# Build the Go app, specifying the entry file directly
+RUN go build -o server ./cmd/server.go
+
+# Expose port used by your Go app
+EXPOSE 8080
+
+# Run the binary
+CMD ["./server"]

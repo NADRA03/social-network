@@ -1,19 +1,23 @@
 # Use official Node image
 FROM node:23-alpine
 
-# Create app directory
+# Set working directory
 WORKDIR /app
 
-# Copy package files and install
+# Copy package files and install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Copy rest of the code
+# Copy the rest of the frontend source code
 COPY . .
 
-# Build app
-RUN npm run build
+# Optional: Build app (if this is production)
+# ENV NEXT_IGNORE_ESLINT=true
+# ENV NEXT_DISABLE_TYPE_CHECKING=true
+# RUN npm run build
 
-# Expose port and start
+# Expose port used by React dev server
 EXPOSE 3000
-CMD ["npm", "start"]
+
+# Start React dev server
+CMD ["npm", "run", "dev"]
