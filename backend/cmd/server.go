@@ -41,6 +41,7 @@ func main() {
 	// Auth routes
 	r.Handle("/register", auth.RegisterHandler(sqlite.DB)).Methods("POST")
 	r.Handle("/login", auth.LoginHandler(sqlite.DB)).Methods("POST")
+	r.Handle("/logout", auth.AuthMiddleware(http.HandlerFunc(auth.LogoutHandler))).Methods("POST")
     r.Handle("/ws", auth.AuthMiddleware(http.HandlerFunc(auth.UserWebSocket))).Methods("GET")
     r.Handle("/getSession", auth.AuthMiddleware(http.HandlerFunc(auth.GetSessionHandler))).Methods("GET")
 	// Profile routes (with auth middleware)
@@ -48,12 +49,14 @@ func main() {
 	// r.HandleFunc("/users/{id}", profile.GetUserProfileHandler).Methods("GET")
 
 	// Profile routes
-	r.Handle("/profile/{username}", auth.AuthMiddleware(http.HandlerFunc(profile.GetOwnProfileHandler))).Methods("GET")
-	r.Handle("/users/{username}", auth.AuthMiddleware(http.HandlerFunc(profile.GetUserProfileHandler))).Methods("GET")
+	r.Handle("/profile/{id}", auth.AuthMiddleware(http.HandlerFunc(profile.GetOwnProfileHandler))).Methods("GET")
+	r.Handle("/users/{id}", auth.AuthMiddleware(http.HandlerFunc(profile.GetUserProfileHandler))).Methods("GET")
+	r.Handle("/profile/{id}/posts", auth.AuthMiddleware(http.HandlerFunc(profile.GetUserPostsHandler))).Methods("GET")
+	r.Handle("/is-following/{id}", auth.AuthMiddleware(http.HandlerFunc(profile.IsFollowingHandler(sqlite.DB)))).Methods("GET")
 	r.Handle("/profile/privacy", auth.AuthMiddleware(http.HandlerFunc(profile.TogglePrivacyHandler(sqlite.DB)))).Methods("PATCH")
 	r.Handle("/profile/avatar", auth.AuthMiddleware(http.HandlerFunc(profile.UpdateAvatarHandler))).Methods("PATCH")
-	r.Handle("/follow/{username}", auth.AuthMiddleware(profile.FollowHandler(sqlite.DB))).Methods("POST")
-	r.Handle("/unfollow/{username}", auth.AuthMiddleware(profile.UnfollowHandler(sqlite.DB))).Methods("DELETE")
+	r.Handle("/follow/{id}", auth.AuthMiddleware(profile.FollowHandler(sqlite.DB))).Methods("POST")
+	r.Handle("/unfollow/{id}", auth.AuthMiddleware(profile.UnfollowHandler(sqlite.DB))).Methods("DELETE")
 	r.Handle("/followers", auth.AuthMiddleware(http.HandlerFunc(profile.GetFollowersHandler))).Methods("GET")
 	r.Handle("/profile/close-friends", auth.AuthMiddleware(http.HandlerFunc(profile.GetCloseFriendsHandler))).Methods("GET")
 	r.Handle("/profile/close-friends", auth.AuthMiddleware(http.HandlerFunc(profile.CloseFriendsHandler))).Methods("PATCH")

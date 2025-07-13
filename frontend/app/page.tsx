@@ -1,28 +1,25 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { session } from "@/app/utils/session";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useParams } from "next/navigation";
-import Link from "next/link";
+import { logout } from "@/app/utils/auth";
+import BottomLeftNavigation from "./utils/navigation";
+import { SquarePlus } from "lucide-react";
 import {
   House,
   MessageSquareMore,
   Bell,
   Search,
   Plus,
-  Paperclip,
   Users,
   Camera,
   MessageCircle,
   X,
   Send,
-  TrendingUp,
-  Hash,
   Star,
-  Heart,
-  Share,
-  Bookmark,
-  MoreHorizontal,
   Earth,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,6 +33,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import axios from "axios";
+import { getSession } from "./api";
+import { useSessionStore } from "./utils/store";
 
 enum postVisibility {
   Public = 0,
@@ -45,7 +44,11 @@ enum postVisibility {
 
 interface Post {
   id: number;
+  user_id: number;
   username: string;
+  first_name: string;
+  last_name: string;
+  display_name: string;
   avatar?: string;
   content: string;
   image?: string;
@@ -60,9 +63,7 @@ interface Comment {
   created_at: string;
 }
 
-export async function uploadImageToSupabase(
-  file: File
-): Promise<string | null> {
+export async function uploadImageToSupabase(file: File): Promise<string | null> {
   const filePath = `posts/${Date.now()}-${file.name}`;
   const { data, error } = await supabase.storage
     .from("social")
@@ -80,7 +81,10 @@ export async function uploadImageToSupabase(
 }
 
 export default function Home() {
+  const router = useRouter();
   const { username } = useParams();
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasSession, setHasSession] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
@@ -92,31 +96,58 @@ export default function Home() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [visibility, setVisibility] = useState(0);
   const [suggestedUsers, setSuggestedUsers] = useState<
-    {
-      id: number;
-      name: string;
-      username: string;
-      avatar?: string;
-    }[]
+    { id: number; name: string; username: string; avatar?: string }[]
   >([]);
+  const [userAvatar, setUserAvatar] = useState("");
+  const session = useSessionStore((s) => s.session);
 
-  // Fetch posts
+ 
   useEffect(() => {
-    const loadData = async () => {
-      // await fetchNonFollowedUsers();
-      axios
-      .get("http://localhost:8080/feed", { withCredentials: true })
-      .then((res) => {
-        console.log("Fetched posts:", res.data);
-        console.log("Posts received from backend:", res.data);
-        setPosts(res.data);
-      })
-      .catch((err) => console.error("Failed to load posts", err));
+    const checkSession = async () => {
+      try {
+    const currentSession = await getSession(); 
+    setHasSession(!!currentSession);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    loadData();
+    checkSession();
   }, []);
 
-  // Submit new post
+  useEffect(() => {
+    const loadData = async () => {
+      if (!hasSession) return;
+
+      setIsLoading(true);
+      try {
+        const res = await axios.get("http://localhost:8080/feed", {
+          withCredentials: true,
+        });
+        setPosts(res.data);
+      } catch (err) {
+        console.error("Failed to load posts", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    if (hasSession) {
+      loadData();
+      fetchUserAvatar();
+    }
+  }, [hasSession]);
+
+  const fetchUserAvatar = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/profile/avatar", {
+        withCredentials: true,
+      });
+      setUserAvatar(response.data.avatar);
+    } catch (err) {
+      console.error("Failed to fetch user avatar", err);
+    }
+  };
+
   const handlePost = async () => {
     if (!content.trim()) return;
 
@@ -148,7 +179,6 @@ export default function Home() {
       .catch((err) => console.error("Failed to create post", err));
   };
 
-  //Upload images on posts
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -162,7 +192,6 @@ export default function Home() {
     setImageFile(file);
   };
 
-  // Handle comment popup
   const handleCommentClick = (post: Post) => {
     setSelectedPost(post);
     setShowComments(true);
@@ -189,25 +218,6 @@ export default function Home() {
     }
   };
 
-  // const fetchNonFollowedUsers = async () => {
-  //   try {
-  //     const response = await axios.get(
-  //       "http://localhost:8080/users/not-followed",
-  //       {
-  //         withCredentials: true,
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-  //     console.log("Suggested users response:", response.data); 
-  //     setSuggestedUsers(response.data || []);
-  //   } catch (err) {
-  //     console.error("Failed to fetch suggested users:", err);
-  //     setSuggestedUsers([]);
-  //   }
-  // };
-
   const fetchComments = async (postId: number) => {
     try {
       const res = await axios.get(
@@ -228,15 +238,50 @@ export default function Home() {
         {},
         { withCredentials: true }
       );
-      // fetchNonFollowedUsers();
     } catch (err) {
       console.error("Failed to follow user", err);
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (!hasSession) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-100 flex items-center justify-center">
+        <div className="max-w-md mx-4 p-8 bg-white/80 backdrop-blur-md rounded-2xl shadow-xl text-center">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            Welcome to Social Network
+          </h1>
+          <p className="text-gray-600 mb-8">Connect and share your thoughts</p>
+          <div className="space-y-4">
+            <Button
+              onClick={() => router.push("/login")}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 rounded-xl"
+            >
+              Log In
+            </Button>
+            <Button
+              onClick={() => router.push("/register")}
+              variant="outline"
+              className="w-full border-blue-600 text-blue-600 hover:bg-blue-50 py-3 rounded-xl"
+            >
+              Create Account
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-100">
-      {/* Enhanced Navigation Bar */}
+      {/*Navigation Bar */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-white/20 shadow-lg">
         <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
           <div className="flex items-center gap-8">
@@ -244,7 +289,6 @@ export default function Home() {
               Social Network
             </h1>
 
-            {/* Quick Navigation */}
             <nav className="hidden md:flex items-center gap-4">
               <Button
                 variant="ghost"
@@ -254,6 +298,7 @@ export default function Home() {
                 Home
               </Button>
               <Button
+                onClick={() => router.push(`/chat`)}
                 variant="ghost"
                 className="flex items-center gap-2 text-gray-600 hover:bg-white/50 rounded-xl px-4 py-2"
               >
@@ -264,7 +309,7 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Enhanced Search bar */}
+            {/* Search bar */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <input
@@ -274,28 +319,6 @@ export default function Home() {
               />
             </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative bg-white/30 hover:bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl"
-                >
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 h-3 w-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full animate-pulse"></span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="bg-white/90 backdrop-blur-md border-white/20"
-              >
-                <DropdownMenuItem>New follower: Sarah Chen</DropdownMenuItem>
-                <DropdownMenuItem>Mike liked your post</DropdownMenuItem>
-                <DropdownMenuItem>New comment on your post</DropdownMenuItem>
-                <DropdownMenuItem>Mark all as read</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
             {/* Profile Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -303,21 +326,40 @@ export default function Home() {
                   variant="ghost"
                   className="p-0 bg-white/30 hover:bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl"
                 >
-                  <img
-                    src="https://img.daisyui.com/images/profile/demo/gordon@192.webp"
-                    alt="Profile"
-                    className="h-10 w-10 rounded-lg border-2 border-white/30"
-                  />
+                {
+                  userAvatar ? (
+                    <img
+                      src={userAvatar}
+                      alt="Profile"
+                      className="h-10 w-10 rounded-lg border-2 border-white/30"
+                    />
+                  ) : (
+                    <div className="h-10 w-10 rounded-lg border-2 border-white/30 bg-gray-300 text-white font-semibold flex items-center justify-center">
+                      {session?.Username?.[0]?.toUpperCase() || "?"}
+                    </div>
+                  )
+                }
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
                 className="bg-white/90 backdrop-blur-md border-white/20"
               >
-                <DropdownMenuItem>
-                  <Link href={`/profile/${username}`}>Profile</Link>
+                <DropdownMenuItem
+                  onClick={() => {
+                    const currentUserId = session?.UserID;
+                    if (!currentUserId) {
+                      console.error("No user ID found in session");
+                      return;
+                    }
+                    router.push(`/profile/${currentUserId}`);
+                  }}
+                >
+                  Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem>Logout</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => logout()}>
+                  Logout
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -328,8 +370,7 @@ export default function Home() {
       <div className="pt-20 max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-2 lg:col-start-2">
-            <div className="space-y-6">
-
+            <div className="space-y-6 pt-10">
               {/* Posts Feed */}
               {Array.isArray(posts) && posts.length > 0 ? (
                 posts.map((post, index) => (
@@ -339,19 +380,25 @@ export default function Home() {
                   >
                     <CardContent className="p-6">
                       <div className="flex items-start gap-4">
-                        <img
-                          src={
-                            post.avatar ||
-                            "https://img.daisyui.com/images/profile/demo/gordon@192.webp"
-                          }
-                          alt="Profile"
-                          className="w-12 h-12 rounded-full border-2 border-white/50 shadow-lg"
-                        />
+                      <div
+                        onClick={() => router.push(`/profile/${post.user_id}`)}
+                        className="w-12 h-12 rounded-full border-2 border-white/50 shadow-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-lg font-semibold text-gray-700 dark:text-gray-200 cursor-pointer overflow-hidden"
+                      >
+                        {userAvatar ? (
+                          <img
+                            src={userAvatar}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span>{post.display_name?.[0]?.toUpperCase() || "?"}</span>
+                        )}
+                      </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-3">
                               <span className="font-bold text-gray-800">
-                                {post.username}
+                                {post.display_name}
                               </span>
                               <span className="text-sm text-gray-500 bg-white/40 px-2 py-1 rounded-full backdrop-blur-sm">
                                 {new Date(post.created_at).toLocaleString()}
@@ -493,14 +540,17 @@ export default function Home() {
             {/* Original Post */}
             <div className="p-6 border-b border-white/20 bg-white/30">
               <div className="flex items-start gap-4">
+              {selectedPost.avatar ? (
                 <img
-                  src={
-                    selectedPost.avatar ||
-                    "https://img.daisyui.com/images/profile/demo/gordon@192.webp"
-                  }
+                  src={selectedPost.avatar}
                   alt="Profile"
-                  className="w-12 h-12 rounded-full border-2 border-white/40 shadow-lg"
+                  className="w-12 h-12 rounded-full border-2 border-white/40 shadow-lg object-cover"
                 />
+              ) : (
+                <div className="w-12 h-12 rounded-full border-2 border-white/40 shadow-lg bg-gray-400 flex items-center justify-center text-white font-semibold text-lg">
+                  {selectedPost.username?.[0]?.toUpperCase() || "?"}
+                </div>
+              )}
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <span className="font-semibold text-gray-800">
@@ -522,11 +572,9 @@ export default function Home() {
                   key={comment.id}
                   className="flex items-start gap-3 p-4 bg-white/40 rounded-xl backdrop-blur-sm"
                 >
-                  <img
-                    src="https://img.daisyui.com/images/profile/demo/gordon@192.webp"
-                    alt="Profile"
-                    className="w-10 h-10 rounded-full border-2 border-white/40 shadow-md"
-                  />
+                <div className="w-12 h-12 rounded-full border-2 border-white/40 shadow-lg bg-gray-400 flex items-center justify-center text-white font-semibold text-lg">
+                  {selectedPost.username?.[0]?.toUpperCase() || "?"}
+                </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-medium text-gray-800">
@@ -564,7 +612,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* Enhanced Post Form */}
+      {/*Post Form */}
       {showForm && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <Card className="w-full max-w-lg mx-4 bg-white/95 backdrop-blur-md border-white/20 shadow-3xl rounded-2xl">
@@ -584,11 +632,17 @@ export default function Home() {
               </div>
 
               <div className="flex items-start gap-4 mb-6">
-                <img
-                  src="https://img.daisyui.com/images/profile/demo/gordon@192.webp"
-                  alt="Your profile"
-                  className="w-12 h-12 rounded-full border-2 border-white/50 shadow-lg"
-                />
+                {session?.AvatarURL ? (
+                  <img
+                    src={session.AvatarURL}
+                    alt="Your profile"
+                    className="w-12 h-12 rounded-full border-2 border-white/50 shadow-lg object-cover"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full border-2 border-white/50 shadow-lg bg-gray-300 flex items-center justify-center text-lg font-semibold text-white">
+                    {session?.Username?.[0]?.toUpperCase() || "?"}
+                  </div>
+                )}
                 <div className="flex-1">
                   <Textarea
                     placeholder="What's happening?"
@@ -677,13 +731,15 @@ export default function Home() {
       )}
 
       {/* Floating Action Button */}
-      <Button
-        onClick={() => setShowForm(!showForm)}
-        className="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 z-40"
-        size="icon"
-      >
-        <Plus className="w-7 h-7" />
-      </Button>
+<Button
+  onClick={() => setShowForm(!showForm)}
+  className="fixed bottom-4 right-4 w-16 h-16 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 shadow-xl hover:shadow-purple-500/40 hover:scale-110 transition-all duration-300 z-50"
+  size="icon"
+>
+  <SquarePlus className="w-8 h-8 text-white drop-shadow-lg" />
+</Button>
+
+      <BottomLeftNavigation/>
     </main>
   );
 }

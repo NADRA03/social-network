@@ -36,6 +36,14 @@ export const getSelectedGroupId = () => useGroupStore.getState().selectedGroupId
 export const getSelectedUserId = () => useGroupStore.getState().selectedUserId;
 export const getSelectedGroupDetails = () => useGroupStore.getState().selectedGroupDetails;
 
+export const useSessionStore = create<{
+  session: any;
+  setSession: (session: any) => void;
+}>((set) => ({
+  session: null,
+  setSession: (session) => set({ session }),
+}));
+
 // {
 //     "group_id": 1,
 //     "name": "malak",

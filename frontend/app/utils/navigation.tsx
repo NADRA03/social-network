@@ -56,7 +56,6 @@ useEffect(() => {
     const unread = newNotifications.filter(n => !n.read).length;
     setUnreadCount(unread);
 
-    // ✅ On first time only: record all current notification IDs
     if (!didInit.current) {
       initialNotificationIDs.current = new Set(newNotifications.map(n => n.id));
       setNotifications(newNotifications);
@@ -64,15 +63,14 @@ useEffect(() => {
       return;
     }
 
-    // ✅ On later updates only: show toast for any new unread notification
+   
     const previous = initialNotificationIDs.current;
     const newUnread = newNotifications.filter(n => !n.read && !previous.has(n.id));
 
     newUnread.forEach(n => showToastU(n.message));
 
-    // Update notifications and tracked IDs
     setNotifications(newNotifications);
-    newNotifications.forEach(n => previous.add(n.id)); // Add any new ones to avoid future repeats
+    newNotifications.forEach(n => previous.add(n.id)); 
   });
 
   connectWebSocket(() => {});
@@ -127,7 +125,7 @@ function handleNotificationResponse(id: number, action: "accepted" | "rejected")
 }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-4 items-start">
+    <div className="fixed bottom-8 left-4 z-50 flex flex-col gap-4 items-start">
     {/* Home */}
   <Link href="/" className="group">
     <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 p-2 rounded-full shadow-md hover:shadow-purple-500/40 hover:scale-105 transition">
@@ -136,11 +134,11 @@ function handleNotificationResponse(id: number, action: "accepted" | "rejected")
   </Link>
 
     {/* Profile */}
-<Link href={`/profile/${session?.Username}`} className="group">
-  <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 p-2 rounded-full shadow-md hover:shadow-purple-500/40 hover:scale-105 transition">
-    <User className="w-full h-full text-white" />
-  </div>
-</Link>
+    <Link href={`/profile/${session?.UserID}`} className="group">
+      <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 p-2 rounded-full shadow-md hover:shadow-purple-500/40 hover:scale-105 transition">
+        <User className="w-full h-full text-white" />
+      </div>
+    </Link>
 
     {/* Messages */}
   <Link href="/chat" className="group">
@@ -174,7 +172,7 @@ function handleNotificationResponse(id: number, action: "accepted" | "rejected")
     </button>
 
         {showNotifications && (
-<div className="absolute right-14 bottom-0 mb-1 w-64 max-h-72 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg p-3 space-y-2 z-50">
+<div className="absolute left-14 bottom-0 mb-1 w-64 max-h-72 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg p-3 space-y-2 z-50">
   {notifications.length > 0 ? (
     [...notifications].reverse().map((notif) => {
       const createdAt = new Date(notif.created_at);

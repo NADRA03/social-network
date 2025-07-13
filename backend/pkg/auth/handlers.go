@@ -5,17 +5,21 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"regexp"
 	"social-network/pkg/db/sqlite"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type RegisterRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Username string `json:"nickname"`
-	Avatar   string `json:"avatar"`
-	Bio      string `json:"about_me"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+	Username  string `json:"nickname"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Avatar    string `json:"avatar"`
+	Bio       string `json:"about_me"`
 }
 
 func RegisterHandler(db *sql.DB) http.HandlerFunc {
@@ -27,6 +31,11 @@ func RegisterHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		if !validEmail(req.Email) {
+			http.Error(w, "Invalid Email Format", http.StatusBadRequest)
+			return
+		}
+
 		hashed, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 		if err != nil {
 			http.Error(w, "Error hashing password", http.StatusInternalServerError)
@@ -35,9 +44,9 @@ func RegisterHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		result, err := db.Exec(`
-			INSERT INTO users (username, email, password_hash, bio, avatar_url)
-			VALUES (?, ?, ?, ?, ?)`,
-			req.Username, req.Email, string(hashed), req.Bio, req.Avatar)
+			INSERT INTO users (username, email, first_name, last_name, password_hash, bio, avatar_url)
+			VALUES (?, ?, ?, ?, ?, ?, ?)`,
+			req.Username, req.Email, req.FirstName, req.LastName, string(hashed), req.Bio, req.Avatar)
 		if err != nil {
 			http.Error(w, "Registration failed", http.StatusInternalServerError)
 			log.Println("DB insert error:", err)
@@ -58,6 +67,10 @@ func RegisterHandler(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+func validEmail(email string) bool {
+	email_pattern := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+	return email_pattern.MatchString(email)
+}
 
 type LoginRequest struct {
 	Email    string `json:"email"`
@@ -85,7 +98,7 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 		var username string
 
 		sqlite.DB.QueryRow("SELECT username FROM users WHERE id = ?", id).Scan(&username)
-		createSession(w, id) 
+		createSession(w, id)
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -94,4 +107,35 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 			"username": username,
 		})
 	}
+}
+
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("session")
+	if err != nil {
+		http.Error(w, "no active session found", http.StatusBadRequest)
+		return
+	}
+
+	_, err = sqlite.DB.Exec("DELETE FROM sessions WHERE id = ?", cookie.Value)
+	if err != nil {
+		log.Println("Failed to delete session:", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	Session = SessionStr{}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		Expires:  time.Unix(0, 0),
+		MaxAge:   -1,
+	})
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Logged out successfully",
+	})
 }
