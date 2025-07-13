@@ -9,6 +9,7 @@ import { ProfileHeader } from "@/components/ProfileHeader";
 import { ProfileStats } from "@/components/ProfileStats";
 import { ProfileTabs } from "@/components/ProfileTabs";
 import AMPMToggle from "@/components/AMPMToggle";
+import BottomLeftNavigation from "@/app/utils/navigation";
 
 const Profile = () => {
   // const { params } = useParams();
@@ -67,6 +68,7 @@ const Profile = () => {
         // isFollowing={profile.is_following}
         canViewContent={profile.can_view_content}
       />
+      <BottomLeftNavigation />
     </div>
   );
 };

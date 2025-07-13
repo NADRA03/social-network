@@ -221,6 +221,16 @@ export const markAllNotificationsAsRead = () =>
     },
   });
 
+export const acceptFollowRequest = (inviterId: number) =>
+  request("/followAccept", {
+    method: "POST",
+    body: JSON.stringify({ inviter_id: inviterId }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+
 
 export function connectWebSocket(onMessage: (event: MessageEvent) => void) {
 	socket = new WebSocket("ws://localhost:8080/ws");
