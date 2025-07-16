@@ -151,7 +151,7 @@ export const ProfileHeader = ({
   const toggleCloseFriend = (id: number) => {
     setFollowers(
       followers.map((f) =>
-        f.id === id ? { ...f, isCloseFriend: !f.is_close_friend } : f
+        f.id === id ? { ...f, is_close_friend: !f.is_close_friend } : f
       )
     );
   };

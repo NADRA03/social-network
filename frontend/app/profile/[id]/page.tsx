@@ -14,6 +14,7 @@ import BottomLeftNavigation from "@/app/utils/navigation";
 const Profile = () => {
   // const { params } = useParams();
   const { id } = useParams();
+  const userId = Number(id);
   const { username } = useParams();
   const [profile, setProfile] = useState<any>(null);
   const [error, setError] = useState("");
@@ -60,6 +61,7 @@ const Profile = () => {
       />
 
       <ProfileStats
+        userId={userId} // 👈 pass it here
         isPrivate={profile.is_private}
         followerCount={profile.follower_count}
         followingCount={profile.following_count}
@@ -69,6 +71,7 @@ const Profile = () => {
         // isPrivate={profile.is_private}
         // isOwner={profile.is_owner}
         // isFollowing={profile.is_following}
+        username={profile.username || ""}
         canViewContent={profile.can_view_content}
         userId={profile.id}
       />

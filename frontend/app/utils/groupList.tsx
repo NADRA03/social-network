@@ -120,6 +120,10 @@ useEffect(() => {
 
     container.innerHTML = "";
 
+    if (!Array.isArray(data.groups)) {
+      return;
+    }
+
     data.groups.forEach((group: any) => {
       const wrapper = document.createElement("div");
         wrapper.className = `
@@ -132,15 +136,26 @@ useEffect(() => {
         : `<div class="text-xs text-gray-400 italic">No messages yet</div>`;
 
         wrapper.innerHTML = `
-          <div class="flex items-center gap-2 mb-3">
-            <div class="w-8 h-8 rounded-full bg-base-300 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users-icon">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                <path d="M16 3.128a4 4 0 0 1 0 7.744"/>
-                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                <circle cx="9" cy="7" r="4"/>
-              </svg>
-            </div>
+          <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-300 via-purple-300 to-indigo-300 text-white flex items-center justify-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-users-icon"
+          >
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <path d="M16 3.128a4 4 0 0 1 0 7.744" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <circle cx="9" cy="7" r="4" />
+          </svg>
+        </div>
             <div class="font-semibold text-base">${group.Name}</div>
           </div>
           ${preview}

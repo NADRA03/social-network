@@ -251,3 +251,64 @@ func AcceptFollowRequestHandler(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+func GetFollowGraphHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		id := vars["id"]
+
+		type User struct {
+			ID        int    `json:"id"`
+			Username  string `json:"username"`
+			FirstName string `json:"first_name"`
+			LastName  string `json:"last_name"`
+			AvatarURL string `json:"avatar_url"`
+		}
+
+		var userID int
+		err := db.QueryRow("SELECT id FROM users WHERE id = ?", id).Scan(&userID)
+		if err != nil {
+			http.Error(w, "User not found", http.StatusNotFound)
+			return
+		}
+
+		var following []User
+		rows, err := db.Query(`
+			SELECT u.id, u.username, u.first_name, u.last_name, u.avatar_url
+			FROM followers f
+			JOIN users u ON u.id = f.followed_id
+			WHERE f.follower_id = ?
+		`, userID)
+		if err == nil {
+			defer rows.Close()
+			for rows.Next() {
+				var u User
+				if err := rows.Scan(&u.ID, &u.Username, &u.FirstName, &u.LastName, &u.AvatarURL); err == nil {
+					following = append(following, u)
+				}
+			}
+		}
+
+		var followers []User
+		rows, err = db.Query(`
+			SELECT u.id, u.username, u.first_name, u.last_name, u.avatar_url
+			FROM followers f
+			JOIN users u ON u.id = f.follower_id
+			WHERE f.followed_id = ?
+		`, userID)
+		if err == nil {
+			defer rows.Close()
+			for rows.Next() {
+				var u User
+				if err := rows.Scan(&u.ID, &u.Username, &u.FirstName, &u.LastName, &u.AvatarURL); err == nil {
+					followers = append(followers, u)
+				}
+			}
+		}
+
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"following": following,
+			"followers": followers,
+		})
+	}
+}
+

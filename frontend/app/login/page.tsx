@@ -9,31 +9,35 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, User } from "lucide-react";
 import { showToastU } from "../utils/toast";
+import SessionInitializer from "../utils/session";
+import { useSessionStore } from "../utils/store";
+import { loadSession } from "../utils/session";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const setSessionInStore = useSessionStore((state) => state.setSession);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted");
-    try {
-      const res = await axios.post(
-        "http://localhost:8080/login",
-        { email, password },
-        {
-          withCredentials: true,
-        }
-      );
+const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    const res = await axios.post(
+      "http://localhost:8080/login",
+      { email, password },
+      { withCredentials: true }
+    );
 
-      const username = res.data.username;
-      await new Promise((r) => setTimeout(r, 100));
-      router.push(`/`);
-    } catch (err: any) {
-      showToastU("Login failed. Please try again.");
-    }
-  };
+    const username = res.data.username;
+
+    // Load session manually
+    await loadSession(setSessionInStore);
+
+    router.push(`/`);
+  } catch (err: any) {
+    showToastU("Login failed. Please try again.");
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 flex items-center justify-center p-6">

@@ -18,12 +18,21 @@ export default function SessionInitializer() {
   useEffect(() => {
     getSession()
       .then((res) => {
-        setSession(res);               // set global session
-        setSessionInStore(res);        // also update Zustand store
+        setSession(res);              
+        setSessionInStore(res);        
         console.log("Session loaded:", res);
       })
       .catch(() => {});
   }, [router, setSessionInStore]);
 
   return null;
+}
+
+export async function loadSession(setSessionInStore: (s: any) => void) {
+  const session = await getSession();
+  if (session) {
+    setSession(session);
+    setSessionInStore(session);
+    console.log("Session loaded:", session);
+  }
 }

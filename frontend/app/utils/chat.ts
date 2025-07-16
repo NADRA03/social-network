@@ -61,10 +61,16 @@ export function appendChatMessage(msg: ChatMessage, partnerName: string): void {
 
 export async function loadChatHistory(user1: number, user2: number, partnerName: string, limit = 10, offset = 0) {
 	try {
-		const messages: ChatMessage[] = await getChatMessages(user1, user2, limit, offset);
+		const messages: ChatMessage[] | null = await getChatMessages(user1, user2, limit, offset);
+
+		if (!Array.isArray(messages)) {
+			console.warn("No chat messages or invalid response:", messages);
+			return;
+		}
 
 		const chatBox = document.getElementById("chat-messages");
 		if (!chatBox) return;
+
 		if (offset === 0) {
 			chatBox.innerHTML = ""; 
 		}
@@ -78,6 +84,7 @@ export async function loadChatHistory(user1: number, user2: number, partnerName:
 		console.error("Failed to load chat history:", error);
 	}
 }
+
 
 function createChatMessageHTML(msg: ChatMessage, partnerName: string): string {
 	const isMe = msg.sender_id === session.UserID;

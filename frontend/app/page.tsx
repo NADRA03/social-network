@@ -8,6 +8,7 @@ import { useParams } from "next/navigation";
 import { logout } from "@/app/utils/auth";
 import BottomLeftNavigation from "./utils/navigation";
 import { SquarePlus } from "lucide-react";
+import { searchUsers } from "@/app/api";
 import {
   House,
   MessageSquareMore,
@@ -36,6 +37,7 @@ import axios from "axios";
 import { getSession } from "./api";
 import { useSessionStore } from "./utils/store";
 
+
 enum postVisibility {
   Public = 0,
   FollowersOnly = 1,
@@ -60,6 +62,7 @@ interface Comment {
   id: number;
   username: string;
   content: string;
+  image_url?: string;
   created_at: string;
 }
 
@@ -100,6 +103,13 @@ export default function Home() {
   >([]);
   const [userAvatar, setUserAvatar] = useState("");
   const session = useSessionStore((s) => s.session);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<any[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const timeoutRef = useRef<any>(null);
+  const [commentImageFile, setCommentImageFile] = useState<File | null>(null);
+  const commentFileInputRef = useRef<HTMLInputElement>(null);
+
 
  
   useEffect(() => {
@@ -192,6 +202,22 @@ export default function Home() {
     setImageFile(file);
   };
 
+  const handleCommentImageChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validTypes = ["image/jpeg", "image/png", "image/gif"];
+    if (!validTypes.includes(file.type)) {
+      alert("Only JPEG, PNG, and GIF images are allowed");
+      return;
+    }
+
+    setCommentImageFile(file);
+  };
+
+
   const handleCommentClick = (post: Post) => {
     setSelectedPost(post);
     setShowComments(true);
@@ -199,19 +225,27 @@ export default function Home() {
   };
 
   const submitComment = async () => {
-    if (!commentContent.trim() || !selectedPost) return;
+    if (!commentContent.trim() && !commentImageFile) return;
+    if (!selectedPost) return;
 
     try {
+      let imageUrl: string | null = null;
+      if (commentImageFile) {
+        imageUrl = await uploadImageToSupabase(commentImageFile);
+      }
+
       await axios.post(
         "http://localhost:8080/comment",
         {
           post_id: selectedPost.id,
           content: commentContent,
+          image: imageUrl || undefined,
         },
         { withCredentials: true }
       );
 
       setCommentContent("");
+      setCommentImageFile(null);
       fetchComments(selectedPost.id);
     } catch (err) {
       console.error("Failed to submit comment:", err);
@@ -242,6 +276,28 @@ export default function Home() {
       console.error("Failed to follow user", err);
     }
   };
+
+  useEffect(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+    if (query.trim().length === 0) {
+      setResults([]);
+      setShowResults(false);
+      return;
+    }
+
+    timeoutRef.current = setTimeout(async () => {
+      const res = await searchUsers(query);
+      if (Array.isArray(res)) {
+        setResults(res);
+        setShowResults(true);
+      } else {
+        setResults([]);
+        setShowResults(false);
+      }
+    }, 300); // debounce delay
+  }, [query]);
+
 
   if (isLoading) {
     return (
@@ -290,7 +346,7 @@ export default function Home() {
             </h1>
 
             <nav className="hidden md:flex items-center gap-4">
-              <Button
+              {/* <Button
                 variant="ghost"
                 className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 rounded-xl px-4 py-2"
               >
@@ -304,19 +360,50 @@ export default function Home() {
               >
                 <MessageSquareMore className="w-4 h-4" />
                 Messages
-              </Button>
+              </Button> */}
             </nav>
           </div>
 
           <div className="flex items-center gap-4">
             {/* Search bar */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <input
-                type="search"
-                placeholder="Search posts, users, topics..."
-                className="pl-10 pr-4 py-2 w-80 bg-white/70 backdrop-blur-sm border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent shadow-sm transition-all duration-200"
-              />
+      {/* ✅ Your original search bar — unchanged */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+        <input
+          type="search"
+          placeholder="Search users..."
+          className="pl-10 pr-4 py-2 w-80 bg-white/70 backdrop-blur-sm border border-white/30 rounded-xl focus:outline-none focus:border-transparent shadow-sm transition-all duration-200"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
+
+      {/* 🔍 Search results */}
+      {showResults && results.length > 0 && (
+        <div className="absolute left-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-md z-50 max-h-64 overflow-y-auto">
+          {results.map((user) => (
+            <button
+              key={user.ID}
+              onClick={() => router.push(`/profile/${user.ID}`)}
+              className="w-full text-left px-4 py-2 hover:bg-blue-50 transition flex items-center gap-3"
+            >
+              {user.AvatarURL ? (
+                <img
+                  src={user.AvatarURL}
+                  alt={user.Username}
+                  className="w-8 h-8 rounded-full object-cover border border-gray-300"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-300 via-purple-300 to-indigo-300 text-white flex items-center justify-center font-semibold uppercase">
+                  {user.Username?.charAt(0)}
+                </div>
+              )}
+              <div className="text-sm font-medium">{user.Username}</div>
+            </button>
+          ))}
+        </div>
+      )}
             </div>
 
             {/* Profile Menu */}
@@ -334,9 +421,12 @@ export default function Home() {
                       className="h-10 w-10 rounded-lg border-2 border-white/30"
                     />
                   ) : (
-                    <div className="h-10 w-10 rounded-lg border-2 border-white/30 bg-gray-300 text-white font-semibold flex items-center justify-center">
-                      {session?.Username?.[0]?.toUpperCase() || "?"}
+                  <div className="relative h-10 w-10 rounded-lg text-white font-semibold uppercase overflow-hidden group">
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 rounded-lg blur-sm opacity-70 group-hover:opacity-100 transition duration-200"></span>
+                    <div className="relative z-10 flex items-center justify-center h-full w-full">
+                      {session?.Username?.[0] || "?"}
                     </div>
+                  </div>
                   )
                 }
                 </Button>
@@ -441,19 +531,19 @@ export default function Home() {
                             </div>
                           )}
 
-                          <div className="flex items-center justify-between pt-4 border-t border-white/20">
-                            <div className="flex items-center gap-2">
-                              <Button
-                                onClick={() => handleCommentClick(post)}
-                                variant="ghost"
-                                size="sm"
-                                className="flex items-center gap-2 bg-white/30 hover:bg-blue-50 hover:text-blue-600 transition-colors rounded-xl px-4 py-2"
-                              >
-                                <MessageCircle className="w-4 h-4" />
-                                <span className="font-medium">Comment</span>
-                              </Button>
-                            </div>
+                        <div className="flex items-center justify-between pt-4 border-t border-white/20">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleCommentClick(post)}
+                              className="relative px-4 py-1.5 text-sm text-white font-medium group overflow-hidden rounded-md"
+                            >
+                              <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 rounded-md blur-sm opacity-70 group-hover:opacity-100 transition duration-200"></span>
+                              <span className="relative z-10 flex items-center gap-2">
+                                <span>Comment</span>
+                              </span>
+                            </button>
                           </div>
+                        </div>
                         </div>
                       </div>
                     </CardContent>
@@ -527,101 +617,115 @@ export default function Home() {
 
       {/* Comments Popup Modal */}
       {showComments && selectedPost && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-60 p-4">
-          <Card className="w-full max-w-2xl max-h-[80vh] bg-white/95 backdrop-blur-md border-white/20 shadow-3xl rounded-2xl overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b border-white/20 bg-gradient-to-r from-blue-50/50 to-purple-50/50">
-              <h3 className="text-xl font-bold text-gray-800">Comments</h3>
-              <Button
-                onClick={() => setShowComments(false)}
-                variant="ghost"
-                size="icon"
-                className="bg-white/30 hover:bg-white/50 rounded-full"
-              >
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
+<div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-60 p-4">
+  <Card className="w-full max-w-2xl max-h-[90vh] bg-white/95 backdrop-blur-md border-white/20 shadow-3xl rounded-2xl overflow-hidden flex flex-col">
 
-            {/* Original Post */}
-            <div className="p-6 border-b border-white/20 bg-white/30">
-              <div className="flex items-start gap-4">
-              {selectedPost.avatar ? (
-                <img
-                  src={selectedPost.avatar}
-                  alt="Profile"
-                  className="w-12 h-12 rounded-full border-2 border-white/40 shadow-lg object-cover"
-                />
-              ) : (
-                <div className="w-12 h-12 rounded-full border-2 border-white/40 shadow-lg bg-gray-400 flex items-center justify-center text-white font-semibold text-lg">
-                  {selectedPost.username?.[0]?.toUpperCase() || "?"}
-                </div>
-              )}
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="font-semibold text-gray-800">
-                      {selectedPost.username}
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      {new Date(selectedPost.created_at).toLocaleString()}
-                    </span>
-                  </div>
-                  <p className="text-gray-700"   style={{
-    wordBreak: "break-word",
-    overflowWrap: "break-word",
-    overflowX: "hidden",
-  }}>{selectedPost.content}</p>
-                </div>
-              </div>
-            </div>
+    {/* Header */}
+    <div className="flex items-center justify-between p-6 border-b border-white/20 bg-gradient-to-r from-blue-50/50 to-purple-50/50">
+      <h3 className="text-xl font-bold text-gray-800">Comments</h3>
+      <Button onClick={() => setShowComments(false)} variant="ghost" size="icon" className="bg-white/30 hover:bg-white/50 rounded-full">
+        <X className="w-5 h-5" />
+      </Button>
+    </div>
 
-            {/* Comments List */}
-            <div className="flex-1 overflow-y-auto max-h-96 p-6 space-y-4">
-              {comments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="flex items-start gap-3 p-4 bg-white/40 rounded-xl backdrop-blur-sm"
-                >
-                <div className="w-12 h-12 rounded-full border-2 border-white/40 shadow-lg bg-gray-400 flex items-center justify-center text-white font-semibold text-lg">
-                  {selectedPost.username?.[0]?.toUpperCase() || "?"}
-                </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-gray-800">
-                        {comment.username}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {new Date(comment.created_at).toLocaleString()}
-                      </span>
-                    </div>
-                    <p className="text-gray-700 text-sm"   style={{
-    wordBreak: "break-word",
-    overflowWrap: "break-word",
-    overflowX: "hidden",
-  }}>{comment.content}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Comment Input */}
-            <div className="p-6 border-t border-white/20 bg-white/30">
-              <div className="flex gap-3">
-                <Textarea
-                  placeholder="Write a comment..."
-                  rows={2}
-                  className="flex-1 bg-white/50 border-white/30 focus:border-blue-500/50 rounded-xl resize-none"
-                  value={commentContent}
-                  onChange={(e) => setCommentContent(e.target.value)}
-                />
-                <Button
-                  onClick={submitComment}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg rounded-xl px-6"
-                >
-                  <Send className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          </Card>
+    {/* Original Post */}
+    <div className="p-6 border-b border-white/20 bg-white/30">
+      <div className="flex items-start gap-4">
+        {selectedPost.avatar ? (
+          <img src={selectedPost.avatar} alt="Profile" className="w-12 h-12 rounded-full border-2 border-white/40 shadow-lg object-cover" />
+        ) : (
+          <div className="w-12 h-12 rounded-full border-2 border-white/40 shadow-lg bg-gray-400 flex items-center justify-center text-white font-semibold text-lg">
+            {selectedPost.username?.[0]?.toUpperCase() || "?"}
+          </div>
+        )}
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <span className="font-semibold text-gray-800">{selectedPost.username}</span>
+            <span className="text-sm text-gray-500">{new Date(selectedPost.created_at).toLocaleString()}</span>
+          </div>
+          <p className="text-gray-700 break-words">{selectedPost.content}</p>
         </div>
+      </div>
+    </div>
+
+    {/* Comments scrollable section */}
+    <div className="flex-1 overflow-y-auto p-6 space-y-4 border-b border-white/20">
+      {comments.map((comment) => (
+        <div key={comment.id} className="flex items-start gap-3 p-4 bg-white/40 rounded-xl backdrop-blur-sm">
+          <div className="w-12 h-12 rounded-full border-2 border-white/40 shadow-lg bg-gray-400 flex items-center justify-center text-white font-semibold text-lg">
+            {comment.username?.[0]?.toUpperCase() || "?"}
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-medium text-gray-800">{comment.username}</span>
+              <span className="text-xs text-gray-500">{new Date(comment.created_at).toLocaleString()}</span>
+            </div>
+            <p className="text-gray-700 text-sm break-words">{comment.content}</p>
+            {comment.image_url && (
+              <div className="mt-2">
+                <img src={comment.image_url} alt="Comment" className="max-h-40 rounded-md border border-gray-200" />
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Image Preview if selected */}
+    {commentImageFile && (
+      <div className="px-6 pt-3">
+        <div className="relative">
+          <img
+            src={URL.createObjectURL(commentImageFile)}
+            alt="Comment preview"
+            className="max-h-40 rounded-md border border-gray-200"
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-1 right-1 bg-black/50 hover:bg-black/70 text-white rounded-full p-1"
+            onClick={() => setCommentImageFile(null)}
+          >
+            <X className="w-3 h-3" />
+          </Button>
+        </div>
+      </div>
+    )}
+
+    {/* Input area — always pinned at bottom */}
+    <div className="p-6 bg-white/30">
+      <div className="flex flex-col gap-3">
+        <div className="flex gap-3">
+          <Textarea
+            placeholder="Write a comment..."
+            rows={2}
+            className="flex-1 bg-white/50 border-white/30 focus:border-blue-500/50 rounded-xl resize-none"
+            value={commentContent}
+            onChange={(e) => setCommentContent(e.target.value)}
+          />
+          <button type="button" onClick={() => commentFileInputRef.current?.click()} className="group">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 p-2 rounded-full shadow-md hover:shadow-purple-500/40 hover:scale-105 transition flex items-center justify-center">
+              <Camera className="w-5 h-5 text-white" />
+            </div>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/gif"
+              ref={commentFileInputRef}
+              className="hidden"
+              onChange={handleCommentImageChange}
+            />
+          </button>
+          <button type="submit" onClick={submitComment} className="group">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 p-2 rounded-full shadow-md hover:shadow-purple-500/40 hover:scale-105 transition flex items-center justify-center">
+              <Send className="w-5 h-5 text-white" />
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </Card>
+</div>
+
       )}
 
       {/*Post Form */}
@@ -691,13 +795,14 @@ export default function Home() {
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
+                  <button
+                    type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="bg-white/30 hover:bg-white/50 border border-white/20 rounded-xl"
+                    className="group"
                   >
-                    <Camera className="w-4 h-4" />
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 p-2 rounded-full shadow-md hover:shadow-purple-500/40 hover:scale-105 transition flex items-center justify-center">
+                      <Camera className="w-5 h-5 text-white" />
+                    </div>
                     <input
                       type="file"
                       accept="image/*"
@@ -705,17 +810,15 @@ export default function Home() {
                       ref={fileInputRef}
                       className="hidden"
                     />
-                  </Button>
+                  </button>
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="bg-white/30 hover:bg-white/50 border border-white/20 rounded-xl"
-                      >
-                        <Users className="w-4 h-4" />
-                      </Button>
+                      <button type="button" className="group">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 p-2 rounded-full shadow-md hover:shadow-purple-500/40 hover:scale-105 transition flex items-center justify-center">
+                          <Users className="w-5 h-5 text-white" />
+                        </div>
+                      </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                       <DropdownMenuItem onClick={() => setVisibility(0)}>
@@ -734,13 +837,22 @@ export default function Home() {
                   </DropdownMenu>
                 </div>
 
-                <Button
-                  onClick={handlePost}
-                  disabled={!content.trim()}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white shadow-lg px-8 py-3 rounded-xl transition-all duration-200"
-                >
-                  Post
-                </Button>
+<button
+  type="button"
+  onClick={handlePost}
+  disabled={!content.trim()}
+  className="relative px-8 py-2 text-white font-medium group overflow-hidden rounded-md disabled:cursor-not-allowed"
+>
+  <span
+    className={`absolute inset-0 w-full h-full rounded-md blur-sm opacity-70 group-hover:opacity-100 transition duration-200 ${
+      content.trim()
+        ? "bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800"
+        : "bg-gradient-to-br from-gray-400 to-gray-500"
+    }`}
+  ></span>
+  <span className="relative z-10">Post</span>
+</button>
+
               </div>
             </CardContent>
           </Card>
@@ -748,13 +860,12 @@ export default function Home() {
       )}
 
       {/* Floating Action Button */}
-<Button
+<div
   onClick={() => setShowForm(!showForm)}
-  className="fixed bottom-4 right-4 w-16 h-16 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 shadow-xl hover:shadow-purple-500/40 hover:scale-110 transition-all duration-300 z-50"
-  size="icon"
+  className="fixed bottom-8 right-8 w-16 h-16 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 shadow-xl hover:shadow-purple-500/40 hover:scale-110 transition-all duration-300 cursor-pointer z-50"
 >
   <SquarePlus className="w-8 h-8 text-white drop-shadow-lg" />
-</Button>
+</div>
 
       <BottomLeftNavigation/>
     </main>

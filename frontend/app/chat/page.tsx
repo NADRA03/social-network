@@ -49,11 +49,16 @@ export default function ChatPage() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const emojiRef = useRef<HTMLDivElement>(null);
   const [showSearch, setShowSearch] = useState(false);
+  const messageRef = useRef<string>("");
   const onEmojiClick = (emojiData: any) => {
   setMessage((prev) => prev + emojiData.emoji);
   };
   let offset = 0;
   const limit = 10;
+
+useEffect(() => {
+  messageRef.current = message;
+}, [message]);
 
 useEffect(() => {
   if (!showDirect) return;
@@ -66,6 +71,10 @@ useEffect(() => {
     if (data.type !== "userlist") return;
 
     container.innerHTML = "";
+
+    if (!Array.isArray(data.users)) {
+      return;
+    }
 
     data.users.forEach((user: any) => {
       const wrapper = document.createElement("div");

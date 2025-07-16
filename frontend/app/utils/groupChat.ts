@@ -77,12 +77,14 @@ export async function loadGroupChatHistory(
       chatBox.innerHTML = "";
     }
 
-    messages.reverse().forEach((msg) => {
-      const wrapper = document.createElement("div");
-      const senderName = members[msg.sender_id] || "User";
-      wrapper.innerHTML = createGroupChatMessageHTML(msg, senderName, groupName);
-      chatBox.prepend(wrapper.firstElementChild!);
-    });
+if (Array.isArray(messages)) {
+  messages.reverse().forEach((msg) => {
+    const wrapper = document.createElement("div");
+    const senderName = members[msg.sender_id] || "User";
+    wrapper.innerHTML = createGroupChatMessageHTML(msg, senderName, groupName);
+    chatBox.prepend(wrapper.firstElementChild!);
+  });
+}
   } catch (error) {
     console.error("Failed to load group chat history:", error);
   }

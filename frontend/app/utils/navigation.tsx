@@ -6,11 +6,12 @@ import Link from "next/link";
 import { connectWebSocket } from "../api"; 
 import { joinGroup } from "../api";
 import { updateNotificationStatus } from "../api";
-import { session } from "./session";
 import { setNotificationUpdater } from "./notifications";
 import { markAllNotificationsAsRead } from "../api";
 import { acceptFollowRequest } from "../api";
 import { showToastU } from "./toast";
+import { useSessionStore } from "./store";
+import { socket } from "../api";
 
 
 
@@ -35,6 +36,7 @@ export default function BottomLeftNavigation() {
   const isMounted = useRef(false);
   const initialNotificationIDs = useRef<Set<number>>(new Set());
   const didInit = useRef(false);
+  const session = useSessionStore((s) => s.session);
 
 
 
@@ -72,8 +74,11 @@ useEffect(() => {
     setNotifications(newNotifications);
     newNotifications.forEach(n => previous.add(n.id)); 
   });
-
+if (
+  (window.location.pathname === "/" || window.location.pathname.startsWith("/profile"))
+) {
   connectWebSocket(() => {});
+}
 }, []);
 
 function handleNotificationResponse(id: number, action: "accepted" | "rejected") {
@@ -125,7 +130,7 @@ function handleNotificationResponse(id: number, action: "accepted" | "rejected")
 }
 
   return (
-    <div className="fixed bottom-8 left-4 z-50 flex flex-col gap-4 items-start">
+    <div className="fixed bottom-8 left-8 z-50 flex flex-col gap-4 items-start">
     {/* Home */}
   <Link href="/" className="group">
     <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 p-2 rounded-full shadow-md hover:shadow-purple-500/40 hover:scale-105 transition">

@@ -69,6 +69,7 @@ func main() {
 	r.Handle("/profile/close-friends", auth.AuthMiddleware(http.HandlerFunc(profile.GetCloseFriendsHandler))).Methods("GET")
 	r.Handle("/profile/close-friends", auth.AuthMiddleware(http.HandlerFunc(profile.CloseFriendsHandler))).Methods("PATCH")
 	r.Handle("/users/not-followed", auth.AuthMiddleware(http.HandlerFunc(profile.GetNotFollowedUsersHandler))).Methods("GET")
+	r.HandleFunc("/follow-graph/{id}", profile.GetFollowGraphHandler(sqlite.DB)).Methods("GET")
 	// Post routes
 	r.Handle("/post", auth.AuthMiddleware(http.HandlerFunc(posts.CreatePostHandler))).Methods("POST")
 	r.Handle("/feed", auth.AuthMiddleware(http.HandlerFunc(posts.FeedHandler))).Methods("GET")

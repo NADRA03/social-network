@@ -31,10 +31,6 @@ func RegisterHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		if len(req.Username) < 3 || len(req.Username) > 15 {
-			http.Error(w, "Username must be between 3 and 15 characters", http.StatusBadRequest)
-			return
-		}
 		if len(req.FirstName) > 15 || len(req.LastName) > 15 {
 			http.Error(w, "Name fields must be less than 15 characters", http.StatusBadRequest)
 			return

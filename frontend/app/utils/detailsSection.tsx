@@ -75,9 +75,9 @@ export default function Details() {
         <ul className="divide-y divide-base-300">
           {members.map((member: any) => (
             <li key={member.ID} className="py-2 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-white text-gray-600 flex items-center justify-center font-bold uppercase shadow">
-                {member.Username?.charAt(0) || "?"}
-              </div>
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-300 via-purple-300 to-indigo-300 text-white flex items-center justify-center font-bold uppercase shadow">
+                    {member.Username?.charAt(0) || "?"}
+                  </div>
               <span className="text-sm text-black">{member.Username || "Unnamed"}</span>
             </li>
           ))}

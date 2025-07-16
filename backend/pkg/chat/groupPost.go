@@ -21,6 +21,7 @@ type GroupComment struct {
 	ID        int    `json:"id"`
 	PostID    int    `json:"post_id"`
 	UserID    int    `json:"user_id"`
+	ImageURL  string `json:"image_url"` 
 	Content   string `json:"content"`
 	CreatedAt string `json:"created_at"`
 }
@@ -77,8 +78,8 @@ func CreateGroupComment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result, err := sqlite.DB.Exec(
-		`INSERT INTO group_comments (post_id, user_id, content) VALUES (?, ?, ?)`,
-		comment.PostID, auth.Session.UserID, comment.Content,
+		`INSERT INTO group_comments (post_id, user_id, content, image_url) VALUES (?, ?, ?, ?)`,
+		comment.PostID, auth.Session.UserID, comment.Content, comment.ImageURL,
 	)
 	if err != nil {
 		http.Error(w, "Database error", http.StatusInternalServerError)
@@ -88,10 +89,10 @@ func CreateGroupComment(w http.ResponseWriter, r *http.Request) {
 	lastID, _ := result.LastInsertId()
 
 	err = sqlite.DB.QueryRow(`
-		SELECT id, post_id, user_id, content, created_at
+		SELECT id, post_id, user_id, content, image_url, created_at
 		FROM group_comments
 		WHERE id = ?
-	`, lastID).Scan(&comment.ID, &comment.PostID, &comment.UserID, &comment.Content, &comment.CreatedAt)
+	`, lastID).Scan(&comment.ID, &comment.PostID, &comment.UserID, &comment.Content, &comment.ImageURL, &comment.CreatedAt)
 	if err != nil {
 		http.Error(w, "Failed to fetch comment", http.StatusInternalServerError)
 		return
@@ -169,7 +170,7 @@ func GetGroupComments(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rows, err := sqlite.DB.Query(`
-		SELECT id, post_id, user_id, content, created_at
+		SELECT id, post_id, user_id, content, image_url, created_at
 		FROM group_comments
 		WHERE post_id = ?
 		ORDER BY created_at ASC
@@ -183,7 +184,7 @@ func GetGroupComments(w http.ResponseWriter, r *http.Request) {
 	var comments []GroupComment
 	for rows.Next() {
 		var c GroupComment
-		if err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Content, &c.CreatedAt); err != nil {
+		if err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Content, &c.ImageURL, &c.CreatedAt); err != nil {
 			continue
 		}
 		comments = append(comments, c)

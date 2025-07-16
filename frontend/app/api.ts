@@ -6,20 +6,36 @@ import { pushNotifications } from "./utils/notifications";
 const API_BASE = "http://localhost:8080"; 
 
 export let socket: WebSocket | null = null;
-
+let isListening = false;
 
 async function request(path: string, options: RequestInit = {}) {
 	const res = await fetch(`${API_BASE}${path}`, {
-		credentials: "include", 
+		credentials: "include",
 		headers: {
 			"Content-Type": "application/json",
-			...(options.headers || {})
+			...(options.headers || {}),
 		},
 		...options,
 	});
-	if (!res.ok) throw new Error(await res.text());
+
+	if (!res.ok) {
+		if (res.status === 401) {
+			if (typeof window !== "undefined") {
+				const path = window.location.pathname;
+				if (path !== "/login" && path !== "/register" && path !== "/") {
+					window.location.href = "/";
+				}
+			}
+			return { unauthorized: true };
+		}
+
+		console.warn(`API error ${res.status}:`, await res.text());
+		return { error: true, status: res.status };
+	}
+
 	return res.json().catch(() => ({}));
 }
+
 
 export const register = (data: any) =>
 	request("/register", {
@@ -53,10 +69,17 @@ export const unfollowUser = (id: number) =>
 		method: "DELETE",
 	});
 
-export const getSession = () =>
-	request("/getSession", {
+export const getSession = async () => {
+	const res = await request("/getSession", {
 		method: "GET",
 	});
+
+	if (res.unauthorized) {
+		return null; 
+	}
+
+	return res; 
+};
 
 export const searchUsers = (username: string = "") =>
 	request("/users/search", {
@@ -178,11 +201,13 @@ export const createGroupPost = (data: {
   group_id: number;
   content: string;
   image_url?: string;
-}) =>
-  request("/groups/posts", {
+}) => {
+  console.log("[createGroupPost] Sending data:", data); 
+  return request("/groups/posts", {
     method: "POST",
     body: JSON.stringify(data),
-});
+  });
+};
 
 export const getGroupPosts = (groupId: number) =>
   request(`/groups/posts?group_id=${groupId}`, {
@@ -192,6 +217,7 @@ export const getGroupPosts = (groupId: number) =>
 export const createGroupComment = (data: {
   post_id: number;
   content: string;
+  image_url: string | undefined;
 }) =>
   request("/groups/comments", {
     method: "POST",
@@ -221,6 +247,15 @@ export const markAllNotificationsAsRead = () =>
     },
   });
 
+export const getFollowGraph = (userId: number) =>
+  request(`/follow-graph/${userId}`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
 export const acceptFollowRequest = (inviterId: number) =>
   request("/followAccept", {
     method: "POST",
@@ -229,8 +264,6 @@ export const acceptFollowRequest = (inviterId: number) =>
       "Content-Type": "application/json",
     },
   });
-
-
 
 export function connectWebSocket(onMessage: (event: MessageEvent) => void) {
 	socket = new WebSocket("ws://localhost:8080/ws");
