@@ -2,13 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 import axios from "axios";
 
 import { ProfileHeader } from "@/components/ProfileHeader";
 import { ProfileStats } from "@/components/ProfileStats";
 import { ProfileTabs } from "@/components/ProfileTabs";
-import AMPMToggle from "@/components/AMPMToggle";
 import BottomLeftNavigation from "@/app/utils/navigation";
 
 const Profile = () => {

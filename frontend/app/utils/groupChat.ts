@@ -1,11 +1,8 @@
 "use client";
 
 import { session } from "./session";
-import { getChatMessages } from "../api";
-import { useGroupStore } from "./store";
-import { getSelectedGroupId, getSelectedUserId } from "./store";
+import { getSelectedGroupId } from "./store";
 import { showToastU } from "./toast";
-import { socket } from "../api";
 import { getGroupMessages } from "../api";
 
 

@@ -1,14 +1,10 @@
-import { BadgePlus, X, Users, SquarePlus  } from "lucide-react";
-import { createGroup, searchUsers, joinGroup} from "../api";
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { X, SquarePlus } from "lucide-react";
+import { createGroup, searchUsers } from "../api";
 import '../output.css';
 import { connectWebSocket } from "../api";
 import { useEffect, useState, useRef } from "react";
 import { socket } from "../api";
 import { session } from './session';
-import { appendChatMessage } from '../utils/chat';
-import { loadChatHistory } from '../utils/chat';
 import { useGroupStore } from "./store";
 import { appendGroupChatMessage } from "./groupChat";
 import { showToastU } from "./toast";

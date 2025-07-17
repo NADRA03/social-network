@@ -11,8 +11,6 @@ import { markAllNotificationsAsRead } from "../api";
 import { acceptFollowRequest } from "../api";
 import { showToastU } from "./toast";
 import { useSessionStore } from "./store";
-import { socket } from "../api";
-
 
 
 type Notification = {

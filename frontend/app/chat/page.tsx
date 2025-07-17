@@ -1,7 +1,5 @@
 'use client';
 
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
 import '../output.css';
 import { connectWebSocket } from "../api";
 import { useEffect, useState, useRef } from "react";
@@ -9,7 +7,7 @@ import { socket } from "../api";
 import { session } from '../utils/session';
 import { appendChatMessage } from '../utils/chat';
 import { loadChatHistory } from '../utils/chat';
-import { BadgePlus, MessageSquareDashed, Users, UsersRound, Search } from 'lucide-react';
+import { MessageSquareDashed, UsersRound, Search } from 'lucide-react';
 import GroupList from '../utils/groupList';
 import { useGroupStore } from '../utils/store';
 import { showToastU } from '../utils/toast';

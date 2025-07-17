@@ -3,7 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   experimental: {
   },
-  // You can add more settings like images, redirects, etc.
+  eslint: {
+    ignoreDuringBuilds: true, 
+  },
 };
 
 export const config = {

@@ -12,26 +12,6 @@ import { showToastU } from "../utils/toast";
 import { supabase } from "@/lib/supabase";
 import { Mail, Lock, User, UserPlus, Calendar } from "lucide-react";
 
-export async function uploadProfilePicture(file: File): Promise<string | null> {
-  const filePath = `profiles/${Date.now()}-${file.name}`;
-  const { data, error } = await supabase.storage
-    .from("social")
-    .upload(filePath, file, {
-      cacheControl: "3600",
-      upsert: false,
-    });
-
-  if (error) {
-    console.error("Upload failed:", error);
-    return null;
-  }
-
-  const { data: publicUrlData } = supabase.storage
-    .from("social")
-    .getPublicUrl(filePath);
-  return publicUrlData?.publicUrl || null;
-}
-
 export default function RegisterPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -71,6 +51,26 @@ const handleSubmit = async (e: React.FormEvent) => {
     console.error(err);
   }
 };
+
+async function uploadProfilePicture(file: File): Promise<string | null> {
+  const filePath = `profiles/${Date.now()}-${file.name}`;
+  const { data, error } = await supabase.storage
+    .from("social")
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
+
+  if (error) {
+    console.error("Upload failed:", error);
+    return null;
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from("social")
+    .getPublicUrl(filePath);
+  return publicUrlData?.publicUrl || null;
+}
 
   return (
     <div className="min-h-screen bg-fixed bg-no-repeat bg-cover bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 flex items-center justify-center p-6">

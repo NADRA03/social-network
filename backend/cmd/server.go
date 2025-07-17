@@ -28,8 +28,9 @@ func main() {
 		if err != nil {
 			log.Fatal("Failed to get working directory:", err)
 		}
-		dbPath = filepath.Join(cwd, "..", "social.db")
-		migrationDir := filepath.Join(cwd, "..", "pkg", "db", "migrations")
+
+		dbPath = filepath.Join(cwd, "..", "social.db") 
+		migrationDir := filepath.Join(cwd, "pkg", "db", "migrations") 
 		migrationPath = "file://" + filepath.ToSlash(migrationDir)
 	}
 

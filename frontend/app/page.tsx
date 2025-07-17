@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { session } from "@/app/utils/session";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useParams } from "next/navigation";
@@ -66,23 +65,6 @@ interface Comment {
   created_at: string;
 }
 
-export async function uploadImageToSupabase(file: File): Promise<string | null> {
-  const filePath = `posts/${Date.now()}-${file.name}`;
-  const { data, error } = await supabase.storage
-    .from("social")
-    .upload(filePath, file);
-
-  if (error) {
-    console.error("Upload failed:", error);
-    return null;
-  }
-
-  const { data: publicUrlData } = supabase.storage
-    .from("social")
-    .getPublicUrl(filePath);
-  return publicUrlData?.publicUrl || null;
-}
-
 export default function Home() {
   const router = useRouter();
   const { username } = useParams();
@@ -110,7 +92,22 @@ export default function Home() {
   const [commentImageFile, setCommentImageFile] = useState<File | null>(null);
   const commentFileInputRef = useRef<HTMLInputElement>(null);
 
+  async function uploadImageToSupabase(file: File): Promise<string | null> {
+  const filePath = `posts/${Date.now()}-${file.name}`;
+  const { data, error } = await supabase.storage
+    .from("social")
+    .upload(filePath, file);
 
+  if (error) {
+    console.error("Upload failed:", error);
+    return null;
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from("social")
+    .getPublicUrl(filePath);
+  return publicUrlData?.publicUrl || null;
+  }
  
   useEffect(() => {
     const checkSession = async () => {
