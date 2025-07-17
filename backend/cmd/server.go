@@ -30,7 +30,7 @@ func main() {
 		}
 
 		dbPath = filepath.Join(cwd, "..", "social.db") 
-		migrationDir := filepath.Join(cwd, "pkg", "db", "migrations") 
+		migrationDir := filepath.Join(cwd, "..", "pkg", "db", "migrations") 
 		migrationPath = "file://" + filepath.ToSlash(migrationDir)
 	}
 

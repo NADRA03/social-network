@@ -1,0 +1,9 @@
+{
+  "/favicon.ico/route": "/favicon.ico",
+  "/_not-found/page": "/_not-found",
+  "/login/page": "/login",
+  "/chat/page": "/chat",
+  "/page": "/",
+  "/profile/[id]/page": "/profile/[id]",
+  "/register/page": "/register"
+}
