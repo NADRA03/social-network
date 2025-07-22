@@ -16,23 +16,33 @@ export default function SessionInitializer() {
   const setSessionInStore = useSessionStore((state) => state.setSession);
 
   useEffect(() => {
-    getSession()
-      .then((res) => {
-        setSession(res);              
-        setSessionInStore(res);        
+    getSession().then((res) => {
+      if (res?.unauthorized) {
+        console.log("Unauthorized - resetting session");
+        setSession(null);
+        setSessionInStore(null);
+      } else {
+        setSession(res);
+        setSessionInStore(res);
         console.log("Session loaded:", res);
-      })
-      .catch(() => {});
+      }
+    });
   }, [router, setSessionInStore]);
 
   return null;
 }
 
 export async function loadSession(setSessionInStore: (s: any) => void) {
-  const session = await getSession();
-  if (session) {
-    setSession(session);
-    setSessionInStore(session);
-    console.log("Session loaded:", session);
+  const res = await getSession();
+  if (res?.unauthorized) {
+    console.log("401 received during session load. Resetting session.");
+    setSession(null);
+    setSessionInStore(null);
+  } else {
+    setSession(res);
+    setSessionInStore(res);
+    console.log("Session loaded:", res);
   }
 }
+
+
