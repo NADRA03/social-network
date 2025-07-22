@@ -10,6 +10,7 @@ import { loadChatHistory } from '../utils/chat';
 import { MessageSquareDashed, UsersRound, Search } from 'lucide-react';
 import GroupList from '../utils/groupList';
 import { useGroupStore } from '../utils/store';
+import ResizableLayout from '@/components/Resizable';
 import { showToastU } from '../utils/toast';
 import PostsSection from '../utils/postsSesction';
 import EventsSection from '../utils/eventsSection';
@@ -48,6 +49,9 @@ export default function ChatPage() {
   const emojiRef = useRef<HTMLDivElement>(null);
   const [showSearch, setShowSearch] = useState(false);
   const messageRef = useRef<string>("");
+  const [isMobile, setIsMobile] = useState(false);
+  const [showMobileChat, setShowMobileChat] = useState(false);
+  const [showMobileDetails, setShowMobileDetails] = useState(false);
   const onEmojiClick = (emojiData: any) => {
   setMessage((prev) => prev + emojiData.emoji);
   };
@@ -57,6 +61,13 @@ export default function ChatPage() {
 useEffect(() => {
   messageRef.current = message;
 }, [message]);
+
+useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
 useEffect(() => {
   if (!showDirect) return;
@@ -226,259 +237,219 @@ useEffect(() => {
 
 
 return (
-<main className="h-screen overflow-hidden">
+  <main className="h-screen overflow-hidden">
+    <ResizableLayout
+      LeftPanel={
+        <div className="h-full flex flex-col pl-10 pt-5 overflow-hidden relative z-10 before:absolute before:inset-y-0 before:left-0 before:w-1/2 before:bg-gradient-to-r before:from-purple-600 before:to-transparent before:opacity-10 before:z-0">
+          <div className="flex justify-around border-b border-base-300 bg-white p-2">
+            <button
+              onClick={() => {
+                setShowDirect(true);
+                setShowSearch(false);
+              }}
+              className={`relative px-4 py-2 rounded-lg group transition hover:scale-105 ${
+                showDirect && !showSearch
+                  ? "bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 shadow-xl text-white"
+                  : "bg-gray-100 text-purple-600"
+              }`}
+            >
+              <MessageSquareDashed className="w-5 h-5 mx-auto" />
+              <span className="text-xs font-medium">Direct</span>
+            </button>
 
+            <button
+              onClick={() => {
+                setShowDirect(false);
+                setShowSearch(false);
+              }}
+              className={`relative px-4 py-2 rounded-lg group transition hover:scale-105 ${
+                !showDirect && !showSearch
+                  ? "bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 shadow-xl text-white"
+                  : "bg-gray-100 text-purple-600"
+              }`}
+            >
+              <UsersRound className="w-5 h-5 mx-auto" />
+              <span className="text-xs font-medium">Groups</span>
+            </button>
 
+            <button
+              onClick={() => {
+                setShowSearch(true);
+              }}
+              className={`relative px-4 py-2 rounded-lg group transition hover:scale-105 ${
+                showSearch
+                  ? "bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 shadow-xl text-white"
+                  : "bg-gray-100 text-purple-600"
+              }`}
+            >
+              <Search className="w-5 h-5 mx-auto" />
+              <span className="text-xs font-medium">Explore</span>
+            </button>
+          </div>
 
+          {showSearch ? (
+            <SearchList />
+          ) : showDirect ? (
+            <div ref={containerRef} className="mt-6"></div>
+          ) : (
+            <GroupList />
+          )}
+        </div>
+      }
+      MiddlePanel={
+        <div
+          id="chat"
+          className="relative h-full w-full flex flex-col pt-5 overflow-hidden"
+        >
+          {activeTab === "chat" && (
+            <div className="absolute inset-0 z-0" />
+          )}
 
+          {(selectedUserId === null && selectedGroupId === null) || activeTab !== "chat" ? (
+            <div className="absolute inset-0 z-0 flex items-center justify-center" />
+          ) : null}
 
-<div className="flex h-full">
-<div className="w-1/5 h-full flex flex-col pl-10 pt-5 overflow-hidden relative z-10 before:absolute before:inset-y-0 before:left-0 before:w-1/2 before:bg-gradient-to-r before:from-purple-600 before:to-transparent before:opacity-10 before:z-0">
+          {selectedUserId === null && selectedGroupId === null ? (
+            <div className="flex items-center justify-center flex-col mt-80 text-center text-gray-500">
+              <div className="flex flex-col items-center justify-center h-full text-gray-600 z-10">
+                <p className="mt-4 text-lg font-medium text-purple-500"></p>
+              </div>
+            </div>
+          ) : selectedGroupId !== null ? (
+            <>
+              <div className="relative z-10 flex justify-around border-b border-base-300 p-2">
+                {["chat", "posts", "events"].map((key) => (
+                  <button
+                    key={key}
+                    className={`relative z-10 flex flex-col items-center gap-1 px-4 py-2 rounded-lg group transition hover:scale-105 ${
+                      activeTab === key
+                        ? "bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 shadow-md text-white"
+                        : "bg-gray-100 text-purple-600"
+                    }`}
+                    onClick={() => setActiveTab(key as "chat" | "posts" | "events")}
+                  >
+                    {key === "chat" ? (
+                      <>
+                        <MessageCircle className="w-5 h-5" />
+                        <span className="text-xs font-medium">Chat</span>
+                      </>
+                    ) : key === "posts" ? (
+                      <>
+                        <FileText className="w-5 h-5" />
+                        <span className="text-xs font-medium">Posts</span>
+                      </>
+                    ) : (
+                      <>
+                        <CalendarDays className="w-5 h-5" />
+                        <span className="text-xs font-medium">Events</span>
+                      </>
+                    )}
+                  </button>
+                ))}
+              </div>
 
-<div className="flex justify-around border-b border-base-300 bg-white p-2">
-  <button
-    onClick={() => {
-      setShowDirect(true);
-      setShowSearch(false);
-    }}
-    className={`relative px-4 py-2 rounded-lg group transition hover:scale-105 ${
-      showDirect && !showSearch
-        ? "bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 shadow-xl text-white"
-        : "bg-gray-100 text-purple-600"
-    }`}
-  >
-    <MessageSquareDashed className="w-5 h-5 mx-auto" />
-    <span className="text-xs font-medium">Direct</span>
-  </button>
+              <div className={`${activeTab !== "chat" ? "hidden" : ""} flex flex-col flex-1 overflow-y-auto`}>
+                <div id="chat-messages" className="flex-1 overflow-y-auto p-4 space-y-3" />
 
-  <button
-    onClick={() => {
-      setShowDirect(false);
-      setShowSearch(false);
-    }}
-    className={`relative px-4 py-2 rounded-lg group transition hover:scale-105 ${
-      !showDirect && !showSearch
-        ? "bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 shadow-xl text-white"
-        : "bg-gray-100 text-purple-600"
-    }`}
-  >
-    <UsersRound className="w-5 h-5 mx-auto" />
-    <span className="text-xs font-medium">Groups</span>
-  </button>
+                <form
+                  id="chat-form"
+                  style={{ position: "sticky", bottom: 0, background: "var(--b2)", zIndex: 10 }}
+                  className="p-4 border-t border-base-300 flex gap-2 items-end relative"
+                  onSubmit={(e) => e.preventDefault()}
+                >
+                  <div ref={emojiRef} className="relative w-full flex gap-2 items-center">
+                    <button type="button" onClick={() => setShowEmojiPicker((prev) => !prev)} className="text-xl">
+                      😊
+                    </button>
 
-  <button
-    onClick={() => {
-      setShowSearch(true);
-    }}
-    className={`relative px-4 py-2 rounded-lg group transition hover:scale-105 ${
-      showSearch
-        ? "bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 shadow-xl text-white"
-        : "bg-gray-100 text-purple-600"
-    }`}
-  >
-    <Search className="w-5 h-5 mx-auto" />
-    <span className="text-xs font-medium">Explore</span>
-  </button>
-</div>
+                    <input
+                      id="default-search"
+                      type="text"
+                      className="input input-bordered flex-1 min-w-[150px] border-none outline-none focus:ring-0 focus:outline-none"
+                      placeholder="Type your message..."
+                      maxLength={200}
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                    />
 
-      {showSearch ? (
-        <SearchList />
-      ) : showDirect ? (
-        <div ref={containerRef} className="mt-6"></div>
-      ) : (
-        <GroupList />
-      )}
-</div>
+                    {showEmojiPicker && (
+                      <div className="absolute bottom-12 left-0 z-50">
+                        <EmojiPicker onEmojiClick={onEmojiClick} />
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    type="submit"
+                    className="relative px-6 py-2 text-white font-medium group overflow-hidden rounded-md flex items-center justify-center"
+                  >
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 rounded-md blur-sm opacity-70 group-hover:opacity-100 transition duration-200"></span>
+                    <span className="relative z-10 text-center">Submit</span>
+                  </button>
+                </form>
+              </div>
 
+              <div className={`${activeTab !== "posts" ? "hidden" : ""} flex-1 p-4 overflow-y-auto`}>
+                <PostsSection />
+              </div>
 
-<div className="divider divider-horizontal"></div>
+              <div className={`${activeTab !== "events" ? "hidden" : ""} flex-1 p-4 overflow-y-auto`}>
+                <EventsSection />
+              </div>
+            </>
+          ) : (
+            <>
+              <div id="chat-messages" className="flex-1 overflow-y-auto p-4 space-y-3" />
 
-<div id="chat"
-  className="relative h-screen w-1/3 flex flex-col pt-5 overflow-hidden"
->
-  {activeTab === "chat" && (
-    <div
-      className="absolute inset-0 z-0"
-    ></div>
-  )}
+              <form
+                id="chat-form"
+                style={{ position: "sticky", bottom: 0, background: "var(--b2)", zIndex: 10 }}
+                className="p-4 border-t border-base-300 flex gap-2 items-end relative"
+                onSubmit={(e) => e.preventDefault()}
+              >
+                <div ref={emojiRef} className="relative w-full flex gap-2 items-center">
+                  <button type="button" onClick={() => setShowEmojiPicker((prev) => !prev)} className="text-xl">
+                    😊
+                  </button>
 
-  {(selectedUserId === null && selectedGroupId === null) || activeTab !== "chat" ? (
-<div className="absolute inset-0 z-0 flex items-center justify-center">
-  {/* <img
-    src="loading2.gif"
-    alt="Background"
-    className="object-cover w-20 h-20"
-  /> */}
-</div>
-  ) : null}
+                  <input
+                    id="default-search"
+                    type="text"
+                    className="input input-bordered flex-1 min-w-[150px] border-none outline-none focus:ring-0 focus:outline-none"
+                    placeholder="Type your message..."
+                    maxLength={200}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                  />
 
-  {selectedUserId === null && selectedGroupId === null ? (
-    <div className="flex items-center justify-center flex-col mt-80 text-center text-gray-500">
-  <div className="flex flex-col items-center justify-center h-full text-gray-600 z-10">
-    {/* <MessageCircle className="w-12 h-12 text-purple-500 animate-bounce" /> */}
-    <p className="mt-4 text-lg font-medium text-purple-500"></p>
-  </div>
-    </div>
-  ) : selectedGroupId !== null ? (
-    <>
-<div className="relative z-10 flex justify-around border-b border-base-300 p-2">
-  <button
-    className={`relative z-10 flex flex-col items-center gap-1 px-4 py-2 rounded-lg group transition hover:scale-105 ${
-      activeTab === "chat"
-        ? "bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 shadow-md text-white"
-        : "bg-gray-100 text-purple-600"
-    }`}
-    onClick={() => setActiveTab("chat")}
-  >
-    <MessageCircle className="w-5 h-5" />
-    <span className="text-xs font-medium">Chat</span>
-  </button>
-
-  <button
-    className={`relative z-10 flex flex-col items-center gap-1 px-4 py-2 rounded-lg group transition hover:scale-105 ${
-      activeTab === "posts"
-        ? "bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 shadow-md text-white"
-        : "bg-gray-100 text-purple-600"
-    }`}
-    onClick={() => setActiveTab("posts")}
-  >
-    <FileText className="w-5 h-5" />
-    <span className="text-xs font-medium">Posts</span>
-  </button>
-
-  <button
-    className={`relative z-10 flex flex-col items-center gap-1 px-4 py-2 rounded-lg group transition hover:scale-105 ${
-      activeTab === "events"
-        ? "bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 shadow-md text-white"
-        : "bg-gray-100 text-purple-600"
-    }`}
-    onClick={() => setActiveTab("events")}
-  >
-    <CalendarDays className="w-5 h-5" />
-    <span className="text-xs font-medium">Events</span>
-  </button>
-</div>
-
-  {/* Chat Section */}
-  <div className={`${activeTab !== "chat" ? "hidden" : ""} flex flex-col flex-1 overflow-y-auto` }>
-    <div id="chat-messages" className="flex-1 overflow-y-auto p-4 space-y-3"></div>
-
-<form
-  id="chat-form"
-  style={{ position: "sticky", bottom: 0, background: "var(--b2)", zIndex: 10 }}
-  className="p-4 border-t border-base-300 flex gap-2 items-end relative"
-  onSubmit={(e) => e.preventDefault()}
->
-<div ref={emojiRef} className="relative w-full flex gap-2 items-center">
-  <button
-    type="button"
-    onClick={() => setShowEmojiPicker((prev) => !prev)}
-    className="text-xl"
-  >
-    😊
-  </button>
-
-  <input
-    id="default-search"
-    type="text"
-    className="input input-bordered flex-1 min-w-[150px] border-none outline-none focus:ring-0 focus:outline-none"
-    placeholder="Type your message..."
-    maxLength={200}
-    value={message}
-    onChange={(e) => setMessage(e.target.value)}
-  />
-
-  {showEmojiPicker && (
-    <div className="absolute bottom-12 left-0 z-50">
-      <EmojiPicker onEmojiClick={onEmojiClick} />
-    </div>
-  )}
-</div>
-<button
-  type="submit"
-  className="relative px-6 py-2 text-white font-medium group overflow-hidden rounded-md flex items-center justify-center"
->
-  <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 rounded-md blur-sm opacity-70 group-hover:opacity-100 transition duration-200"></span>
-  <span className="relative z-10 text-center">Submit</span>
-</button>
-</form>
-  </div>
-
-  {/* Posts Section */}
-  <div className={`${activeTab !== "posts" ? "hidden" : ""} flex-1 p-4 overflow-y-auto`}>
-   <PostsSection/>
-  </div>
-
-  {/* Events Section */}
-  <div className={`${activeTab !== "events" ? "hidden" : ""} flex-1 p-4 overflow-y-auto`}>
-    <EventsSection/>
-  </div>
-    </>
-  ) : (
-    <>
-      <div id="chat-messages" className="flex-1 overflow-y-auto p-4 space-y-3"></div>
-<form
-  id="chat-form"
-  style={{ position: "sticky", bottom: 0, background: "var(--b2)", zIndex: 10 }}
-  className="p-4 border-t border-base-300 flex gap-2 items-end relative"
-  onSubmit={(e) => e.preventDefault()}
->
-<div ref={emojiRef} className="relative w-full flex gap-2 items-center">
-  <button
-    type="button"
-    onClick={() => setShowEmojiPicker((prev) => !prev)}
-    className="text-xl"
-  >
-    😊
-  </button>
-
-  <input
-    id="default-search"
-    type="text"
-    className="input input-bordered flex-1 min-w-[150px] border-none outline-none focus:ring-0 focus:outline-none"
-    placeholder="Type your message..."
-    maxLength={200}
-    value={message}
-    onChange={(e) => setMessage(e.target.value)}
-  />
-
-  {showEmojiPicker && (
-    <div className="absolute bottom-12 left-0 z-50">
-      <EmojiPicker onEmojiClick={onEmojiClick} />
-    </div>
-  )}
-</div>
-<button
-  type="submit"
-  className="relative px-6 py-2 text-white font-medium group overflow-hidden rounded-md flex items-center justify-center"
->
-  <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 rounded-md blur-sm opacity-70 group-hover:opacity-100 transition duration-200"></span>
-  <span className="relative z-10 text-center">Submit</span>
-</button>
-</form>
-    </>
-  )}
-</div>
-
-  <div className="divider divider-horizontal"></div>
-  <div className="overflow-hidden w-3/7 h-full">
-
-
-    <div id="details"     className="h-full relative z-10 inline-block text-sm text-gray-900 dark:text-gray-400 w-full 
-    before:absolute before:inset-x-0 before:top-0 before:h-1/1
-    before:bg-gradient-to-b before:from-purple-600 before:via-indigo-600 before:to-indigo-800
-    before:opacity-50 before:z-0"
-     >
-    <Details />
-    </div>
-
-
-  </div>
-
-
-</div>
-          <BottomLeftNavigation />
-    </main>
+                  {showEmojiPicker && (
+                    <div className="absolute bottom-12 left-0 z-50">
+                      <EmojiPicker onEmojiClick={onEmojiClick} />
+                    </div>
+                  )}
+                </div>
+                <button
+                  type="submit"
+                  className="relative px-6 py-2 text-white font-medium group overflow-hidden rounded-md flex items-center justify-center"
+                >
+                  <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 rounded-md blur-sm opacity-70 group-hover:opacity-100 transition duration-200"></span>
+                  <span className="relative z-10 text-center">Submit</span>
+                </button>
+              </form>
+            </>
+          )}
+        </div>
+      }
+      RightPanel={
+        <div className="h-full relative z-10 inline-block text-sm text-gray-900 dark:text-gray-400 w-full 
+          before:absolute before:inset-x-0 before:top-0 before:h-1/1
+          before:bg-gradient-to-b before:from-purple-600 before:via-indigo-600 before:to-indigo-800
+          before:opacity-50 before:z-0">
+          <Details />
+        </div>
+      }
+    />
+    <BottomLeftNavigation />
+  </main>
     
   );
 }

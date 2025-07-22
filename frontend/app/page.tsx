@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { useParams } from "next/navigation";
 import { logout } from "@/app/utils/auth";
 import BottomLeftNavigation from "./utils/navigation";
-import { SquarePlus } from "lucide-react";
+import { SquarePlus, Menu } from "lucide-react";
 import { searchUsers } from "@/app/api";
 import {
   House,
@@ -67,6 +67,7 @@ interface Comment {
 
 export default function Home() {
   const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { username } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [hasSession, setHasSession] = useState(false);
@@ -84,6 +85,7 @@ export default function Home() {
     { id: number; name: string; username: string; avatar?: string }[]
   >([]);
   const [userAvatar, setUserAvatar] = useState("");
+
   const session = useSessionStore((s) => s.session);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
@@ -91,7 +93,7 @@ export default function Home() {
   const timeoutRef = useRef<any>(null);
   const [commentImageFile, setCommentImageFile] = useState<File | null>(null);
   const commentFileInputRef = useRef<HTMLInputElement>(null);
-
+  
   async function uploadImageToSupabase(file: File): Promise<string | null> {
   const filePath = `posts/${Date.now()}-${file.name}`;
   const { data, error } = await supabase.storage
@@ -335,17 +337,20 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-100">
       {/*Navigation Bar */}
+      {/* Navigation Bar */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-white/20 shadow-lg">
         <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-4">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Social Network
             </h1>
 
-            <nav className="hidden md:flex items-center gap-4">
-              {/* <Button
+            {/* Desktop Nav */}
+            {/* <nav className="hidden md:flex items-center gap-4 ml-6">
+              <Button
+                onClick={() => router.push(`/`)}
                 variant="ghost"
-                className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 rounded-xl px-4 py-2"
+                className="flex items-center gap-2 text-gray-600 hover:bg-white/50 rounded-xl px-4 py-2"
               >
                 <House className="w-4 h-4" />
                 Home
@@ -357,50 +362,59 @@ export default function Home() {
               >
                 <MessageSquareMore className="w-4 h-4" />
                 Messages
-              </Button> */}
-            </nav>
+              </Button>
+            </nav> */}
+
+            {/* Mobile Menu Toggle */}
+            {/* <div className="md:hidden ml-4">
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                {mobileMenuOpen ? (
+                  <X className="w-6 h-6 text-gray-700" />
+                ) : (
+                  <Menu className="w-6 h-6 text-gray-700" />
+                )}
+              </button>
+            </div> */}
           </div>
 
           <div className="flex items-center gap-4">
             {/* Search bar */}
-            <div className="relative">
-      {/* ✅ Your original search bar — unchanged */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-        <input
-          type="search"
-          placeholder="Search users..."
-          className="pl-10 pr-4 py-2 w-80 bg-white/70 backdrop-blur-sm border border-white/30 rounded-xl focus:outline-none focus:border-transparent shadow-sm transition-all duration-200"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </div>
-
-      {/* 🔍 Search results */}
-      {showResults && results.length > 0 && (
-        <div className="absolute left-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-md z-50 max-h-64 overflow-y-auto">
-          {results.map((user) => (
-            <button
-              key={user.ID}
-              onClick={() => router.push(`/profile/${user.ID}`)}
-              className="w-full text-left px-4 py-2 hover:bg-blue-50 transition flex items-center gap-3"
-            >
-              {user.AvatarURL ? (
-                <img
-                  src={user.AvatarURL}
-                  alt={user.Username}
-                  className="w-8 h-8 rounded-full object-cover border border-gray-300"
+            <div className="relative w-full max-w-xs md:max-w-sm">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <input
+                  type="search"
+                  placeholder="Search users..."
+                  className="pl-10 pr-4 py-2 w-full bg-white/70 backdrop-blur-sm border border-white/30 rounded-xl focus:outline-none focus:border-transparent shadow-sm transition-all duration-200"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
                 />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-300 via-purple-300 to-indigo-300 text-white flex items-center justify-center font-semibold uppercase">
-                  {user.Username?.charAt(0)}
+              </div>
+
+              {showResults && results.length > 0 && (
+                <div className="absolute left-0 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-md z-50 max-h-64 overflow-y-auto">
+                  {results.map((user) => (
+                    <button
+                      key={user.ID}
+                      onClick={() => router.push(`/profile/${user.ID}`)}
+                      className="w-full text-left px-4 py-2 hover:bg-blue-50 transition flex items-center gap-3"
+                    >
+                      {user.AvatarURL ? (
+                        <img
+                          src={user.AvatarURL}
+                          alt={user.Username}
+                          className="w-8 h-8 rounded-full object-cover border border-gray-300"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-300 via-purple-300 to-indigo-300 text-white flex items-center justify-center font-semibold uppercase">
+                          {user.Username?.charAt(0)}
+                        </div>
+                      )}
+                      <div className="text-sm font-medium">{user.Username}</div>
+                    </button>
+                  ))}
                 </div>
               )}
-              <div className="text-sm font-medium">{user.Username}</div>
-            </button>
-          ))}
-        </div>
-      )}
             </div>
 
             {/* Profile Menu */}
@@ -410,22 +424,20 @@ export default function Home() {
                   variant="ghost"
                   className="p-0 bg-white/30 hover:bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl"
                 >
-                {
-                  userAvatar ? (
+                  {userAvatar ? (
                     <img
                       src={userAvatar}
                       alt="Profile"
                       className="h-10 w-10 rounded-lg border-2 border-white/30"
                     />
                   ) : (
-                  <div className="relative h-10 w-10 rounded-lg text-white font-semibold uppercase overflow-hidden group">
-                    <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 rounded-lg blur-sm opacity-70 group-hover:opacity-100 transition duration-200"></span>
-                    <div className="relative z-10 flex items-center justify-center h-full w-full">
-                      {session?.Username?.[0] || "?"}
+                    <div className="relative h-10 w-10 rounded-lg text-white font-semibold uppercase overflow-hidden group">
+                      <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 rounded-lg blur-sm opacity-70 group-hover:opacity-100 transition duration-200"></span>
+                      <div className="relative z-10 flex items-center justify-center h-full w-full">
+                        {session?.Username?.[0] || "?"}
+                      </div>
                     </div>
-                  </div>
-                  )
-                }
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -451,7 +463,36 @@ export default function Home() {
             </DropdownMenu>
           </div>
         </div>
+
+        {/* Mobile dropdown menu */}
+        {/* {mobileMenuOpen && (
+          <div className="md:hidden px-6 pb-4 bg-white/90 backdrop-blur-md shadow-md border-t border-white/20 space-y-2">
+            <Button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                router.push(`/`);
+              }}
+              variant="ghost"
+              className="w-full justify-start"
+            >
+              <House className="w-4 h-4 mr-2" />
+              Home
+            </Button>
+            <Button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                router.push(`/chat`);
+              }}
+              variant="ghost"
+              className="w-full justify-start"
+            >
+              <MessageSquareMore className="w-4 h-4 mr-2" />
+              Messages
+            </Button>
+          </div>
+        )} */}
       </div>
+
 
       {/* Main Content Layout */}
       <div className="pt-20 max-w-7xl mx-auto px-6 py-8">
