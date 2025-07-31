@@ -46,7 +46,7 @@ A full-stack **modern social networking platform** that enables users to chat, p
   └─ docker-compose.yml
 ```
 
-## ⚙️ Setup Instructions
+## Setup Instructions
 
 ### 1. Clone the Repository
 
@@ -79,14 +79,45 @@ docker-compose up --build
 
 ## Screenshots
 
-> (Include screenshots of the Home page, Chat UI, Post creation modal, Poll voting, and Mobile layout.)
+### Login Page
+![Login](./readme/login.png)
+
+### Welcome Page
+![Welcome](./readme/welcome.png)
+
+### Home Feed
+![Home](./readme/home.png)
+
+### Group View
+![Group](./readme/group.png)
+
+### Direct Messages
+![Direct](./readme/direct.png)
+
+### Events Page
+![Events](./readme/events.png)
+
+### Create Post Modal
+![Create Post](./readem/createPost.png)
+
+### Comments Section
+![Comments](./readem/comments.png)
+
+### Close Friends
+![Close Friends](./readme/close_friends.png)
+
+### Notifications
+![Notifications](./readme/notifications.png)
+
+### Profile Page
+![Profile](./readme/profile.png)
 
 ## Future Plans
 
 - Admin moderation panel
 - Dark mode toggle
 
-## 👤 Authors
+## Authors
 
 **Malak Ahmed**  
 Full-stack developer & cybersecurity enthusiast
