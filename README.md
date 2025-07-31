@@ -79,12 +79,6 @@ docker-compose up --build
 
 ## Screenshots
 
-### Login Page
-![Login](./readme/login.png)
-
-### Welcome Page
-![Welcome](./readme/welcome.png)
-
 ### Home Feed
 ![Home](./readme/home.png)
 
@@ -98,10 +92,7 @@ docker-compose up --build
 ![Events](./readme/events.png)
 
 ### Create Post Modal
-![Create Post](./readem/createPost.png)
-
-### Comments Section
-![Comments](./readem/comments.png)
+![Create Post](./readme/createPost.png)
 
 ### Close Friends
 ![Close Friends](./readme/close_friends.png)
